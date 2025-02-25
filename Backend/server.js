@@ -1,5 +1,6 @@
 const express = require("express");
 const { Pool } = require("pg");
+const taskRoutes = require("./routes/task");
 
 const app = express();
 
@@ -81,6 +82,8 @@ app.post("/create_project", async (req, res) => {
     return res.status(500).json({ error: err.message });
   }
 });
+
+app.use("/task", taskRoutes);
 
 // Start the server
 app.listen(3000, () => {
