@@ -3,6 +3,7 @@ import Login from './page/Login';
 import AdminDashboard from './page/AdminDashboard';
 import Project from './page/Project';
 import CreateProject from './page/CreateProject';
+import Home from './page/Home';
 
 
 function App() {
@@ -14,6 +15,7 @@ function App() {
         <Route path="/admin-dashboard" element={<AdminDashboard />} />
         <Route path="/project" element={<Project />} />
         <Route path="/create-project" element={<CreateProject />} />
+        <Route path="/home" element={<Home />} />
       </Routes>
     </BrowserRouter>
   );
