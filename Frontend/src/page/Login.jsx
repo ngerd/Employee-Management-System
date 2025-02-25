@@ -1,8 +1,9 @@
 import React from "react";
+import TextInput from "../component/TextInput";
 
 const Login = () => {
   return (
-    <section className="bg-white">
+    <section className="bg-gray-100">
       <div className="lg:grid lg:min-h-screen lg:grid-cols-12">
         <section className="relative flex h-32 items-end bg-gray-900 lg:col-span-5 lg:h-full xl:col-span-6">
           <img
@@ -28,11 +29,11 @@ const Login = () => {
             </a>
 
             <h2 className="mt-6 text-2xl font-bold text-white sm:text-3xl md:text-4xl">
-            Welcome to ICS 🐱
+              Welcome to ICS 🐱
             </h2>
 
             <p className="mt-4 leading-relaxed text-white/90">
-            Some description about the website.
+              Some description about the website.
             </p>
           </div>
         </section>
@@ -68,38 +69,8 @@ const Login = () => {
             </div>
 
             <form action="#" className="mt-8 grid grid-cols-6 gap-6">
-              <div className="col-span-6 sm:col-span-3">
-                <label
-                  htmlFor="FirstName"
-                  className="block text-sm font-medium text-gray-700"
-                >
-                  First Name
-                </label>
-
-                <input
-                  type="text"
-                  id="FirstName"
-                  name="first_name"
-                  className="mt-1 h-10 w-full rounded-md border-gray-200 bg-white text-sm text-gray-700 shadow-xs"
-                />
-              </div>
-
-              <div className="col-span-6 sm:col-span-3">
-                <label
-                  htmlFor="LastName"
-                  className="block text-sm font-medium text-gray-700"
-                >
-                  Last Name
-                </label>
-
-                <input
-                  type="text"
-                  id="LastName"
-                  name="last_name"
-                  className="mt-1 h-10 w-full rounded-md border-gray-200 bg-white text-sm text-gray-700 shadow-xs"
-                />
-              </div>
-
+              <TextInput label="First Name" id="FirstName" name="first_name" />
+              <TextInput label="Last Name" id="LastName" name="last_name" />
               <div className="col-span-6">
                 <label
                   htmlFor="Email"
@@ -113,7 +84,7 @@ const Login = () => {
                   type="email"
                   id="Email"
                   name="email"
-                  className="mt-1 h-10 w-full rounded-md border-gray-200 bg-white text-sm text-gray-700 shadow-xs"
+                  className="mt-1 h-10 w-full rounded-md border-gray-300 bg-white text-sm text-gray-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 />
               </div>
 
@@ -130,7 +101,7 @@ const Login = () => {
                   type="password"
                   id="Password"
                   name="password"
-                  className="mt-1 h-10 w-full rounded-md border-gray-200 bg-white text-sm text-gray-700 shadow-xs"
+                  className="mt-1 h-10 w-full rounded-md border-gray-300 bg-white text-sm text-gray-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 />
               </div>
 
@@ -146,7 +117,7 @@ const Login = () => {
                   type="password"
                   id="PasswordConfirmation"
                   name="password_confirmation"
-                  className="mt-1 h-10 w-full rounded-md border-gray-200 bg-white text-sm text-gray-700 shadow-xs"
+                  className="mt-1 h-10 w-full rounded-md border-gray-300 bg-white text-sm text-gray-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 />
               </div>
 
@@ -156,10 +127,10 @@ const Login = () => {
                     type="checkbox"
                     id="MarketingAccept"
                     name="marketing_accept"
-                    className="size-5 rounded-md border-gray-200 bg-white shadow-xs"
+                    className="size-6 rounded-md border-gray-300 bg-white shadow-sm"
                   />
 
-                  <span className="text-sm text-gray-700">
+                  <span className="block text-sm font-medium text-gray-700">
                     Manager Role
                   </span>
                 </label>
