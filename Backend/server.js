@@ -1,5 +1,6 @@
 const express = require("express");
 const { Pool } = require("pg");
+const taskRoutes = require("./routes/task");
 
 const app = express();
 
@@ -10,12 +11,12 @@ app.use(express.json());
 const pool = new Pool({
   user: "postgres",
   host: "172.30.3.66",
-  database: "deploy",
+  database: "postgres",
   password: "cuoi08",
   port: 5432,
 });
 pool.connect();
-// // API endpoint to create timesheet entries for multiple employees
+// API endpoint to create timesheet entries for multiple employees
 // app.post("/create_timesheet", async (req, res) => {
 //   const { empIds, taskId, projectId, duration } = req.body;
 
@@ -70,7 +71,7 @@ app.post("/create_project", async (req, res) => {
   try {
     // Insert the new project into the Project table
     const result = await pool.query(
-      "INSERT INTO Project (projectName, projectDescription) VALUES ($1, $2) RETURNING *",
+      'INSERT INTO public."Project" ("projectname", "projectdescription") VALUES ($1, $2) RETURNING *',
       [projectName, projectDescription]
     );
 
@@ -81,6 +82,8 @@ app.post("/create_project", async (req, res) => {
     return res.status(500).json({ error: err.message });
   }
 });
+
+app.use("/task", taskRoutes);
 
 // Start the server
 app.listen(3000, () => {
