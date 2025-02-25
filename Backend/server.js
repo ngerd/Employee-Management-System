@@ -1,21 +1,13 @@
 const express = require("express");
-const { Pool } = require("pg");
 const taskRoutes = require("./routes/task");
+const createProject = require("./routes/create_project");
 
 const app = express();
 
 // Middleware to parse JSON request bodies
 app.use(express.json());
 
-// Configure your PostgreSQL connection details
-const pool = new Pool({
-  user: "postgres",
-  host: "172.30.3.66",
-  database: "postgres",
-  password: "cuoi08",
-  port: 5432,
-});
-pool.connect();
+
 // API endpoint to create timesheet entries for multiple employees
 // app.post("/create_timesheet", async (req, res) => {
 //   const { empIds, taskId, projectId, duration } = req.body;
@@ -58,31 +50,8 @@ app.get("/", (req, res) => {
   res.send("Hello World");
 });
 
-app.post("/create_project", async (req, res) => {
-  const { projectName, projectDescription } = req.body;
 
-  // Validate input: Ensure required fields are provided
-  if (!projectName) {
-    return res
-      .status(400)
-      .json({ error: "Missing required field: projectName" });
-  }
-
-  try {
-    // Insert the new project into the Project table
-    const result = await pool.query(
-      'INSERT INTO public."Project" ("projectname", "projectdescription") VALUES ($1, $2) RETURNING *',
-      [projectName, projectDescription]
-    );
-
-    // Return the created project record with status 201 (Created)
-    return res.status(201).json({ project: result.rows[0] });
-  } catch (err) {
-    // Handle any errors that occur during the query
-    return res.status(500).json({ error: err.message });
-  }
-});
-
+app.use("/create_project", createProject);
 app.use("/task", taskRoutes);
 
 // Start the server
