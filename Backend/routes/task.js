@@ -1,9 +1,8 @@
-const path = require("path");
-const express = require("express");
+import express from "express";
 const router = express.Router();
 
 router.get("/", (req, res) => {
   res.send("Task hello");
 });
 
-module.exports = router;
+export default router;
