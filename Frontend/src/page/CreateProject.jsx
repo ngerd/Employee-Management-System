@@ -42,14 +42,32 @@ const CreateProject = () => {
                                 </div>
 
                                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                                    <div>
-                                        <label className="sr-only" htmlFor="email">Email</label>
-                                        <input
-                                            className="w-full rounded-lg border-gray-200 p-3 text-sm"
-                                            placeholder="Email address"
-                                            type="email"
-                                            id="email"
-                                        />
+                                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                                        {/* Start Date */}
+                                        <div>
+                                            <label htmlFor="startDate" className="block text-sm font-medium text-gray-700">
+                                                Start Date
+                                            </label>
+                                            <input
+                                                type="date"
+                                                id="startDate"
+                                                name="startDate"
+                                                className="w-full rounded-lg border-gray-300 p-3 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                            />
+                                        </div>
+
+                                        {/* End Date */}
+                                        <div>
+                                            <label htmlFor="endDate" className="block text-sm font-medium text-gray-700">
+                                                End Date
+                                            </label>
+                                            <input
+                                                type="date"
+                                                id="endDate"
+                                                name="endDate"
+                                                className="w-full rounded-lg border-gray-300 p-3 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                            />
+                                        </div>
                                     </div>
 
                                     <div>
