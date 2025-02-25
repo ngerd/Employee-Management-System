@@ -10,7 +10,7 @@ app.use(express.json());
 const pool = new Pool({
   user: "postgres",
   host: "172.30.3.66",
-  database: "deploy",
+  database: "postgres",
   password: "cuoi08",
   port: 5432,
 });
@@ -70,7 +70,7 @@ app.post("/create_project", async (req, res) => {
   try {
     // Insert the new project into the Project table
     const result = await pool.query(
-      "INSERT INTO Project (projectName, projectDescription) VALUES ($1, $2) RETURNING *",
+      'INSERT INTO public."Project" ("projectname", "projectdescription") VALUES ($1, $2) RETURNING *',
       [projectName, projectDescription]
     );
 
