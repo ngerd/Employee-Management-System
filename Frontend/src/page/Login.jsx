@@ -160,25 +160,9 @@ const Login = () => {
                   />
 
                   <span className="text-sm text-gray-700">
-                    I want to receive emails about events, product updates and
-                    company announcements.
+                    Manager Role
                   </span>
                 </label>
-              </div>
-
-              <div className="col-span-6">
-                <p className="text-sm text-gray-500">
-                  By creating an account, you agree to our
-                  <a href="#" className="text-gray-700 underline">
-                    {" "}
-                    terms and conditions{" "}
-                  </a>
-                  and
-                  <a href="#" className="text-gray-700 underline">
-                    privacy policy
-                  </a>
-                  .
-                </p>
               </div>
 
               <div className="col-span-6 sm:flex sm:items-center sm:gap-4">
@@ -186,13 +170,6 @@ const Login = () => {
                   Create an account
                 </button>
 
-                <p className="mt-4 text-sm text-gray-500 sm:mt-0">
-                  Already have an account?
-                  <a href="#" className="text-gray-700 underline">
-                    Log in
-                  </a>
-                  .
-                </p>
               </div>
             </form>
           </div>
