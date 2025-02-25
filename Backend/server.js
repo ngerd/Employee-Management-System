@@ -15,7 +15,7 @@ const pool = new Pool({
   port: 5432,
 });
 pool.connect();
-// // API endpoint to create timesheet entries for multiple employees
+// API endpoint to create timesheet entries for multiple employees
 // app.post("/create_timesheet", async (req, res) => {
 //   const { empIds, taskId, projectId, duration } = req.body;
 
