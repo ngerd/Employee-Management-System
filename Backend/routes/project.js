@@ -2,7 +2,7 @@ import express from "express";
 import pool from "../DB.js";
 const router = express.Router();
 
-router.post("/", async (req, res) => {
+router.post("/create_project", async (req, res) => {
   const { project_id, project_name, project_description, start_date, end_date, created_at } = req.body;
 
   // Validate input
@@ -13,7 +13,7 @@ router.post("/", async (req, res) => {
   try {
     // Insert the new project into the Project table
     const result = await pool.query(
-      'INSERT INTO public."Project" ("project_id", "project_name", "project_description", "start_date", "end_date","created_at") VALUES ($1, $2, $3, $4, $5, $6) RETURNING *',
+      'INSERT INTO public."Projects" ("project_id", "project_name", "project_description", "start_date", "end_date","created_at") VALUES ($1, $2, $3, $4, $5, $6) RETURNING *',
       [project_id, project_name, project_description, start_date, end_date,created_at]
     );
     return res.status(201).json({ project: result.rows[0] });
