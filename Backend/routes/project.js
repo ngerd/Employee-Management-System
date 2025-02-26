@@ -13,7 +13,7 @@ router.post("/create_project", async (req, res) => {
     // Insert the new project into the Project table
     const result = await pool.query(
       'INSERT INTO public."Projects" ("project_id", "project_name", "project_description", "start_date", "end_date","created_at") VALUES ($1, $2, $3, $4, $5, $6) RETURNING *',
-      [project_id, project_name, project_description, start_date, end_date,created_at]
+      [project_id, project_name, project_description, start_date, end_date, created_at]
     );
     return res.status(201).json({ project: result.rows[0] });
   } catch (err) {
@@ -21,23 +21,23 @@ router.post("/create_project", async (req, res) => {
   }
 });
 
-router.post('/get-project', async (req, res) =>{
+router.post('/get-project', async (req, res) => {
   const { employee_id } = req.body;
 
-  if(!employee_id){
-    return res.status(400).json({error: "employee ID is required"})
+  if (!employee_id) {
+    return res.status(400).json({ error: "employee ID is required" })
   }
-  
-  try{
+
+  try {
     const result = await pool.query(
       'SELECT * FROM public."Employee_projects" WHERE employee_id = $1', [employee_id]);
 
-    if(result.rows.length === 0){
-      return res.status(404).json({error: "Project not found"});
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: "Project not found" });
     }
 
-  }catch(err){
-    return res.status(500).json({error: err.message})
+  } catch (err) {
+    return res.status(500).json({ error: err.message })
   }
 });
 
@@ -86,4 +86,46 @@ router.post('/info', async (req, res) => {
   }
 });
 
+
+router.post("/update", async (req, res) => {
+  const { project_id, project_name, project_description, end_date } = req.body;
+
+  if (!project_id) {
+    return res.status(400).json({ error: "Project ID must be provided" })
+  }
+
+  if (project_name === undefined &&
+    project_description === undefined &&
+    end_date === undefined
+  ) {
+    return res.status(400).json({ error: "At least one field must be provided to be update" });
+  }
+
+  try {
+    const updateQuery = `UPDATE public."Projects" 
+                           SET  project_name = COALESCE($1, project_name),
+                                project_description = COALESCE($2, project_description),
+                                end_date = COALESCE($3, end_date)
+                            WHERE project_id = $4
+                            RETURNING *`;
+                            
+    const value = [project_name, project_description, end_date, project_id];
+    const result = await pool.query(updateQuery, value);
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: "Project not found." });
+    }
+    return res.status(201).json({ project: result.rows[0] });
+  } catch (err) {
+      // Handle foreign key violation errors (e.g., invalid projectId)
+    if (err.code === '23503') {
+      if (err.detail && err.detail.includes('table public."Projects"')) {
+        return res.status(400).json({ err: `Project with ID ${project_id} does not exist.` });
+      }
+      return res.status(400).json({ err: 'Foreign key constraint violation.' });
+    }
+    console.error('Error updating task:', err);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
 export default router;
