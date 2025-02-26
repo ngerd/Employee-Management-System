@@ -5,14 +5,15 @@ const router = express.Router();
 router.post("/create_project", async (req, res) => {
   const { project_id, project_name, project_description, start_date, end_date} = req.body;
   // Validate input
-  if (!project_name) {
+  if (!project_name && !project_id) {
     return res.status(400).json({ error: "Missing required field: projectName" });
   }
 
   try {
     // Insert the new project into the Project table
     const result = await pool.query(
-      `INSERT INTO public."Projects" ("project_id", "project_name", "project_description", "start_date", "end_date","created_at") VALUES ($1, $2, $3, $4, $5, TO_CHAR(NOW(), 'YYYY-MM-DD HH24:MI')) RETURNING *`,
+      `INSERT INTO public."Projects" ("project_id", "project_name", "project_description", "start_date", "end_date","created_at") 
+      VALUES ($1, $2, $3, $4, $5, TO_CHAR(NOW(), 'YYYY-MM-DD HH24:MI')) RETURNING *`,
       [project_id, project_name, project_description, start_date, end_date]
     );
     return res.status(201).json({ project: result.rows[0] });
@@ -168,4 +169,19 @@ router.post("/add-employee", async (req, res) => {
     res.status(500).json({ error: "Internal Server Error" });
   }
 });
+
+//Delete employee from project
+router.post("/delete-employee", async (req, res) => {
+    const {employee_id} = req.body;
+    if(!employee_id){
+      return res.status(404).json({error: "employee ID is required"})
+    }
+
+    try{
+      const deleteQuery = `DELETE FROM `
+    }catch(error){
+      console.error("Error deleting employee: ", error);
+      res.status(500).json({ error: "Internal Server Error" })
+    }
+})
 export default router;
