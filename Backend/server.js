@@ -1,6 +1,6 @@
 import express from "express";
 import taskRoutes from "./routes/task.js";
-import createProject from "./routes/create_project.js";
+import createProject from "./routes/project.js";
 import authRoutes from "./routes/auth.js";
 
 const app = express();
@@ -9,7 +9,7 @@ const app = express();
 app.use(express.json());
 
 // Mount routes
-app.use("/create_project", createProject);
+app.use("/projects", createProject);
 app.use("/task", taskRoutes);
 app.use("/", authRoutes);
 
