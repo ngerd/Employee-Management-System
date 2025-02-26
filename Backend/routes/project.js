@@ -4,7 +4,6 @@ const router = express.Router();
 
 router.post("/create_project", async (req, res) => {
   const { project_id, project_name, project_description, start_date, end_date, created_at } = req.body;
-
   // Validate input
   if (!project_name) {
     return res.status(400).json({ error: "Missing required field: projectName" });
@@ -19,6 +18,26 @@ router.post("/create_project", async (req, res) => {
     return res.status(201).json({ project: result.rows[0] });
   } catch (err) {
     return res.status(500).json({ error: err.message });
+  }
+});
+
+router.post('/get-project', async (req, res) =>{
+  const { employee_id } = req.body;
+
+  if(!employee_id){
+    return res.status(400).json({error: "employee ID is required"})
+  }
+  
+  try{
+    const result = await pool.query(
+      'SELECT * FROM public."Employee_projects" WHERE employee_id = $1', [employee_id]);
+
+    if(result.rows.length === 0){
+      return res.status(404).json({error: "Project not found"});
+    }
+
+  }catch(err){
+    return res.status(500).json({error: err.message})
   }
 });
 
