@@ -1,0 +1,65 @@
+SET search_path TO project_management;  -- Use the schema
+
+CREATE TABLE Project
+(
+  project_id SERIAL PRIMARY KEY,
+  project_name VARCHAR(255) NOT NULL,
+  project_description TEXT NOT NULL,
+  start_date DATE NOT NULL,
+  due_date DATE NOT NULL,
+  project_status VARCHAR(50) NOT NULL,
+  managerId INT NOT NULL
+);
+
+CREATE TABLE Task
+(
+  task_id SERIAL PRIMARY KEY,
+  project_id INT NOT NULL,
+  task_name VARCHAR(255) NOT NULL,
+  task_description TEXT NOT NULL,
+  start_date DATE NOT NULL,
+  due_date DATE NOT NULL,
+  cost DECIMAL(10,2) NOT NULL,
+  task_status VARCHAR(50) NOT NULL,
+  FOREIGN KEY (project_id) REFERENCES Project(project_id) ON DELETE CASCADE
+);
+
+CREATE TABLE Role
+(
+  role_id SERIAL PRIMARY KEY,
+  role_name VARCHAR(255) NOT NULL,
+  pay_rate_SG DECIMAL(10,2) NOT NULL,
+  description TEXT NOT NULL,
+  pay_rate_VN DECIMAL(10,2) NOT NULL
+);
+
+CREATE TABLE Employee
+(
+  employee_id SERIAL PRIMARY KEY,
+  firstname VARCHAR(255) NOT NULL,
+  lastname VARCHAR(255) NOT NULL,
+  email VARCHAR(255) UNIQUE NOT NULL,
+  password VARCHAR(255) NOT NULL,
+  createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  isManager BOOLEAN NOT NULL,
+  role_id INT NOT NULL,
+  FOREIGN KEY (role_id) REFERENCES Role(role_id) ON DELETE CASCADE
+);
+
+CREATE TABLE Member
+(
+  project_id INT NOT NULL,
+  employee_id INT NOT NULL,
+  PRIMARY KEY (project_id, employee_id),
+  FOREIGN KEY (project_id) REFERENCES Project(project_id) ON DELETE CASCADE,
+  FOREIGN KEY (employee_id) REFERENCES Employee(employee_id) ON DELETE CASCADE
+);
+
+CREATE TABLE Task_Assignment
+(
+  employee_id INT NOT NULL,
+  task_id INT NOT NULL,
+  PRIMARY KEY (employee_id, task_id),
+  FOREIGN KEY (employee_id) REFERENCES Employee(employee_id) ON DELETE CASCADE,
+  FOREIGN KEY (task_id) REFERENCES Task(task_id) ON DELETE CASCADE
+);
