@@ -3,7 +3,7 @@ import pool from "../DB.js";
 const router = express.Router();
 
 router.post("/create_project", async (req, res) => {
-  const { project_id, project_name, project_description, start_date, end_date, created_at } = req.body;
+  const { project_id, project_name, project_description, start_date, end_date} = req.body;
   // Validate input
   if (!project_name) {
     return res.status(400).json({ error: "Missing required field: projectName" });
@@ -12,8 +12,8 @@ router.post("/create_project", async (req, res) => {
   try {
     // Insert the new project into the Project table
     const result = await pool.query(
-      'INSERT INTO public."Projects" ("project_id", "project_name", "project_description", "start_date", "end_date","created_at") VALUES ($1, $2, $3, $4, $5, $6) RETURNING *',
-      [project_id, project_name, project_description, start_date, end_date, created_at]
+      `INSERT INTO public."Projects" ("project_id", "project_name", "project_description", "start_date", "end_date","created_at") VALUES ($1, $2, $3, $4, $5, TO_CHAR(NOW(), 'YYYY-MM-DD HH24:MI')) RETURNING *`,
+      [project_id, project_name, project_description, start_date, end_date]
     );
     return res.status(201).json({ project: result.rows[0] });
   } catch (err) {
