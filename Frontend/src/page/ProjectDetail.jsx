@@ -1,6 +1,6 @@
 import React from 'react'
 
-function ViewProject() {
+function ProjectDetail() {
   return (
     <div>
       View Project
@@ -8,4 +8,4 @@ function ViewProject() {
   )
 }
 
-export default ViewProject
+export default ProjectDetail

@@ -4,8 +4,7 @@ import AdminDashboard from './page/AdminDashboard';
 import Project from './page/Project';
 import CreateProject from './page/CreateProject';
 import Home from './page/Home';
-import ProjectList from './page/ProjectList';
-import ViewProject from './page/ViewProject';
+import ProjectDetail from './page/ProjectDetail';
 
 function App() {
   return (
@@ -16,7 +15,7 @@ function App() {
         <Route path="/admin-dashboard" element={<AdminDashboard />} />
         <Route path="/project" element={<Project />} />
         <Route path="/create-project" element={<CreateProject />} />
-        <Route path="/view-project" element={<ViewProject />} />
+        <Route path="/project-detail" element={<ProjectDetail />} />
         <Route path="/home" element={<Home />} />
       </Routes>
     </BrowserRouter>
