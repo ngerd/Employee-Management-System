@@ -82,7 +82,7 @@ const CreateProject = () => {
                             type="submit"
                             className="inline-block w-full rounded-lg bg-black px-5 py-3 font-medium text-white sm:w-auto"
                         >
-                            Send Enquiry
+                            Create Project
                         </button>
                     </div>
                 </div>
