@@ -21,6 +21,7 @@ router.post("/create_project", async (req, res) => {
   }
 });
 
+//Get all employess's Projects
 router.post('/get-project', async (req, res) => {
   const { employee_id } = req.body;
 
@@ -41,6 +42,7 @@ router.post('/get-project', async (req, res) => {
   }
 });
 
+//Get Project info
 router.post('/info', async (req, res) => {
   const { projectId } = req.body;
 
@@ -86,7 +88,7 @@ router.post('/info', async (req, res) => {
   }
 });
 
-
+//Update Project
 router.post("/update", async (req, res) => {
   const { project_id, project_name, project_description, end_date } = req.body;
 
@@ -117,15 +119,53 @@ router.post("/update", async (req, res) => {
     }
     return res.status(201).json({ project: result.rows[0] });
   } catch (err) {
-      // Handle foreign key violation errors (e.g., invalid projectId)
-    if (err.code === '23503') {
-      if (err.detail && err.detail.includes('table public."Projects"')) {
-        return res.status(400).json({ err: `Project with ID ${project_id} does not exist.` });
-      }
-      return res.status(400).json({ err: 'Foreign key constraint violation.' });
-    }
     console.error('Error updating task:', err);
     res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+//Add employee to project
+router.post("/add-employee", async (req, res) => {
+  const {employee_id, project_id, role_id} = req.body;
+  
+  if(!employee_id || !project_id || !role_id){
+    return res.status(400).json({error: "Missing reqiured field"});
+  }
+
+  try{
+    const addEmployeeQuery = `INSERT INTO public."Employee_projects" (employee_id, project_id, role_id, assigned_at)
+                              VALUES ($1, $2, $3, TO_CHAR(NOW(), 'YYYY-MM-DD HH24:MI')) RETURNING *`;
+    const value = [employee_id, project_id, role_id];
+    const result = await pool.query(addEmployeeQuery, value);
+    return res.status(201).json({data: result.rows[0]});
+  }catch(error){
+    // Handle duplicate key error (assignment already exists)
+    if (error.code === "23505") {
+      return res.status(400).json({
+        error: `Employee ${employee_id}  already exists.`,
+      });
+    }
+    // Check if error is a foreign key violation (error code 23503)
+    if (error.code === "23503") {
+      if (error.detail && error.detail.includes('table public."Projects"')) {
+        return res
+          .status(400)
+          .json({ error: `Project with ID ${project_id} does not exist.` });
+      } else if (error.detail && error.detail.includes('table public."Employees"')) {
+        return res
+          .status(400)
+          .json({ error: `Employee with ID ${employee_id} does not exist.` });
+      }else if(error.detail && error.detail.includes('table Public."Roles"')){
+        return res
+          .status(400)
+          .json({ error: `Role with ID ${role_id} does not exist.` });
+      }
+      return res
+        .status(400)
+        .json({ error: "Foreign key constraint violation." });
+    }
+    console.error("Error assigning task:", error);
+    res.status(500).json({ error: "Internal Server Error" });
   }
 });
 export default router;
