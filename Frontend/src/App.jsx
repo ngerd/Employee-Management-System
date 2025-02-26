@@ -18,7 +18,6 @@ function App() {
         <Route path="/create-project" element={<CreateProject />} />
         <Route path="/view-project" element={<ViewProject />} />
         <Route path="/home" element={<Home />} />
-        <Route path="/project-list" element={<ProjectList />} /> {/* Add this line */}
       </Routes>
     </BrowserRouter>
   );
