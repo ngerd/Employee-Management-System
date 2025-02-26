@@ -22,8 +22,8 @@ function Navbar() {
 
   return (
     <div className="flex items-center justify-between py-2 px-3 md:px-5 bg-white drop-shadow-md text-black">
-      <a href="#">
-        <img src={logo} alt="" className="w-40 hover:scale-152 transition-all"/>
+      <a href="/home">
+        <img src={logo} alt="" className="w-40 hover:scale-110 transition-all"/>
       </a>
       <div className="relative" ref={dropdownRef}>
         <button
