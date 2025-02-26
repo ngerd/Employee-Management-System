@@ -1,13 +1,12 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import Login from './page/Login';
 import AdminDashboard from './page/AdminDashboard';
 import Project from './page/Project';
 import CreateProject from './page/CreateProject';
 import Home from './page/Home';
 import ProjectDetail from './page/ProjectDetail';
 import Navbar from './component/Navbar';
-import Login from "./page/Login";
 import Timesheet from "./page/Timesheet";
+import Login from "./page/Login";
 import CreateEmployee from './page/CreateEmployee';
 
 
@@ -18,8 +17,8 @@ function App() {
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Navigate to="/admin-dashboard" replace />} />
-          <Route path="/login" element={<Login />} />
           <Route path="/admin-dashboard" element={<AdminDashboard />} />
+          <Route path="/login" element={<Login />} />
           <Route path="/project" element={<Project />} />
           <Route path="/create-project" element={<CreateProject />} />
           <Route path="/project-detail" element={<ProjectDetail />} />
