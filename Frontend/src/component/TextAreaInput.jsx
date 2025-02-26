@@ -1,4 +1,4 @@
-const TextareaInput = ({ label, id, name }) => {
+const TextAreaInput = ({ label, id, name }) => {
     return (
         <div>
             <label htmlFor={id} className="block text-sm font-medium text-gray-700">
@@ -14,4 +14,4 @@ const TextareaInput = ({ label, id, name }) => {
     );
 };
 
-export default TextareaInput;
+export default TextAreaInput;

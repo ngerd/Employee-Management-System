@@ -2,23 +2,42 @@ import express from "express";
 import pool from "../DB.js";
 const router = express.Router();
 
-router.post("/", async (req, res) => {
-  const { project_id, projectName, projectDescription } = req.body;
-
+router.post("/create_project", async (req, res) => {
+  const { project_id, project_name, project_description, start_date, end_date, created_at } = req.body;
   // Validate input
-  if (!projectName) {
+  if (!project_name) {
     return res.status(400).json({ error: "Missing required field: projectName" });
   }
 
   try {
     // Insert the new project into the Project table
     const result = await pool.query(
-      'INSERT INTO public."Project" ("project_id", "projectname", "projectdescription") VALUES ($1, $2, $3) RETURNING *',
-      [project_id, projectName, projectDescription]
+      'INSERT INTO public."Projects" ("project_id", "project_name", "project_description", "start_date", "end_date","created_at") VALUES ($1, $2, $3, $4, $5, $6) RETURNING *',
+      [project_id, project_name, project_description, start_date, end_date,created_at]
     );
     return res.status(201).json({ project: result.rows[0] });
   } catch (err) {
     return res.status(500).json({ error: err.message });
+  }
+});
+
+router.post('/get-project', async (req, res) =>{
+  const { employee_id } = req.body;
+
+  if(!employee_id){
+    return res.status(400).json({error: "employee ID is required"})
+  }
+  
+  try{
+    const result = await pool.query(
+      'SELECT * FROM public."Employee_projects" WHERE employee_id = $1', [employee_id]);
+
+    if(result.rows.length === 0){
+      return res.status(404).json({error: "Project not found"});
+    }
+
+  }catch(err){
+    return res.status(500).json({error: err.message})
   }
 });
 

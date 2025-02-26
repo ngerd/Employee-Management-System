@@ -1,6 +1,6 @@
 import React from 'react';
 import TextInput from '../component/TextInput';
-import TextareaInput from '../component/TextAreaInput';
+import TextAreaInput from '../component/TextAreaInput';
 
 
 const CreateProject = () => {
@@ -39,7 +39,7 @@ const CreateProject = () => {
                                         />
                                     </div>
                                 </div>
-                                <TextareaInput label="Project Description" id="projectDescription" name="project_description" />
+                                <TextAreaInput label="Project Description" id="projectDescription" name="project_description" />
                             </form>
                         </div>
 
@@ -73,7 +73,7 @@ const CreateProject = () => {
                                         />
                                     </div>
                                 </div>
-                                <TextareaInput label="Project Description" id="projectDescription" name="project_description" />
+                                <TextAreaInput label="Project Description" id="projectDescription" name="project_description" />
                             </form>
                         </div>
                     </div>
