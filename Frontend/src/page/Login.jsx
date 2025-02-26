@@ -1,5 +1,6 @@
 import React from "react";
-import TextInput from "../component/TextInput";
+import EmailInput from "../component/EmailInput";
+import PasswordInput from "../component/PasswordInput";
 
 const Login = () => {
   return (
@@ -68,79 +69,14 @@ const Login = () => {
               </p>
             </div>
 
-            <form action="#" className="mt-8 grid grid-cols-6 gap-6">
-              <TextInput label="First Name" id="FirstName" name="first_name" />
-              <TextInput label="Last Name" id="LastName" name="last_name" />
-              <div className="col-span-6">
-                <label
-                  htmlFor="Email"
-                  className="block text-sm font-medium text-gray-700"
-                >
-                  {" "}
-                  Email{" "}
-                </label>
+            <form action="#" className="space-y-4">
+              <EmailInput label="Email" id="Email" name="email" type="email" />
+              <PasswordInput label="Password" id="Password" name="password" type="password" />
 
-                <input
-                  type="email"
-                  id="Email"
-                  name="email"
-                  className="mt-1 h-10 w-full rounded-md border-gray-300 bg-white text-sm text-gray-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                />
-              </div>
-
-              <div className="col-span-6 sm:col-span-3">
-                <label
-                  htmlFor="Password"
-                  className="block text-sm font-medium text-gray-700"
-                >
-                  {" "}
-                  Password{" "}
-                </label>
-
-                <input
-                  type="password"
-                  id="Password"
-                  name="password"
-                  className="mt-1 h-10 w-full rounded-md border-gray-300 bg-white text-sm text-gray-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                />
-              </div>
-
-              <div className="col-span-6 sm:col-span-3">
-                <label
-                  htmlFor="PasswordConfirmation"
-                  className="block text-sm font-medium text-gray-700"
-                >
-                  Password Confirmation
-                </label>
-
-                <input
-                  type="password"
-                  id="PasswordConfirmation"
-                  name="password_confirmation"
-                  className="mt-1 h-10 w-full rounded-md border-gray-300 bg-white text-sm text-gray-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                />
-              </div>
-
-              <div className="col-span-6">
-                <label htmlFor="MarketingAccept" className="flex gap-4">
-                  <input
-                    type="checkbox"
-                    id="MarketingAccept"
-                    name="marketing_accept"
-                    className="size-6 rounded-md border-gray-300 bg-white shadow-sm"
-                  />
-
-                  <span className="block text-sm font-medium text-gray-700">
-                    Manager Role
-                  </span>
-                </label>
-              </div>
-
-              <div className="col-span-6 sm:flex sm:items-center sm:gap-4">
+              <div className="col-span-6 mt-7 sm:flex sm:items-center sm:gap-4">
                 <button className="inline-block shrink-0 rounded-md border border-blue-600 bg-blue-600 px-12 py-3 text-sm font-medium text-white transition hover:bg-white hover:text-blue-600 focus:ring-3 focus:outline-none">
-                  Create an account
+                  Login
                 </button>
-
               </div>
             </form>
           </div>
