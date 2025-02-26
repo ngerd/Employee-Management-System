@@ -7,6 +7,7 @@ import Home from './page/Home';
 import ProjectDetail from './page/ProjectDetail';
 import Navbar from './component/Navbar';
 import Login from "./page/Login";
+import Timesheet from "./page/Timesheet";
 
 function App() {
   return (
@@ -22,6 +23,8 @@ function App() {
           <Route path="/project-detail" element={<ProjectDetail />} />
           <Route path="/login" element={<Login />} />
           <Route path="/home" element={<Home />} />
+          <Route path="/timesheet" element={<Timesheet />} />
+          
         </Routes>
       </BrowserRouter>
     </div>
