@@ -132,4 +132,104 @@ router.post('/assign', async (req, res) => {
   }
 });
 
+router.post('/update', async (req, res) => {
+  const { taskId, projectId, taskName, taskDescription, startDate, dueDate } = req.body;
+
+  if (!taskId) {
+    return res.status(400).json({ error: "Task ID is required in the request body." });
+  }
+
+  // Check if at least one field to update is provided
+  if (
+    projectId === undefined &&
+    taskName === undefined &&
+    taskDescription === undefined &&
+    startDate === undefined &&
+    dueDate === undefined
+  ) {
+    return res.status(400).json({ error: "At least one field must be provided to update." });
+  }
+
+  try {
+    const updateQuery = `
+      UPDATE tasks 
+      SET project_id = COALESCE($1, project_id),
+          task_name = COALESCE($2, task_name),
+          task_description = COALESCE($3, task_description),
+          start_date = COALESCE($4, start_date),
+          due_date = COALESCE($5, due_date)
+      WHERE task_id = $6
+      RETURNING *
+    `;
+    const values = [projectId, taskName, taskDescription, startDate, dueDate, taskId];
+    const result = await pool.query(updateQuery, values);
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: "Task not found." });
+    }
+
+    res.json(result.rows[0]);
+  } catch (error) {
+    // Handle foreign key violation errors (e.g., invalid projectId)
+    if (error.code === '23503') {
+      if (error.detail && error.detail.includes('table "projects"')) {
+        return res.status(400).json({ error: `Project with ID ${projectId} does not exist.` });
+      }
+      return res.status(400).json({ error: 'Foreign key constraint violation.' });
+    }
+    console.error('Error updating task:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+router.delete('/delete', async (req, res) => {
+  const { taskId } = req.body;
+
+  if (!taskId) {
+    return res.status(400).json({ error: 'Task ID is required in the request body.' });
+  }
+
+  try {
+    const deleteQuery = 'DELETE FROM tasks WHERE task_id = $1 RETURNING *';
+    const result = await pool.query(deleteQuery, [taskId]);
+
+    // If no rows are returned, the task wasn't found
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'Task not found.' });
+    }
+
+    res.json({ message: 'Task deleted successfully.' });
+  } catch (error) {
+    console.error('Error deleting task:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+router.delete('/unassign', async (req, res) => {
+  const { employeeId, taskId } = req.body;
+
+  if (!employeeId || !taskId) {
+    return res.status(400).json({ error: 'Both employeeId and taskId are required in the request body.' });
+  }
+
+  try {
+    const deleteQuery = `
+      DELETE FROM employee_tasks 
+      WHERE employee_id = $1 AND task_id = $2
+      RETURNING *
+    `;
+    const result = await pool.query(deleteQuery, [employeeId, taskId]);
+
+    // If no rows are returned, then the assignment wasn't found
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'Assignment not found.' });
+    }
+
+    res.json({ message: 'Task unassigned successfully.' });
+  } catch (error) {
+    console.error('Error unassigning task:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
 export default router;
