@@ -78,20 +78,20 @@ const CreateEmployee = () => {
             </div>
 
             <div className="col-span-6">
-                <label htmlFor="MarketingAccept" className="flex gap-4">
-                  <input
-                    type="checkbox"
-                    id="MarketingAccept"
-                    name="marketing_accept"
-                    className="size-6 rounded-md border-gray-300 bg-white shadow-sm"
-                  />
+              <label htmlFor="MarketingAccept" className="flex gap-4">
+                <input
+                  type="checkbox"
+                  id="MarketingAccept"
+                  name="marketing_accept"
+                  className="size-6 rounded-md border-gray-300 bg-white shadow-sm"
+                />
 
-                  <span className="block text-sm font-medium text-gray-700">
-                    Manager Role
-                  </span>
-                </label>
-              </div>
-              
+                <span className="block text-sm font-medium text-gray-700">
+                  Manager Role
+                </span>
+              </label>
+            </div>
+
           </form>
         </div>
         <div className="mt-4 text-right">

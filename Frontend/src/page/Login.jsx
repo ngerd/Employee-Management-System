@@ -1,5 +1,5 @@
 import React from "react";
-import EmailInput from "../component/EmailInput";
+import TextInput from "../component/TextInput";
 import PasswordInput from "../component/PasswordInput";
 
 const Login = () => {
@@ -70,7 +70,7 @@ const Login = () => {
             </div>
 
             <form action="#" className="space-y-4">
-              <EmailInput label="Email" id="Email" name="email" type="email" />
+              <TextInput label="Username" id="Username" name="username" />
               <PasswordInput label="Password" id="Password" name="password" type="password" />
 
               <div className="col-span-6 mt-7 sm:flex sm:items-center sm:gap-4">
