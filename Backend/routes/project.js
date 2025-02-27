@@ -178,7 +178,15 @@ router.post("/delete-employee", async (req, res) => {
     }
 
     try{
-      const deleteQuery = `DELETE FROM `
+      const deleteQuery = `DELETE FROM public."Employee_projects" WHERE employee_id = $1 RETURNING *`;
+      const result = await pool.query(deleteQuery, [employee_id]);
+
+      // If no rows are returned, the task wasn't found
+      if (result.rows.length === 0) {
+        return res.status(404).json({ error: "Employee not found." });
+      }
+
+      res.json({message: "Employee delete successfully"});
     }catch(error){
       console.error("Error deleting employee: ", error);
       res.status(500).json({ error: "Internal Server Error" })
