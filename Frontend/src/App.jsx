@@ -8,6 +8,7 @@ import Navbar from './component/Navbar';
 import Timesheet from "./page/Timesheet";
 import Login from "./page/Login";
 import CreateEmployee from './page/CreateEmployee';
+import CreateTimeslot from './page/CreateTimeslot';
 
 
 function App() {
@@ -24,7 +25,7 @@ function App() {
           <Route path="/create-employee" element={<CreateEmployee />} />
           <Route path="/home" element={<Home />} />
           <Route path="/timesheet" element={<Timesheet />} />
-          
+          <Route path="/create-timeslot" element={<CreateTimeslot />} />          
         </Routes>
       </BrowserRouter>
     </div>

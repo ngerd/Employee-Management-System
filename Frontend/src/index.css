@@ -4,6 +4,33 @@
 @import '@fontsource/roboto/500.css';
 @import '@fontsource/roboto/700.css';
 
+.sx-react-calendar-wrapper {
+  width: 100%; /* Take full width of the parent */
+  max-width: 1400px; /* Prevent it from becoming too large */
+  height: 80vh; /* Make it responsive to screen height */
+  max-height: 90vh; /* Prevent it from being too tall */
+}
+
+/* Responsive adjustments for smaller screens */
+@media (max-width: 1024px) {
+  .sx-react-calendar-wrapper {
+    height: 70vh; /* Reduce height for tablets */
+  }
+}
+
+@media (max-width: 768px) {
+  .sx-react-calendar-wrapper {
+    height: 60vh; /* Reduce height for mobile devices */
+  }
+}
+
+@media (max-width: 480px) {
+  .sx-react-calendar-wrapper {
+    height: 50vh; /* Further reduce height for small phones */
+  }
+}
+
+
 /* 
 :root {
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
