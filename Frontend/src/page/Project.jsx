@@ -101,7 +101,7 @@ const Project = () => {
         dataKey="project_id"
         emptyMessage="No projects found."
         showGridlines
-        className="rounded-lg shadow-md border border-gray-300 mt-4"
+        className="rounded-lg shadow-md border border-gray-300 mt-4 z-10"
         filters={filters}
         globalFilterFields={['project_name', 'project_status', 'nation']}
         filterDisplay="menu"
