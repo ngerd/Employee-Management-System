@@ -3,17 +3,18 @@ import pool from "../DB.js";
 const router = express.Router();
 
 router.post("/create_project", async (req, res) => {
-  const { project_id, project_name, project_description, start_date, end_date, created_at } = req.body;
+  const { project_id, project_name, project_description, start_date, end_date} = req.body;
   // Validate input
-  if (!project_name) {
+  if (!project_name && !project_id) {
     return res.status(400).json({ error: "Missing required field: projectName" });
   }
 
   try {
     // Insert the new project into the Project table
     const result = await pool.query(
-      'INSERT INTO public."Projects" ("project_id", "project_name", "project_description", "start_date", "end_date","created_at") VALUES ($1, $2, $3, $4, $5, $6) RETURNING *',
-      [project_id, project_name, project_description, start_date, end_date, created_at]
+      `INSERT INTO public."Projects" ("project_id", "project_name", "project_description", "start_date", "end_date","created_at") 
+      VALUES ($1, $2, $3, $4, $5, TO_CHAR(NOW(), 'YYYY-MM-DD HH24:MI')) RETURNING *`,
+      [project_id, project_name, project_description, start_date, end_date]
     );
     return res.status(201).json({ project: result.rows[0] });
   } catch (err) {
@@ -168,4 +169,27 @@ router.post("/add-employee", async (req, res) => {
     res.status(500).json({ error: "Internal Server Error" });
   }
 });
+
+//Delete employee from project
+router.post("/delete-employee", async (req, res) => {
+    const {employee_id} = req.body;
+    if(!employee_id){
+      return res.status(404).json({error: "employee ID is required"})
+    }
+
+    try{
+      const deleteQuery = `DELETE FROM public."Employee_projects" WHERE employee_id = $1 RETURNING *`;
+      const result = await pool.query(deleteQuery, [employee_id]);
+
+      // If no rows are returned, the task wasn't found
+      if (result.rows.length === 0) {
+        return res.status(404).json({ error: "Employee not found." });
+      }
+
+      res.json({message: "Employee delete successfully"});
+    }catch(error){
+      console.error("Error deleting employee: ", error);
+      res.status(500).json({ error: "Internal Server Error" })
+    }
+})
 export default router;
