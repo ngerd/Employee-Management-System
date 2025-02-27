@@ -25,9 +25,23 @@ const Login = () => {
 
       <div className="flex items-center justify-center px-12 py-12 sm:px-16 lg:col-span-7 lg:px-32 lg:py-32 xl:col-span-6">
         <div className="rounded-lg bg-white p-16 shadow-xl max-w-2xl w-full">
+          <h2 className="text-2xl pb-10 font-extrabold text-gray-900">
+            Login
+          </h2>
           <form action="#" className="space-y-6">
-            <TextInput label="Username" id="Username" name="username" className="w-full px-6 py-4 text-lg" />
-            <PasswordInput label="Password" id="Password" name="password" type="password" className="w-full px-6 py-4 text-lg" />
+            <TextInput
+              label="Username"
+              id="Username"
+              name="username"
+              className="w-full px-6 py-4 text-lg"
+            />
+            <PasswordInput
+              label="Password"
+              id="Password"
+              name="password"
+              type="password"
+              className="w-full px-6 py-4 text-lg"
+            />
 
             <div className="col-span-6 mt-7 sm:flex sm:items-center sm:gap-4">
               <button className="inline-block shrink-0 rounded-md border border-blue-600 bg-blue-600 px-12 py-3 text-sm font-medium text-white transition hover:bg-pink-200 hover:text-blue-800 focus:ring-3 focus:outline-none">
@@ -37,7 +51,6 @@ const Login = () => {
           </form>
         </div>
       </div>
-
     </div>
   );
 };
