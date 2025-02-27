@@ -63,7 +63,7 @@ const Project = () => {
   const viewButtonTemplate = (rowData) => {
     return (
       <button
-        onClick={() => navigate(`/project-detail/${rowData.project_id}`)}
+        onClick={() => navigate(`/project-information/${rowData.project_id}`)}
         className="inline-block rounded-md bg-green-700 px-4 py-2 text-xs font-medium text-white hover:bg-green-500"
       >
         View
