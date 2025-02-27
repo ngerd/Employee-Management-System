@@ -111,8 +111,8 @@ const Project = () => {
         </button>
       </div>
 
-      <div className="mt-4 overflow-x-auto min-h-[300px]">
-        <table className="min-w-full divide-y-2 divide-gray-200 bg-white text-sm">
+      <div className="mt-4 rounded-lg bg-white shadow-lg overflow-x-auto min-h-[300px]">
+        <table className="min-w-full divide-y-2 divide-gray-200 text-sm">
           <thead>
             <tr>
               {["name", "duration", "manager", "code"].map((column) => (
