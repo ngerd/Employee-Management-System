@@ -1,8 +1,6 @@
+@import '@fontsource/poppins';
 @import "tailwindcss";
-@import '@fontsource/roboto/300.css';
-@import '@fontsource/roboto/400.css';
-@import '@fontsource/roboto/500.css';
-@import '@fontsource/roboto/700.css';
+
 
 .sx-react-calendar-wrapper {
   width: 100%; /* Take full width of the parent */
@@ -30,10 +28,8 @@
   }
 }
 
-
-/* 
 :root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  font-family: "Poppins", sans-serif;
   line-height: 1.5;
   font-weight: 400;
 
@@ -47,6 +43,7 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* 
 a {
   font-weight: 500;
   color: #646cff;

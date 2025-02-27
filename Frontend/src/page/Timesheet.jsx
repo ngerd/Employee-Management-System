@@ -1,9 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import { DateCalendar } from "@mui/x-date-pickers/DateCalendar";
 import { createEventModalPlugin } from "@schedule-x/event-modal";
 import { createDragAndDropPlugin } from "@schedule-x/drag-and-drop";
+import { useNavigate } from "react-router-dom";
 
 
 import { useCalendarApp, ScheduleXCalendar } from "@schedule-x/react";
@@ -18,6 +16,7 @@ import { createEventsServicePlugin } from "@schedule-x/events-service";
 import "@schedule-x/theme-default/dist/index.css";
 
 function Timesheet() {
+  const navigate = useNavigate();
   // Initialize ScheduleX Calendar
   const eventsService = useState(() => createEventsServicePlugin())[0];
 
@@ -58,7 +57,7 @@ function Timesheet() {
         </h1>
         <button
           className="rounded-md bg-blue-600 px-4 py-2 text-white font-medium hover:bg-blue-700"
-          onClick={() => navigate("/create-timeslot")}
+          onClick={() => navigate(`/create-timeslot`)}
         >
           Create Time Slot
         </button>
