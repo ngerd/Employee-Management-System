@@ -28,19 +28,15 @@ router.post("/get", async (req, res) => {
   const { projectId } = req.body;
 
   if (!projectId) {
-    return res
-      .status(400)
-      .json({ error: "Project ID is required in the request body." });
+    return res.status(400).json({ error: "Project ID is required." });
   }
 
   try {
-    const result = await pool.query(
-      'SELECT * FROM public."Tasks" WHERE project_id = $1',
-      [projectId]
-    );
+    const query = `SELECT * FROM public."task" WHERE project_id = $1`;
+    const result = await pool.query(query, [projectId]);
     res.json(result.rows);
   } catch (error) {
-    console.error("Error retrieving tasks:", error);
+    console.error("Error fetching tasks:", error);
     res.status(500).json({ error: "Internal Server Error" });
   }
 });
@@ -51,14 +47,12 @@ router.post("/info", async (req, res) => {
   const { taskId } = req.body;
 
   if (!taskId) {
-    return res
-      .status(400)
-      .json({ error: "Task ID is required as a query parameter." });
+    return res.status(400).json({ error: "Task ID is required." });
   }
 
   try {
-    // Query to get task details
-    const taskQuery = 'SELECT * FROM public."Tasks" WHERE task_id = $1';
+    // Query to fetch task details from the "Task" table
+    const taskQuery = `SELECT * FROM public."task" WHERE task_id = $1`;
     const taskResult = await pool.query(taskQuery, [taskId]);
 
     if (taskResult.rows.length === 0) {
@@ -67,12 +61,18 @@ router.post("/info", async (req, res) => {
 
     const task = taskResult.rows[0];
 
-    // Query to get employees assigned to this task
+    // Query to fetch assigned employees for this task from "Task_Assignment" and "Employee" tables
     const employeesQuery = `
-      SELECT e.employee_id, e.first_name, e.last_name, e.email
-      FROM public."Employee_task" et
-      JOIN public."Employees" e ON et.employee_id = e.employee_id
-      WHERE et.task_id = $1
+      SELECT 
+        e.employee_id,
+        e.firstname,
+        e.lastname,
+        e.email,
+        ta.emp_startdate,
+        ta.emp_enddate
+      FROM public."task_assignment" ta
+      JOIN public."employee" e ON ta.employee_id = e.employee_id
+      WHERE ta.task_id = $1
     `;
     const employeesResult = await pool.query(employeesQuery, [taskId]);
 
@@ -89,27 +89,39 @@ router.post("/info", async (req, res) => {
 //Add Task
 
 router.post("/add", async (req, res) => {
-  const { projectId, taskName, taskDescription, startDate, dueDate } = req.body;
+  const {
+    projectId,
+    taskName,
+    taskDescription,
+    startDate,
+    dueDate,
+    taskStatus, // optional; if not provided, we default to "pending"
+  } = req.body;
 
-  // Validate required fields
-  if (!projectId || !taskName) {
+  // Validate required fields (you might require taskDescription, startDate, and dueDate as well)
+  if (!projectId || !taskName || !taskDescription || !startDate || !dueDate) {
     return res.status(400).json({
-      error: "Project ID and task name are required in the request body.",
+      error:
+        "Project ID, task name, task description, start date, and due date are required in the request body.",
     });
   }
 
+  // Default task status to "pending" if not provided
+  const status = taskStatus || "pending";
+
   try {
     const insertQuery = `
-      INSERT INTO public."Tasks" (project_id, task_name, task_description, start_date, due_date)
-      VALUES ($1, $2, $3, $4, $5)
+      INSERT INTO public."task" (project_id, task_name, task_description, start_date, due_date, task_status)
+      VALUES ($1, $2, $3, $4, $5, $6)
       RETURNING task_id
     `;
     const values = [
       projectId,
       taskName,
       taskDescription,
-      startDate || null,
-      dueDate || null,
+      startDate,
+      dueDate,
+      status,
     ];
     const result = await pool.query(insertQuery, values);
 
@@ -117,7 +129,7 @@ router.post("/add", async (req, res) => {
   } catch (error) {
     // Check for foreign key violation (e.g., if projectId does not exist)
     if (error.code === "23503") {
-      if (error.detail && error.detail.includes('table "projects"')) {
+      if (error.detail && error.detail.includes('table "Project"')) {
         return res
           .status(400)
           .json({ error: `Project with ID ${projectId} does not exist.` });
@@ -143,15 +155,12 @@ router.post("/assign", async (req, res) => {
   }
 
   try {
-    // Generate the assigned_at timestamp as a formatted string
-    const assignedAt = formatDate(new Date());
-
     const query = `
-      INSERT INTO public."Employee_task" (employee_id, task_id, assigned_at)
-      VALUES ($1, $2, $3)
+      INSERT INTO public."task_assignment" (employee_id, task_id)
+      VALUES ($1, $2)
       RETURNING *
     `;
-    const result = await pool.query(query, [employeeId, taskId, assignedAt]);
+    const result = await pool.query(query, [employeeId, taskId]);
 
     res.status(201).json({
       message: "Task assigned successfully",
@@ -166,11 +175,11 @@ router.post("/assign", async (req, res) => {
     }
     // Check if error is a foreign key violation (error code 23503)
     if (error.code === "23503") {
-      if (error.detail && error.detail.includes('table "tasks"')) {
+      if (error.detail && error.detail.includes('table "task"')) {
         return res
           .status(400)
           .json({ error: `Task with ID ${taskId} does not exist.` });
-      } else if (error.detail && error.detail.includes('table "employees"')) {
+      } else if (error.detail && error.detail.includes('table "employee"')) {
         return res
           .status(400)
           .json({ error: `Employee with ID ${employeeId} does not exist.` });
@@ -187,8 +196,15 @@ router.post("/assign", async (req, res) => {
 //Update Task
 
 router.post("/update", async (req, res) => {
-  const { taskId, projectId, taskName, taskDescription, startDate, dueDate } =
-    req.body;
+  const {
+    taskId,
+    projectId,
+    taskName,
+    taskDescription,
+    startDate,
+    dueDate,
+    taskStatus,
+  } = req.body;
 
   if (!taskId) {
     return res
@@ -202,7 +218,8 @@ router.post("/update", async (req, res) => {
     taskName === undefined &&
     taskDescription === undefined &&
     startDate === undefined &&
-    dueDate === undefined
+    dueDate === undefined &&
+    taskStatus === undefined
   ) {
     return res
       .status(400)
@@ -211,13 +228,14 @@ router.post("/update", async (req, res) => {
 
   try {
     const updateQuery = `
-      UPDATE public."Tasks" 
+      UPDATE public."task" 
       SET project_id = COALESCE($1, project_id),
           task_name = COALESCE($2, task_name),
           task_description = COALESCE($3, task_description),
           start_date = COALESCE($4, start_date),
-          due_date = COALESCE($5, due_date)
-      WHERE task_id = $6
+          due_date = COALESCE($5, due_date),
+          task_status = COALESCE($6, task_status)
+      WHERE task_id = $7
       RETURNING *
     `;
     const values = [
@@ -226,6 +244,7 @@ router.post("/update", async (req, res) => {
       taskDescription,
       startDate,
       dueDate,
+      taskStatus,
       taskId,
     ];
     const result = await pool.query(updateQuery, values);
@@ -238,7 +257,7 @@ router.post("/update", async (req, res) => {
   } catch (error) {
     // Handle foreign key violation errors (e.g., invalid projectId)
     if (error.code === "23503") {
-      if (error.detail && error.detail.includes('table "projects"')) {
+      if (error.detail && error.detail.includes('table "project"')) {
         return res
           .status(400)
           .json({ error: `Project with ID ${projectId} does not exist.` });
@@ -265,7 +284,7 @@ router.delete("/delete", async (req, res) => {
 
   try {
     const deleteQuery =
-      'DELETE FROM public."Tasks" WHERE task_id = $1 RETURNING *';
+      'DELETE FROM public."task" WHERE task_id = $1 RETURNING *';
     const result = await pool.query(deleteQuery, [taskId]);
 
     // If no rows are returned, the task wasn't found
@@ -293,15 +312,19 @@ router.delete("/unassign", async (req, res) => {
 
   try {
     const deleteQuery = `
-      DELETE FROM public."Employee_tasks" 
-      WHERE employee_id = $1 AND task_id = $2
+      DELETE FROM public."task_assignment"
+      WHERE employee_id = $1
+        AND task_id = $2
+        AND emp_startdate IS NULL
+        AND emp_enddate IS NULL
       RETURNING *
     `;
     const result = await pool.query(deleteQuery, [employeeId, taskId]);
 
-    // If no rows are returned, then the assignment wasn't found
     if (result.rows.length === 0) {
-      return res.status(404).json({ error: "Assignment not found." });
+      return res
+        .status(404)
+        .json({ error: "Assignment not found or already ended." });
     }
 
     res.json({ message: "Task unassigned successfully." });
