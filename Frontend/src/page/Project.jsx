@@ -4,8 +4,7 @@ import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { Button } from 'primereact/button';
 import { InputText } from 'primereact/inputtext';
-import { IconField } from 'primereact/iconfield';
-import { InputIcon } from 'primereact/inputicon';
+import { FilterMatchMode } from 'primereact/api';
 import { CirclePlus } from "lucide-react";
 
 import "primereact/resources/themes/lara-light-blue/theme.css";
@@ -49,7 +48,7 @@ const Project = () => {
 
   const clearFilter = () => {
     initFilters();
-    setGlobalFilterValue("");
+    setGlobalFilterValue('');
   };
 
   const onGlobalFilterChange = (e) => {
@@ -86,10 +85,12 @@ const Project = () => {
 
       <div className="flex justify-between mb-4">
         <Button type="button" icon="pi pi-filter-slash" label="Clear" outlined onClick={clearFilter} />
-        <IconField iconPosition="left">
-          <InputIcon className="pi pi-search" />
-          <InputText value={globalFilterValue} onChange={onGlobalFilterChange} placeholder="Keyword Search" />
-        </IconField>
+        <InputText
+          value={globalFilterValue}
+          onChange={onGlobalFilterChange}
+          placeholder="Keyword Search"
+          className="pl-10 py-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
+        />
       </div>
 
       <DataTable
