@@ -3,13 +3,8 @@ import pool from "../DB.js";
 const router = express.Router();
 
 router.post("/create_project", async (req, res) => {
-  const {
-    project_id,
-    project_name,
-    project_description,
-    start_date,
-    end_date,
-  } = req.body;
+  const { project_name, project_description, start_date, due_date, customername, nation , cost} = req.body;
+  const project_status = `In Progress`;
   // Validate input
   if (!project_name && !project_id) {
     return res
@@ -20,9 +15,9 @@ router.post("/create_project", async (req, res) => {
   try {
     // Insert the new project into the Project table
     const result = await pool.query(
-      `INSERT INTO public."Projects" ("project_id", "project_name", "project_description", "start_date", "end_date","created_at") 
-      VALUES ($1, $2, $3, $4, $5, TO_CHAR(NOW(), 'YYYY-MM-DD HH24:MI')) RETURNING *`,
-      [project_id, project_name, project_description, start_date, end_date]
+      `INSERT INTO public."Project" ("project_name", "project_description", "start_date", "due_date","project_status","customerName","nation","cost") 
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8 ) RETURNING *`,
+      [project_name, project_description, start_date, due_date, project_status, customername, nation, cost]
     );
     return res.status(201).json({ project: result.rows[0] });
   } catch (err) {
@@ -40,13 +35,14 @@ router.post("/get-project", async (req, res) => {
 
   try {
     const result = await pool.query(
-      'SELECT * FROM public."Employee_projects" WHERE employee_id = $1',
-      [employee_id]
-    );
+      'SELECT * FROM public."Project_Member" pm JOIN public."Project" p on pm.project_id = p.project_id WHERE employee_id = $1', [employee_id]);
 
     if (result.rows.length === 0) {
       return res.status(404).json({ error: "Project not found" });
     }
+
+    return res.status(200).json({ projects: result.rows });
+
   } catch (err) {
     return res.status(500).json({ error: err.message });
   }
@@ -102,7 +98,7 @@ router.post("/info", async (req, res) => {
 
 //Update Project
 router.post("/update", async (req, res) => {
-  const { project_id, project_name, project_description, end_date } = req.body;
+  const { project_id, project_name, project_description, due_date, project_status,customerName, nation, cost} = req.body;
 
   if (!project_id) {
     return res.status(400).json({ error: "Project ID must be provided" });
@@ -111,22 +107,28 @@ router.post("/update", async (req, res) => {
   if (
     project_name === undefined &&
     project_description === undefined &&
-    end_date === undefined
+    due_date === undefined &&
+    project_status === undefined &&
+    customerName === undefined &&
+    nation === undefined &&
+    cost === undefined
   ) {
-    return res
-      .status(400)
-      .json({ error: "At least one field must be provided to be update" });
+    return res.status(400).json({ error: "Missing required field to be updated" });
   }
 
   try {
-    const updateQuery = `UPDATE public."Projects" 
+    const updateQuery = `UPDATE public."Project" 
                            SET  project_name = COALESCE($1, project_name),
                                 project_description = COALESCE($2, project_description),
-                                end_date = COALESCE($3, end_date)
-                            WHERE project_id = $4
+                                due_date = COALESCE($3, due_date),
+                                project_status = COALESCE($4, project_status),
+                                "customerName" = COALESCE($5, "customerName"),
+                                nation = COALESCE($6, nation),
+                                cost = COALESCE($7, cost)
+                            WHERE project_id = $8
                             RETURNING *`;
-
-    const value = [project_name, project_description, end_date, project_id];
+                            
+    const value = [project_name, project_description, due_date,project_status,customerName, nation, cost, project_id];
     const result = await pool.query(updateQuery, value);
 
     if (result.rows.length === 0) {
@@ -134,26 +136,60 @@ router.post("/update", async (req, res) => {
     }
     return res.status(201).json({ project: result.rows[0] });
   } catch (err) {
-    console.error("Error updating task:", err);
-    res.status(500).json({ error: "Internal Server Error" });
+    console.error('Error updating project:', err);
+    res.status(500).json({ error: 'Internal Server Error' });
   }
 });
 
 //Add employee to project
 router.post("/add-employee", async (req, res) => {
-  const { employee_id, project_id, role_id } = req.body;
-
-  if (!employee_id || !project_id || !role_id) {
-    return res.status(400).json({ error: "Missing reqiured field" });
+  const {employee_id, project_id, ismanager } = req.body;
+  
+  if(!employee_id || !project_id){
+    return res.status(400).json({error: "Missing reqiured field"});
   }
 
-  try {
-    const addEmployeeQuery = `INSERT INTO public."Employee_projects" (employee_id, project_id, role_id, assigned_at)
-                              VALUES ($1, $2, $3, TO_CHAR(NOW(), 'YYYY-MM-DD HH24:MI')) RETURNING *`;
-    const value = [employee_id, project_id, role_id];
-    const result = await pool.query(addEmployeeQuery, value);
-    return res.status(201).json({ data: result.rows[0] });
-  } catch (error) {
+  const client = await pool.connect();
+  try{
+    await client.query("BEGIN"); 
+
+    //Insert employee into project_member
+    const addEmployeeQuery = `INSERT INTO public."Project_Member" ("isManager", project_id, employee_id)
+                              VALUES ($1, $2, $3) RETURNING *`;
+    const employeeResult = await client.query(addEmployeeQuery, [ismanager, project_id, employee_id]);
+
+    const query = `SELECT p.nation, p.cost, r."pay_rate_SG", r."pay_rate_VN"
+                  FROM public."Project" p
+                  JOIN public."Project_Member" pm ON pm.project_id = p.project_id
+                  JOIN public."Employee" e ON pm.employee_id = e.employee_id
+                  JOIN public."Role" r ON r.role_id = e.role_id
+                  WHERE pm.employee_id = $1 AND pm.project_id = $2`;
+
+    const result = await client.query(query, [employee_id, project_id]);
+
+    if(result.rows.length === 0){
+      await client.query("ROLLBACK");
+      return res.status(404).json({error: "Project or Employee not found"});
+    }
+
+    const { nation, cost: currentCost, pay_rate_SG, pay_rate_VN } = result.rows[0];
+
+    //Determine the correct pay rate based on the project nation
+    const payRate = nation === "Singapore" ? pay_rate_SG : pay_rate_VN;
+
+    //Calculate and update the new project
+    const newCost = parseFloat(currentCost) + parseFloat(payRate);
+
+    await client.query(`UPDATE public."Project" SET cost = $1 WHERE project_id = $2`, [newCost, project_id]);
+    await client.query("COMMIT")
+
+    return res.status(201).json({
+      data: employeeResult.rows[0],
+      updated_cost: newCost
+    });
+
+  }catch(error){
+    await client.query("ROLLBACK");
     // Handle duplicate key error (assignment already exists)
     if (error.code === "23505") {
       return res.status(400).json({
@@ -162,20 +198,20 @@ router.post("/add-employee", async (req, res) => {
     }
     // Check if error is a foreign key violation (error code 23503)
     if (error.code === "23503") {
-      if (error.detail && error.detail.includes('table public."Projects"')) {
+      if (error.detail && error.detail.includes('table public."Project"')) {
         return res
           .status(400)
           .json({ error: `Project with ID ${project_id} does not exist.` });
       } else if (
         error.detail &&
-        error.detail.includes('table public."Employees"')
+        error.detail.includes('table public."Employee"')
       ) {
         return res
           .status(400)
           .json({ error: `Employee with ID ${employee_id} does not exist.` });
       } else if (
         error.detail &&
-        error.detail.includes('table Public."Roles"')
+        error.detail.includes('table Public."Role"')
       ) {
         return res
           .status(400)
@@ -187,29 +223,59 @@ router.post("/add-employee", async (req, res) => {
     }
     console.error("Error assigning task:", error);
     res.status(500).json({ error: "Internal Server Error" });
+  }finally{
+    client.release();
   }
 });
 
 //Delete employee from project
 router.post("/delete-employee", async (req, res) => {
-  const { employee_id } = req.body;
-  if (!employee_id) {
-    return res.status(404).json({ error: "employee ID is required" });
-  }
+    const { employee_id, project_id} = req.body;
+    if(!employee_id && !project_id){
+      return res.status(400).json({error: "Missing reqired field"});
+    } 
+    const client = await pool.connect();
+  
+    try{
+      await client.query("BEGIN");
 
-  try {
-    const deleteQuery = `DELETE FROM public."Employee_projects" WHERE employee_id = $1 RETURNING *`;
-    const result = await pool.query(deleteQuery, [employee_id]);
+      //Fetch project's detail and pay rate
+      const query = `SELECT p.nation, p.cost, r."pay_rate_SG", r."pay_rate_VN"
+                    FROM public."Project" p
+                    JOIN public."Project_Member" pm ON pm.project_id = p.project_id
+                    JOIN public."Employee" e ON pm.employee_id = e.employee_id
+                    JOIN public."Role" r ON r.role_id = e.role_id
+                    WHERE pm.employee_id = $1 AND pm.project_id = $2`;
+      const result = await client.query(query, [employee_id, project_id]);
 
-    // If no rows are returned, the task wasn't found
-    if (result.rows.length === 0) {
-      return res.status(404).json({ error: "Employee not found." });
+      if(result.rows.length === 0){
+        await client.query("ROLLBACK");
+        return res.status(404).json({error: "Project or Employee not found."})
+      }
+
+      const {nation, cost: currentCost, pay_rate_SG, pay_rate_VN } = result.rows[0];
+      const payRate = nation === "Singapore" ? pay_rate_SG : pay_rate_VN;
+      const newCost = parseFloat(currentCost) - parseFloat(payRate);
+
+      await client.query(`UPDATE public."Project" SET cost = $1 WHERE project_id = $2`, [newCost, project_id]);
+      
+      const deleteEmployee = `DELETE FROM public."Project_Member" WHERE employee_id = $1 AND project_id = $2`;
+      const value = [employee_id, project_id];
+      await client.query(deleteEmployee, value);
+
+      await client.query("COMMIT");
+
+      return res.status(201).json({
+        message: "Delete successfully",
+        updated_cost: newCost
+      });
+    }catch(error){
+      await client.query("ROLLBACK");
+
+      console.error("Error deleting employee: ", error);
+      res.status(500).json({ error: "Internal Server Error" })
+    }finally{
+      client.release();
     }
-
-    res.json({ message: "Employee delete successfully" });
-  } catch (error) {
-    console.error("Error deleting employee: ", error);
-    res.status(500).json({ error: "Internal Server Error" });
-  }
 });
 export default router;

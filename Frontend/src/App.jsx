@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
 import AdminDashboard from './page/AdminDashboard';
 import Project from './page/Project';
 import CreateProject from './page/CreateProject';
@@ -10,27 +10,33 @@ import Login from "./page/Login";
 import CreateEmployee from './page/CreateEmployee';
 import CreateTimeslot from './page/CreateTimeslot';
 
+function Layout() {
+  const location = useLocation();
 
-function App() {
   return (
     <div className="min-h-screen bg-gray-100">
-      <Navbar />
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Navigate to="/login" replace />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/project" element={<Project />} />
-          <Route path="/create-project" element={<CreateProject />} />
-          <Route path="/project-detail" element={<ProjectDetail />} />
-          <Route path="/create-employee" element={<CreateEmployee />} />
-          <Route path="/home" element={<Home />} />
-          <Route path="/timesheet" element={<Timesheet />} />
-          <Route path="/create-timeslot" element={<CreateTimeslot />} />          
-        </Routes>
-      </BrowserRouter>
+      {location.pathname !== "/login" && <Navbar />}
+      <Routes>
+        <Route path="/" element={<Navigate to="/login" replace />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/project" element={<Project />} />
+        <Route path="/create-project" element={<CreateProject />} />
+        <Route path="/project-detail" element={<ProjectDetail />} />
+        <Route path="/create-employee" element={<CreateEmployee />} />
+        <Route path="/home" element={<Home />} />
+        <Route path="/timesheet" element={<Timesheet />} />
+        <Route path="/create-timeslot" element={<CreateTimeslot />} />          
+      </Routes>
     </div>
   );
 }
 
-export default App;
+function App() {
+  return (
+    <BrowserRouter>
+      <Layout />
+    </BrowserRouter>
+  );
+}
 
+export default App;
