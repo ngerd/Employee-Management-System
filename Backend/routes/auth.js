@@ -142,7 +142,7 @@ router.post("/updateEmployee", async (req, res) => {
       `UPDATE employee 
        SET firstname = $1, lastname = $2, email = $3, password = $4, role_id = $5
        WHERE employee_id = $6 
-       RETURNING employee_id, firstname, lastname, email, role_id, isadmin`,
+       RETURNING employee_id, firstname, lastname, email, role_id, isAdmin`,
       [firstname, lastname, email, hashedPassword, role_id, employee_id]
     );
     

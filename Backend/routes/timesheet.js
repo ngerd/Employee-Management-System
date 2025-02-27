@@ -109,9 +109,9 @@ router.post("/createTimesheet", async (req, res) => {
 
     // 2) Process each employee in the list.
     for (const emp_id of employee_ids) {
-      // Check if the employee is assigned to the project (via project_member table).
+      // Check if the employee is assigned to the project (via project_employee table).
       const pmResult = await pool.query(
-        "SELECT * FROM project_member WHERE employee_id = $1 AND project_id = $2",
+        "SELECT * FROM project_employee WHERE employee_id = $1 AND project_id = $2",
         [emp_id, taskProject]
       );
       if (pmResult.rowCount === 0) {
