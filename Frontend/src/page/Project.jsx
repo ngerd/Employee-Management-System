@@ -97,8 +97,8 @@ const Project = () => {
   });
 
   return (
-    <div className="min-h-screen">
-      <div className="flex items-center justify-between px-20 mt-10 mb-4">
+    <div className="mx-auto max-w-screen-xl py-10 sm:px-6 lg:px-8">
+      <div className="flex items-center justify-between">
         <h1 className="text-4xl font-bold text-gray-900 flex items-center gap-2">
           Project Dashboard
           <Pin className="w-8 h-11 text-red-800 transform rotate-30" />
@@ -111,7 +111,7 @@ const Project = () => {
         </button>
       </div>
 
-      <div className="ml-5 mr-5 mt-10 overflow-x-auto min-h-[300px]">
+      <div className="mt-4 overflow-x-auto min-h-[300px]">
         <table className="min-w-full divide-y-2 divide-gray-200 bg-white text-sm">
           <thead>
             <tr>
