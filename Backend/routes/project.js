@@ -75,11 +75,11 @@ router.post("/info", async (req, res) => {
 
     // Query to get employees assigned to this project along with their roles
     const employeesQuery = `
-      SELECT e.employee_id, e.first_name, e.last_name, e.email, r.role_name
-      FROM employee_projects ep
-      JOIN employees e ON ep.employee_id = e.employee_id
-      JOIN roles r ON ep.role_id = r.role_id
-      WHERE ep.project_id = $1
+      SELECT e.employee_id, e.firstname, e.lastname, e.email, r.role_name
+      FROM public."project_member" ep
+      JOIN public."employee" e ON ep.employee_id = e.employee_id
+      JOIN public."role" r ON e.role_id = r.role_id
+      WHERE ep.project_id = $1;
     `;
     const employeesResult = await pool.query(employeesQuery, [projectId]);
 
