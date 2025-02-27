@@ -21,7 +21,7 @@ function Home() {
             subtitle="Lorem ipsum dolor"
             description="Lorem ipsum dolor sit amet consectetur adipisicing elit. Cupiditate, praesentium voluptatem omnis atque culpa repellendus."
             linkText="See details"
-            href="#"
+            href="project"
           />
           <Card
             Icon={FaGlobe}
@@ -29,7 +29,7 @@ function Home() {
             subtitle="Lorem ipsum dolor"
             description="Lorem ipsum dolor sit amet consectetur adipisicing elit. Cupiditate, praesentium voluptatem omnis atque culpa repellendus."
             linkText="See details"
-            href="#"
+            href="timesheet"
           />
         </div>
       </div>
