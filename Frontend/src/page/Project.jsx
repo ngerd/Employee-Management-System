@@ -49,7 +49,7 @@ const Project = () => {
 
   const clearFilter = () => {
     initFilters();
-    setGlobalFilterValue('');
+    setGlobalFilterValue("");
   };
 
   const onGlobalFilterChange = (e) => {
@@ -59,6 +59,17 @@ const Project = () => {
       global: { value, matchMode: FilterMatchMode.CONTAINS }
     }));
     setGlobalFilterValue(value);
+  };
+
+  const viewButtonTemplate = (rowData) => {
+    return (
+      <button
+        onClick={() => navigate(`/project-detail/${rowData.project_id}`)}
+        className="inline-block rounded-md bg-green-700 px-4 py-2 text-xs font-medium text-white hover:bg-green-500"
+      >
+        View
+      </button>
+    );
   };
 
   return (
@@ -118,6 +129,7 @@ const Project = () => {
           filterMenuStyle={{ width: '14rem' }}
           style={{ minWidth: '10rem' }}
         />
+        <Column header="Action" body={viewButtonTemplate} style={{ minWidth: "8rem" }} />
       </DataTable>
     </div>
   );
