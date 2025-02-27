@@ -10,6 +10,8 @@ import Login from "./page/Login";
 import CreateEmployee from './page/CreateEmployee';
 import CreateTimeslot from './page/CreateTimeslot';
 import ProjectInformation from "./page/ProjectInformation";
+import ProjectTask from "./page/ProjectTask";
+import ProjectTeam from "./page/ProjectTeam";
 
 function Layout() {
   const location = useLocation();
@@ -28,6 +30,8 @@ function Layout() {
         <Route path="/timesheet" element={<Timesheet />} />
         <Route path="/create-timeslot" element={<CreateTimeslot />} />
         <Route path="/project-information" element={<ProjectInformation />} />          
+        <Route path="/project-task" element={<ProjectTask />} />          
+        <Route path="/project-team" element={<ProjectTeam />} />          
       </Routes>
     </div>
   );

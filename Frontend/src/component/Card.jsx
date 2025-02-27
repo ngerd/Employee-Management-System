@@ -22,7 +22,7 @@ const Card = ({ Icon, title, subtitle, description, linkText, href }) => {
           ) : (
             <div>No Icon Provided</div>
           )}
-          <h2 className="mt-3 text-lg font-medium">{title}</h2>
+          <h2 className="mt-3 text-lg font-bold">{title}</h2>
         </div>
 
         <div className="absolute p-3 opacity-0 transition-opacity group-hover:relative group-hover:opacity-100">

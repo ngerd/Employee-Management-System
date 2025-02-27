@@ -2,13 +2,13 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
-import { Info, ClipboardList, Users, CirclePlus } from "lucide-react"; // Importing icons
+import { Info, ClipboardList, Users, CirclePlus, Download } from "lucide-react"; // Importing icons
 
 import "primereact/resources/themes/lara-light-blue/theme.css";
 import "primereact/resources/primereact.min.css";
 import "primeicons/primeicons.css";
 
-const ProjectInformation = () => {
+const ProjectTeam = () => {
   const navigate = useNavigate();
 
   // Sample Data
@@ -57,8 +57,16 @@ const ProjectInformation = () => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <h1 className="text-4xl font-bold text-gray-900 flex items-center gap-2">
-          Project Information
+          Project Tasks
         </h1>
+        <div className="flex gap-2">
+          <button
+            className="flex items-center gap-2 rounded-md bg-green-700 px-4 py-2 text-white font-medium hover:bg-green-500"
+            onClick={() => navigate("/create-project")}
+          >
+            <CirclePlus className="w-5 h-5" /> Add Task
+          </button>
+        </div>
       </div>
 
       <div className="mt-4">
@@ -81,7 +89,7 @@ const ProjectInformation = () => {
               {/* Information Tab (Active) */}
               <a
                 href="project-information"
-                className="shrink-0 w-32 flex items-center gap-2 rounded-t-2xl border border-gray-300 border-b-white p-3 text-sm font-medium text-sky-600 bg-white"
+                className="shrink-0 w-32 flex items-center gap-2 rounded-t-2xl border border-gray-300 p-3 text-sm font-medium text-gray-500 hover:text-gray-700 bg-gray-100"
               >
                 <Info size={16} /> Information
               </a>
@@ -89,15 +97,15 @@ const ProjectInformation = () => {
               {/* Tasks Tab */}
               <a
                 href="project-task"
-                className="shrink-0 w-32 flex items-center gap-2 rounded-t-2xl border border-gray-300 border-b-white p-3 text-sm font-medium text-gray-500 hover:text-gray-700 bg-gray-100"
+                className="shrink-0 w-32 flex items-center gap-2 rounded-t-2xl border border-gray-300 p-3 text-sm font-medium text-gray-500 hover:text-gray-700 bg-gray-100"
               >
                 <ClipboardList size={16} /> Tasks
               </a>
 
               {/* Teams Tab */}
               <a
-                href="#"
-                className="shrink-0 w-32 flex items-center gap-2 rounded-t-2xl border border-gray-300 border-b-white p-3 text-sm font-medium text-gray-500 hover:text-gray-700 bg-gray-100"
+                href="project-team"
+                className="shrink-0 w-32 flex items-center gap-2 rounded-t-2xl border border-gray-300 border-b-white p-3 text-sm font-medium text-sky-600 bg-white"
               >
                 <Users size={16} /> Teams
               </a>
@@ -107,41 +115,46 @@ const ProjectInformation = () => {
       </div>
 
       {/* DataTable */}
-      <div className="flow-root rounded-b-lg border border-gray-300 py-3 shadow-xs bg-white">
-        <dl className="-my-3 divide-y divide-gray-100 text-sm">
-          <div className="grid grid-cols-1 gap-1 p-3 sm:grid-cols-3 sm:gap-4">
-            <dt className="font-medium text-gray-900">Title</dt>
-            <dd className="text-gray-700 sm:col-span-2">Mr</dd>
-          </div>
-
-          <div className="grid grid-cols-1 gap-1 p-3 sm:grid-cols-3 sm:gap-4">
-            <dt className="font-medium text-gray-900">Name</dt>
-            <dd className="text-gray-700 sm:col-span-2">John Frusciante</dd>
-          </div>
-
-          <div className="grid grid-cols-1 gap-1 p-3 sm:grid-cols-3 sm:gap-4">
-            <dt className="font-medium text-gray-900">Occupation</dt>
-            <dd className="text-gray-700 sm:col-span-2">Guitarist</dd>
-          </div>
-
-          <div className="grid grid-cols-1 gap-1 p-3 sm:grid-cols-3 sm:gap-4">
-            <dt className="font-medium text-gray-900">Salary</dt>
-            <dd className="text-gray-700 sm:col-span-2">$1,000,000+</dd>
-          </div>
-
-          <div className="grid grid-cols-1 gap-1 p-3 sm:grid-cols-3 sm:gap-4">
-            <dt className="font-medium text-gray-900">Bio</dt>
-            <dd className="text-gray-700 sm:col-span-2">
-              Lorem ipsum dolor, sit amet consectetur adipisicing elit. Et
-              facilis debitis explicabo doloremque impedit nesciunt dolorem
-              facere, dolor quasi veritatis quia fugit aperiam aspernatur neque
-              molestiae labore aliquam soluta architecto?
-            </dd>
-          </div>
-        </dl>
-      </div>
+      <DataTable
+        value={projects}
+        paginator
+        rows={10}
+        loading={loading}
+        dataKey="project_id"
+        emptyMessage="No projects found."
+        showGridlines
+        className="border border-gray-300 bg-white"
+      >
+        <Column field="project_id" header="ID" style={{ minWidth: "5rem" }} />
+        <Column
+          field="project_name"
+          header="Project Name"
+          style={{ minWidth: "12rem" }}
+        />
+        <Column
+          field="start_date"
+          header="Start Date"
+          style={{ minWidth: "10rem" }}
+        />
+        <Column
+          field="due_date"
+          header="Due Date"
+          style={{ minWidth: "10rem" }}
+        />
+        <Column
+          field="project_status"
+          header="Status"
+          style={{ minWidth: "10rem" }}
+        />
+        <Column field="nation" header="Nation" style={{ minWidth: "10rem" }} />
+        <Column
+          header="Action"
+          body={viewButtonTemplate}
+          style={{ minWidth: "8rem" }}
+        />
+      </DataTable>
     </div>
   );
 };
 
-export default ProjectInformation;
+export default ProjectTeam;
