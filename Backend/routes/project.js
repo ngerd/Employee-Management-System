@@ -3,10 +3,18 @@ import pool from "../DB.js";
 const router = express.Router();
 
 router.post("/create_project", async (req, res) => {
-  const { project_id, project_name, project_description, start_date, end_date} = req.body;
+  const {
+    project_id,
+    project_name,
+    project_description,
+    start_date,
+    end_date,
+  } = req.body;
   // Validate input
   if (!project_name && !project_id) {
-    return res.status(400).json({ error: "Missing required field: projectName" });
+    return res
+      .status(400)
+      .json({ error: "Missing required field: projectName" });
   }
 
   try {
@@ -23,41 +31,44 @@ router.post("/create_project", async (req, res) => {
 });
 
 //Get all employess's Projects
-router.post('/get-project', async (req, res) => {
+router.post("/get-project", async (req, res) => {
   const { employee_id } = req.body;
 
   if (!employee_id) {
-    return res.status(400).json({ error: "employee ID is required" })
+    return res.status(400).json({ error: "employee ID is required" });
   }
 
   try {
     const result = await pool.query(
-      'SELECT * FROM public."Employee_projects" WHERE employee_id = $1', [employee_id]);
+      'SELECT * FROM public."Employee_projects" WHERE employee_id = $1',
+      [employee_id]
+    );
 
     if (result.rows.length === 0) {
       return res.status(404).json({ error: "Project not found" });
     }
-
   } catch (err) {
-    return res.status(500).json({ error: err.message })
+    return res.status(500).json({ error: err.message });
   }
 });
 
 //Get Project info
-router.post('/info', async (req, res) => {
+router.post("/info", async (req, res) => {
   const { projectId } = req.body;
 
   if (!projectId) {
-    return res.status(400).json({ error: 'Project ID is required as a query parameter.' });
+    return res
+      .status(400)
+      .json({ error: "Project ID is required as a query parameter." });
   }
 
   try {
     // Query to get project details
-    const projectQuery = 'SELECT * FROM projects WHERE project_id = $1';
+    const projectQuery = 'SELECT * FROM public."project" WHERE project_id = $1';
     const projectResult = await pool.query(projectQuery, [projectId]);
 
     if (projectResult.rows.length === 0) {
-      return res.status(404).json({ error: 'Project not found.' });
+      return res.status(404).json({ error: "Project not found." });
     }
 
     const project = projectResult.rows[0];
@@ -79,13 +90,13 @@ router.post('/info', async (req, res) => {
         project_description: project.project_description,
         start_date: project.start_date,
         end_date: project.end_date,
-        created_at: project.created_at
+        created_at: project.created_at,
       },
-      employees: employeesResult.rows
+      employees: employeesResult.rows,
     });
   } catch (error) {
-    console.error('Error fetching project info:', error);
-    res.status(500).json({ error: 'Internal Server Error' });
+    console.error("Error fetching project info:", error);
+    res.status(500).json({ error: "Internal Server Error" });
   }
 });
 
@@ -94,14 +105,17 @@ router.post("/update", async (req, res) => {
   const { project_id, project_name, project_description, end_date } = req.body;
 
   if (!project_id) {
-    return res.status(400).json({ error: "Project ID must be provided" })
+    return res.status(400).json({ error: "Project ID must be provided" });
   }
 
-  if (project_name === undefined &&
+  if (
+    project_name === undefined &&
     project_description === undefined &&
     end_date === undefined
   ) {
-    return res.status(400).json({ error: "At least one field must be provided to be update" });
+    return res
+      .status(400)
+      .json({ error: "At least one field must be provided to be update" });
   }
 
   try {
@@ -111,7 +125,7 @@ router.post("/update", async (req, res) => {
                                 end_date = COALESCE($3, end_date)
                             WHERE project_id = $4
                             RETURNING *`;
-                            
+
     const value = [project_name, project_description, end_date, project_id];
     const result = await pool.query(updateQuery, value);
 
@@ -120,26 +134,26 @@ router.post("/update", async (req, res) => {
     }
     return res.status(201).json({ project: result.rows[0] });
   } catch (err) {
-    console.error('Error updating task:', err);
-    res.status(500).json({ error: 'Internal Server Error' });
+    console.error("Error updating task:", err);
+    res.status(500).json({ error: "Internal Server Error" });
   }
 });
 
 //Add employee to project
 router.post("/add-employee", async (req, res) => {
-  const {employee_id, project_id, role_id} = req.body;
-  
-  if(!employee_id || !project_id || !role_id){
-    return res.status(400).json({error: "Missing reqiured field"});
+  const { employee_id, project_id, role_id } = req.body;
+
+  if (!employee_id || !project_id || !role_id) {
+    return res.status(400).json({ error: "Missing reqiured field" });
   }
 
-  try{
+  try {
     const addEmployeeQuery = `INSERT INTO public."Employee_projects" (employee_id, project_id, role_id, assigned_at)
                               VALUES ($1, $2, $3, TO_CHAR(NOW(), 'YYYY-MM-DD HH24:MI')) RETURNING *`;
     const value = [employee_id, project_id, role_id];
     const result = await pool.query(addEmployeeQuery, value);
-    return res.status(201).json({data: result.rows[0]});
-  }catch(error){
+    return res.status(201).json({ data: result.rows[0] });
+  } catch (error) {
     // Handle duplicate key error (assignment already exists)
     if (error.code === "23505") {
       return res.status(400).json({
@@ -152,11 +166,17 @@ router.post("/add-employee", async (req, res) => {
         return res
           .status(400)
           .json({ error: `Project with ID ${project_id} does not exist.` });
-      } else if (error.detail && error.detail.includes('table public."Employees"')) {
+      } else if (
+        error.detail &&
+        error.detail.includes('table public."Employees"')
+      ) {
         return res
           .status(400)
           .json({ error: `Employee with ID ${employee_id} does not exist.` });
-      }else if(error.detail && error.detail.includes('table Public."Roles"')){
+      } else if (
+        error.detail &&
+        error.detail.includes('table Public."Roles"')
+      ) {
         return res
           .status(400)
           .json({ error: `Role with ID ${role_id} does not exist.` });
@@ -172,24 +192,24 @@ router.post("/add-employee", async (req, res) => {
 
 //Delete employee from project
 router.post("/delete-employee", async (req, res) => {
-    const {employee_id} = req.body;
-    if(!employee_id){
-      return res.status(404).json({error: "employee ID is required"})
+  const { employee_id } = req.body;
+  if (!employee_id) {
+    return res.status(404).json({ error: "employee ID is required" });
+  }
+
+  try {
+    const deleteQuery = `DELETE FROM public."Employee_projects" WHERE employee_id = $1 RETURNING *`;
+    const result = await pool.query(deleteQuery, [employee_id]);
+
+    // If no rows are returned, the task wasn't found
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: "Employee not found." });
     }
 
-    try{
-      const deleteQuery = `DELETE FROM public."Employee_projects" WHERE employee_id = $1 RETURNING *`;
-      const result = await pool.query(deleteQuery, [employee_id]);
-
-      // If no rows are returned, the task wasn't found
-      if (result.rows.length === 0) {
-        return res.status(404).json({ error: "Employee not found." });
-      }
-
-      res.json({message: "Employee delete successfully"});
-    }catch(error){
-      console.error("Error deleting employee: ", error);
-      res.status(500).json({ error: "Internal Server Error" })
-    }
-})
+    res.json({ message: "Employee delete successfully" });
+  } catch (error) {
+    console.error("Error deleting employee: ", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
 export default router;
