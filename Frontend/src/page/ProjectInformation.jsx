@@ -96,7 +96,7 @@ const ProjectInformation = () => {
 
               {/* Teams Tab */}
               <a
-                href="#"
+                href="project-team"
                 className="shrink-0 w-32 flex items-center gap-2 rounded-t-2xl border border-gray-300 border-b-white p-3 text-sm font-medium text-gray-500 hover:text-gray-700 bg-gray-100"
               >
                 <Users size={16} /> Teams
