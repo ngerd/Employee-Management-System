@@ -78,7 +78,7 @@ const Project = () => {
                     <thead>
                         <tr>
                             {['name', 'duration', 'manager', 'code'].map(column => (
-                                <th key={column} className="px-4 py-2 font-medium text-gray-900 relative">
+                                <th key={column} className="px-4 py-2 font-medium text-gray-900 text-left relative">
                                     {column.charAt(0).toUpperCase() + column.slice(1)}
                                     <button onClick={(e) => { e.stopPropagation(); toggleDropdown(column); }} className="ml-2">
                                         <Filter className="w-4 h-4 inline-block" />
@@ -106,7 +106,7 @@ const Project = () => {
                                 <td className="px-4 py-2 text-gray-700">{project.manager}</td>
                                 <td className="px-4 py-2 text-gray-700">{project.code}</td>
                                 <td className="px-4 py-2">
-                                    <button onClick={() => navigate(`/view-project/${project.code}`)} className="inline-block rounded-sm bg-indigo-600 px-4 py-2 text-xs font-medium text-white hover:bg-indigo-700">
+                                    <button onClick={() => navigate(`/project-detail/${project.code}`)} className="inline-block rounded-sm bg-indigo-600 px-4 py-2 text-xs font-medium text-white hover:bg-indigo-700">
                                         View
                                     </button>
                                 </td>
