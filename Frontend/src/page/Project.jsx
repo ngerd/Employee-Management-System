@@ -62,19 +62,19 @@ const Project = () => {
     });
 
     return (
-        <div className="min-h-screen">
-            <div className="flex items-center justify-between mb-4">
-                <h1 className="text-4xl font-bold ml-20 mt-20 text-gray-900 flex items-center gap-2">
+        <div className="mx-auto max-w-screen-xl py-10 sm:px-6 lg:px-8">
+            <div className="flex items-center justify-between">
+                <h1 className="text-4xl font-bold text-gray-900 flex items-center gap-2">
                     Project Dashboard
                     <Pin className="w-8 h-11 text-red-800 transform rotate-30" />
                 </h1>
-                <button className="rounded-md mt-4 mr-4 bg-blue-600 px-4 py-2 text-white font-medium hover:bg-blue-700" onClick={() => navigate("/create-project")}>
+                <button className="rounded-md bg-blue-600 px-4 py-2 text-white font-medium hover:bg-blue-700" onClick={() => navigate("/create-project")}>
                     Create new project
                 </button>
             </div>
 
-            <div className="ml-5 mr-5 mt-10 overflow-x-auto min-h-[300px]">
-                <table className="min-w-full divide-y-2 divide-gray-200 bg-white text-sm">
+            <div className="mt-4 overflow-x-auto min-h-[300px]">
+                <table className="min-w-full rounded-lg shadow-lg divide-y-2 divide-gray-200 bg-white text-sm">
                     <thead>
                         <tr>
                             {['name', 'duration', 'manager', 'code'].map(column => (
