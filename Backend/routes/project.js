@@ -7,7 +7,9 @@ router.post("/create_project", async (req, res) => {
   const project_status = `In Progress`;
   // Validate input
   if (!project_name && !project_id) {
-    return res.status(400).json({ error: "Missing required field: projectName" });
+    return res
+      .status(400)
+      .json({ error: "Missing required field: projectName" });
   }
 
   try {
@@ -24,11 +26,11 @@ router.post("/create_project", async (req, res) => {
 });
 
 //Get all employess's Projects
-router.post('/get-project', async (req, res) => {
+router.post("/get-project", async (req, res) => {
   const { employee_id } = req.body;
 
   if (!employee_id) {
-    return res.status(400).json({ error: "employee ID is required" })
+    return res.status(400).json({ error: "employee ID is required" });
   }
 
   try {
@@ -42,36 +44,38 @@ router.post('/get-project', async (req, res) => {
     return res.status(200).json({ projects: result.rows });
 
   } catch (err) {
-    return res.status(500).json({ error: err.message })
+    return res.status(500).json({ error: err.message });
   }
 });
 
 //Get Project info
-router.post('/info', async (req, res) => {
+router.post("/info", async (req, res) => {
   const { projectId } = req.body;
 
   if (!projectId) {
-    return res.status(400).json({ error: 'Project ID is required as a query parameter.' });
+    return res
+      .status(400)
+      .json({ error: "Project ID is required as a query parameter." });
   }
 
   try {
     // Query to get project details
-    const projectQuery = 'SELECT * FROM projects WHERE project_id = $1';
+    const projectQuery = 'SELECT * FROM public."project" WHERE project_id = $1';
     const projectResult = await pool.query(projectQuery, [projectId]);
 
     if (projectResult.rows.length === 0) {
-      return res.status(404).json({ error: 'Project not found.' });
+      return res.status(404).json({ error: "Project not found." });
     }
 
     const project = projectResult.rows[0];
 
     // Query to get employees assigned to this project along with their roles
     const employeesQuery = `
-      SELECT e.employee_id, e.first_name, e.last_name, e.email, r.role_name
-      FROM employee_projects ep
-      JOIN employees e ON ep.employee_id = e.employee_id
-      JOIN roles r ON ep.role_id = r.role_id
-      WHERE ep.project_id = $1
+      SELECT e.employee_id, e.firstname, e.lastname, e.email, r.role_name
+      FROM public."project_member" ep
+      JOIN public."employee" e ON ep.employee_id = e.employee_id
+      JOIN public."role" r ON e.role_id = r.role_id
+      WHERE ep.project_id = $1;
     `;
     const employeesResult = await pool.query(employeesQuery, [projectId]);
 
@@ -82,13 +86,13 @@ router.post('/info', async (req, res) => {
         project_description: project.project_description,
         start_date: project.start_date,
         end_date: project.end_date,
-        created_at: project.created_at
+        created_at: project.created_at,
       },
-      employees: employeesResult.rows
+      employees: employeesResult.rows,
     });
   } catch (error) {
-    console.error('Error fetching project info:', error);
-    res.status(500).json({ error: 'Internal Server Error' });
+    console.error("Error fetching project info:", error);
+    res.status(500).json({ error: "Internal Server Error" });
   }
 });
 
@@ -97,10 +101,11 @@ router.post("/update", async (req, res) => {
   const { project_id, project_name, project_description, due_date, project_status,customername, nation, cost} = req.body;
 
   if (!project_id) {
-    return res.status(400).json({ error: "Project ID must be provided" })
+    return res.status(400).json({ error: "Project ID must be provided" });
   }
 
-  if (project_name === undefined &&
+  if (
+    project_name === undefined &&
     project_description === undefined &&
     due_date === undefined &&
     project_status === undefined &&
@@ -197,11 +202,17 @@ router.post("/add-employee", async (req, res) => {
         return res
           .status(400)
           .json({ error: `Project with ID ${project_id} does not exist.` });
-      } else if (error.detail && error.detail.includes('table public."Employees"')) {
+      } else if (
+        error.detail &&
+        error.detail.includes('table public."Employees"')
+      ) {
         return res
           .status(400)
           .json({ error: `Employee with ID ${employee_id} does not exist.` });
-      }else if(error.detail && error.detail.includes('table Public."Roles"')){
+      } else if (
+        error.detail &&
+        error.detail.includes('table Public."Roles"')
+      ) {
         return res
           .status(400)
           .json({ error: `Role with ID ${role_id} does not exist.` });

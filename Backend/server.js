@@ -2,6 +2,9 @@ import express from "express";
 import taskRoutes from "./routes/task.js";
 import createProject from "./routes/project.js";
 import authRoutes from "./routes/auth.js";
+import infoRoutes from "./routes/information.js";
+import timesheetRoutes from "./routes/timesheet.js";
+
 
 const app = express();
 
@@ -12,6 +15,8 @@ app.use(express.json());
 app.use("/projects", createProject);
 app.use("/task", taskRoutes);
 app.use("/", authRoutes);
+app.use("/", infoRoutes);
+app.use("/", timesheetRoutes);
 
 app.get("/", (req, res) => {
   res.send("Hello World");
