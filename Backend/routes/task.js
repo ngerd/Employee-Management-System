@@ -98,7 +98,7 @@ router.post("/add", async (req, res) => {
     taskStatus, // optional; if not provided, we default to "pending"
   } = req.body;
 
-  // Validate required fields (you might require taskDescription, startDate, and dueDate as well)
+  // Validate required fields
   if (!projectId || !taskName || !taskDescription || !startDate || !dueDate) {
     return res.status(400).json({
       error:
@@ -110,6 +110,21 @@ router.post("/add", async (req, res) => {
   const status = taskStatus || "pending";
 
   try {
+    // Check if the project exists before adding the task
+    const projectQuery = `
+      SELECT project_id 
+      FROM public."project" 
+      WHERE project_id = $1
+    `;
+    const projectResult = await pool.query(projectQuery, [projectId]);
+
+    if (projectResult.rows.length === 0) {
+      return res
+        .status(400)
+        .json({ error: `Project with ID ${projectId} does not exist.` });
+    }
+
+    // Insert the new task since the project exists
     const insertQuery = `
       INSERT INTO public."task" (project_id, task_name, task_description, start_date, due_date, task_status)
       VALUES ($1, $2, $3, $4, $5, $6)
@@ -127,17 +142,6 @@ router.post("/add", async (req, res) => {
 
     res.status(201).json({ taskId: result.rows[0].task_id });
   } catch (error) {
-    // Check for foreign key violation (e.g., if projectId does not exist)
-    if (error.code === "23503") {
-      if (error.detail && error.detail.includes('table "Project"')) {
-        return res
-          .status(400)
-          .json({ error: `Project with ID ${projectId} does not exist.` });
-      }
-      return res
-        .status(400)
-        .json({ error: "Foreign key constraint violation." });
-    }
     console.error("Error adding new task:", error);
     res.status(500).json({ error: "Internal Server Error" });
   }
@@ -155,39 +159,78 @@ router.post("/assign", async (req, res) => {
   }
 
   try {
-    const query = `
+    // Check if the employee exists
+    const employeeQuery = `
+      SELECT employee_id 
+      FROM public."employee" 
+      WHERE employee_id = $1
+    `;
+    const employeeResult = await pool.query(employeeQuery, [employeeId]);
+    if (employeeResult.rows.length === 0) {
+      return res.status(400).json({
+        error: `Employee with ID ${employeeId} does not exist.`,
+      });
+    }
+
+    // Check if the task exists and retrieve its project_id
+    const taskQuery = `
+      SELECT task_id, project_id 
+      FROM public."task" 
+      WHERE task_id = $1
+    `;
+    const taskResult = await pool.query(taskQuery, [taskId]);
+    if (taskResult.rows.length === 0) {
+      return res.status(400).json({
+        error: `Task with ID ${taskId} does not exist.`,
+      });
+    }
+    const { project_id } = taskResult.rows[0];
+
+    // Check if the employee is part of the project
+    const membershipQuery = `
+      SELECT * 
+      FROM public."project_employee" 
+      WHERE employee_id = $1 AND project_id = $2
+    `;
+    const membershipResult = await pool.query(membershipQuery, [
+      employeeId,
+      project_id,
+    ]);
+    if (membershipResult.rows.length === 0) {
+      return res.status(400).json({
+        error: `Employee with ID ${employeeId} is not a member of project with ID ${project_id}.`,
+      });
+    }
+
+    // Check if the assignment already exists
+    const duplicateQuery = `
+      SELECT * 
+      FROM public."task_assignment" 
+      WHERE employee_id = $1 AND task_id = $2
+    `;
+    const duplicateResult = await pool.query(duplicateQuery, [
+      employeeId,
+      taskId,
+    ]);
+    if (duplicateResult.rows.length > 0) {
+      return res.status(400).json({
+        error: `Assignment for employee ${employeeId} and task ${taskId} already exists.`,
+      });
+    }
+
+    // Insert the new assignment
+    const insertQuery = `
       INSERT INTO public."task_assignment" (employee_id, task_id)
       VALUES ($1, $2)
       RETURNING *
     `;
-    const result = await pool.query(query, [employeeId, taskId]);
+    const result = await pool.query(insertQuery, [employeeId, taskId]);
 
     res.status(201).json({
       message: "Task assigned successfully",
       assignment: result.rows[0],
     });
   } catch (error) {
-    // Handle duplicate key error (assignment already exists)
-    if (error.code === "23505") {
-      return res.status(400).json({
-        error: `Assignment for employee ${employeeId} and task ${taskId} already exists.`,
-      });
-    }
-    // Check if error is a foreign key violation (error code 23503)
-    if (error.code === "23503") {
-      if (error.detail && error.detail.includes('table "task"')) {
-        return res
-          .status(400)
-          .json({ error: `Task with ID ${taskId} does not exist.` });
-      } else if (error.detail && error.detail.includes('table "employee"')) {
-        return res
-          .status(400)
-          .json({ error: `Employee with ID ${employeeId} does not exist.` });
-      }
-      return res
-        .status(400)
-        .json({ error: "Foreign key constraint violation." });
-    }
     console.error("Error assigning task:", error);
     res.status(500).json({ error: "Internal Server Error" });
   }
@@ -214,12 +257,12 @@ router.post("/update", async (req, res) => {
 
   // Check if at least one field to update is provided
   if (
-    projectId === undefined &&
-    taskName === undefined &&
-    taskDescription === undefined &&
-    startDate === undefined &&
-    dueDate === undefined &&
-    taskStatus === undefined
+    projectId === undefined ||
+    (taskName === undefined &&
+      taskDescription === undefined &&
+      startDate === undefined &&
+      dueDate === undefined &&
+      taskStatus === undefined)
   ) {
     return res
       .status(400)
@@ -227,6 +270,21 @@ router.post("/update", async (req, res) => {
   }
 
   try {
+    // If projectId is provided, verify that the project exists
+    if (projectId !== undefined) {
+      const projectQuery = `
+        SELECT project_id 
+        FROM public."project" 
+        WHERE project_id = $1
+      `;
+      const projectResult = await pool.query(projectQuery, [projectId]);
+      if (projectResult.rows.length === 0) {
+        return res
+          .status(400)
+          .json({ error: `Project with ID ${projectId} does not exist.` });
+      }
+    }
+
     const updateQuery = `
       UPDATE public."task" 
       SET project_id = COALESCE($1, project_id),
@@ -255,17 +313,6 @@ router.post("/update", async (req, res) => {
 
     res.json(result.rows[0]);
   } catch (error) {
-    // Handle foreign key violation errors (e.g., invalid projectId)
-    if (error.code === "23503") {
-      if (error.detail && error.detail.includes('table "project"')) {
-        return res
-          .status(400)
-          .json({ error: `Project with ID ${projectId} does not exist.` });
-      }
-      return res
-        .status(400)
-        .json({ error: "Foreign key constraint violation." });
-    }
     console.error("Error updating task:", error);
     res.status(500).json({ error: "Internal Server Error" });
   }
@@ -283,16 +330,22 @@ router.delete("/delete", async (req, res) => {
   }
 
   try {
-    const deleteQuery =
+    // Delete the task and return the deleted row(s)
+    const deleteTaskQuery =
       'DELETE FROM public."task" WHERE task_id = $1 RETURNING *';
-    const result = await pool.query(deleteQuery, [taskId]);
+    const taskResult = await pool.query(deleteTaskQuery, [taskId]);
 
     // If no rows are returned, the task wasn't found
-    if (result.rows.length === 0) {
+    if (taskResult.rows.length === 0) {
       return res.status(404).json({ error: "Task not found." });
     }
 
-    res.json({ message: "Task deleted successfully." });
+    // After deleting the task, delete the related task assignments
+    const deleteAssignmentQuery =
+      'DELETE FROM public."task_assignment" WHERE task_id = $1';
+    await pool.query(deleteAssignmentQuery, [taskId]);
+
+    res.json({ message: "Task and related assignments deleted successfully." });
   } catch (error) {
     console.error("Error deleting task:", error);
     res.status(500).json({ error: "Internal Server Error" });
@@ -300,7 +353,6 @@ router.delete("/delete", async (req, res) => {
 });
 
 //Unassign Tasks
-
 router.delete("/unassign", async (req, res) => {
   const { employeeId, taskId } = req.body;
 

@@ -54,10 +54,10 @@ router.post("/login", async (req, res) => {
 
 // Create Account
 router.post("/createAccount", async (req, res) => {
-  const { firstname, lastname, email, password, confirmPassword, isAdmin, role_id } = req.body;
+  const { firstname, lastname, email, password, confirmPassword, isadmin, role_id } = req.body;
   
   // Validate input
-  if (!firstname || !lastname || !email || !password || !confirmPassword || isAdmin === undefined || !role_id) {
+  if (!firstname || !lastname || !email || !password || !confirmPassword || isadmin === undefined || !role_id) {
     return res.status(400).json({ error: "Missing required fields" });
   }
   
@@ -96,8 +96,8 @@ router.post("/createAccount", async (req, res) => {
     
     // Insert the new account into the employee table.
     const result = await pool.query(
-      'INSERT INTO employee (firstname, lastname, email, password, isAdmin, role_id) VALUES ($1, $2, $3, $4, $5, $6) RETURNING employee_id, firstname, lastname, email, isAdmin, role_id',
-      [firstname, lastname, email, hashedPassword, isAdmin, role_id]
+      'INSERT INTO employee (firstname, lastname, email, password, isadmin, role_id) VALUES ($1, $2, $3, $4, $5, $6) RETURNING employee_id, firstname, lastname, email, isadmin, role_id',
+      [firstname, lastname, email, hashedPassword, isadmin, role_id]
     );
     
     return res.status(201).json({
@@ -142,7 +142,7 @@ router.post("/updateEmployee", async (req, res) => {
       `UPDATE employee 
        SET firstname = $1, lastname = $2, email = $3, password = $4, role_id = $5
        WHERE employee_id = $6 
-       RETURNING employee_id, firstname, lastname, email, role_id, isAdmin`,
+       RETURNING employee_id, firstname, lastname, email, role_id, isadmin`,
       [firstname, lastname, email, hashedPassword, role_id, employee_id]
     );
     
@@ -160,7 +160,7 @@ router.post("/updateEmployee", async (req, res) => {
   }
 });
 
-// Delete Employee
+// Delete Employee endpoint: deletes an employee and associated data in project_member and task_assignment
 router.post("/deleteEmployee", async (req, res) => {
   const { employee_id } = req.body;
   
@@ -169,6 +169,11 @@ router.post("/deleteEmployee", async (req, res) => {
   }
   
   try {
+    // Explicitly delete related rows from project_member and task_assignment
+    await pool.query('DELETE FROM project_employee WHERE employee_id = $1', [employee_id]);
+    await pool.query('DELETE FROM task_assignment WHERE employee_id = $1', [employee_id]);
+    
+    // Now delete the employee record
     const result = await pool.query(
       'DELETE FROM employee WHERE employee_id = $1 RETURNING employee_id',
       [employee_id]
