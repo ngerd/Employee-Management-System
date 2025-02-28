@@ -68,7 +68,7 @@ const ProjectTask = () => {
           </button>
           <button
             className="flex items-center gap-2 rounded-md bg-green-700 px-4 py-2 text-white font-medium hover:bg-green-500"
-            onClick={() => navigate("/create-project")}
+            onClick={() => navigate("#")}
           >
             <Download className="w-5 h-5" /> Download
           </button>

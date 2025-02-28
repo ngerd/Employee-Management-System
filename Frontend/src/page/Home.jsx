@@ -14,7 +14,7 @@ function Home() {
             subtitle="Lorem ipsum dolor"
             description="Lorem ipsum dolor sit amet consectetur adipisicing elit. Cupiditate, praesentium voluptatem omnis atque culpa repellendus."
             linkText="See details"
-            href="#"
+            href="staff"
           />
           {/* Project Card */}
           <Card

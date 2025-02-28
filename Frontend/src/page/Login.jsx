@@ -1,10 +1,61 @@
-import React from "react";
+import React, { useContext, useEffect, useState } from "react";
 import TextInput from "../component/TextInput";
 import PasswordInput from "../component/PasswordInput";
 import { useNavigate } from "react-router-dom";
+import {
+  LoginContext,
+  LoginPageContext,
+  UserContext,
+} from "../context/ContextProvider";
 
 function Login() {
+  const initialValues = {
+    email: "",
+    password: "",
+  };
+  
+  const [formValues, setFormValues] = useState(initialValues);
+  const [formErrors, setFormErrors] = useState({});
+  const { setIsLogin } = useContext(LoginContext);
+  const { setDuringLogin } = useContext(LoginPageContext);
+  const { setUser } = useContext(UserContext);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    setDuringLogin(true);
+  }, [setDuringLogin]);
+
+  const fetchMockData = async () => {
+    try {
+      console.log(formValues);
+      const response = await fetch("http://localhost:3000/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formValues),
+      });
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error("There was a problem fetching the mock data:", error);
+    }
+  };
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormValues({ ...formValues, [name]: value });
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    validate();
+  };
+
+  const validate = async () => {
+    const data = await fetchMockData();
+    console.log(data);
+  };
 
   return (
     <div className="lg:grid lg:min-h-screen lg:grid-cols-12">
@@ -31,25 +82,32 @@ function Login() {
           <h2 className="text-2xl pb-10 font-extrabold text-gray-900">
             Login
           </h2>
-          <form action="#" className="space-y-6">
+          <form className="space-y-6" onSubmit={handleSubmit}>
             <TextInput
               label="Username"
               id="Username"
-              name="username"
+              name="email"
+              value={formValues.email}
+              onChange={handleChange}
               className="w-full px-6 py-4 text-lg"
             />
+            
             <PasswordInput
               label="Password"
               id="Password"
               name="password"
               type="password"
+              value={formValues.password}
+              onChange={handleChange}
               className="w-full px-6 py-4 text-lg"
             />
 
             <div className="col-span-6 mt-7 sm:flex sm:items-center sm:gap-4">
-              <button className="inline-block shrink-0 rounded-md border border-blue-600 bg-blue-600 px-12 py-3 text-sm font-medium text-white transition hover:bg-pink-200 hover:text-blue-800 focus:ring-3 focus:outline-none"
-              onClick={() => navigate(`/home`)}>
-                Login
+              <button 
+              type="submit"
+              className="inline-block shrink-0 rounded-md border border-blue-600 bg-blue-600 px-12 py-3 text-sm font-medium text-white transition hover:bg-pink-200 hover:text-blue-800 focus:ring-3 focus:outline-none"
+              >
+              Login
               </button>
             </div>
           </form>
