@@ -40,12 +40,13 @@ router.post("/viewinfo", async (req, res) => {
 });
 
 router.get("/get-role", async (req, res) => {
-  try{
-    const result = await pool.query(`SELECT * FROM role`);
-    return res.json({Role: result.rows});
-  }catch(error){
+  try {
+    const result = await pool.query(`SELECT role_id, role_name FROM role`);
+    return res.json({ Role: result.rows });
+  } catch (error) {
     console.error("Error retrieving roles: ", error);
-    return res.status(500).json({error: "Internal server error"})
+    return res.status(500).json({ error: "Internal server error" });
   }
 });
+
 export default router;

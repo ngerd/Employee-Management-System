@@ -1,8 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 const CreateEmployee = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedRole, setSelectedRole] = useState("Choose Role");
+  const [roles, setRoles] = useState([]);
   const [formValues, setFormValues] = useState({
     firstname: "",
     lastname: "",
@@ -13,24 +14,30 @@ const CreateEmployee = () => {
     role_id: "",
   });
 
-  const roles = [
-    { id: 1, name: "Junior Consultant" },
-    { id: 2, name: "Consultant" },
-    { id: 3, name: "Sr Consultant Functional" },
-    { id: 4, name: "Sr Consultant Technical" },
-    { id: 5, name: "Lead Expert" },
-    { id: 6, name: "Manager" },
-  ];
+  // Fetch roles from API
+  useEffect(() => {
+    const fetchRoles = async () => {
+      try {
+        const response = await fetch("http://localhost:3000/get-role"); // Adjust the API URL
+        const data = await response.json();
+        setRoles(data.Role); // Assuming API returns { Role: [...] }
+      } catch (error) {
+        console.error("Error fetching roles:", error);
+      }
+    };
+
+    fetchRoles();
+  }, []);
 
   const handleSelect = (role) => {
-    setSelectedRole(role.name);
-    setFormValues({ ...formValues, role_id: role.id });
+    setSelectedRole(role.role_name);
+    setFormValues({ ...formValues, role_id: role.role_id });
     setIsOpen(false);
   };
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
-    setFormValues({ ...formValues, [name]: type === 'checkbox' ? checked : value });
+    setFormValues({ ...formValues, [name]: type === "checkbox" ? checked : value });
   };
 
   const handleSubmit = async (e) => {
@@ -95,7 +102,6 @@ const CreateEmployee = () => {
             className="mt-1 p-2 h-10 w-full rounded-md border-gray-300 bg-white text-sm text-gray-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 pr-10"
             placeholder="Password"
           />
-
           <input
             id="confirmPassword"
             name="confirmPassword"
@@ -106,7 +112,7 @@ const CreateEmployee = () => {
             placeholder="Password Confirmation"
           />
 
-          <div className="relative mt-7">
+          <div className="relative mt-1">
             <button
               type="button"
               onClick={() => setIsOpen(!isOpen)}
@@ -121,23 +127,24 @@ const CreateEmployee = () => {
               >
                 <path
                   fillRule="evenodd"
-                  d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+                  d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 011.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
                   clipRule="evenodd"
                 />
               </svg>
+
             </button>
 
             {isOpen && (
-              <div className="absolute mt-2 w-full bg-white border border-gray-200 rounded-md shadow-lg z-10">
+              <div className="absolute mt-1 w-full bg-white border border-gray-200 rounded-md shadow-lg z-10">
                 <ul className="py-1">
                   {roles.map((role) => (
-                    <li key={role.id}>
+                    <li key={role.role_id}>
                       <button
                         type="button"
                         onClick={() => handleSelect(role)}
                         className="block w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100"
                       >
-                        {role.name}
+                        {role.role_name}
                       </button>
                     </li>
                   ))}
@@ -146,7 +153,7 @@ const CreateEmployee = () => {
             )}
           </div>
 
-          <div className="col-span-6">
+          <div className="col-span-6 mt-4">
             <label htmlFor="isadmin" className="flex gap-4">
               <input
                 type="checkbox"
@@ -156,7 +163,6 @@ const CreateEmployee = () => {
                 onChange={handleChange}
                 className="size-6 rounded-md border-gray-300 bg-white shadow-sm"
               />
-
               <span className="block text-sm font-medium text-gray-700">
                 Manager Role
               </span>
