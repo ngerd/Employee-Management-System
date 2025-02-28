@@ -58,15 +58,14 @@ function Login() {
 
   const validate = async () => {
     const data = await fetchMockData();
-    if (data.error == null) {
-      console.log(data);
-      console.log(formValues);
-      setEmployeeId(data.employee_id);
+    if(data.error == null) {
+      console.log(data.employee_id)
+      setEmployeeId(data.employee_id)
+      console.log(employeeId)
       const employeeData = await fetchEmployeeInfo();
+      console.log(employeeData)
       setisadmin(employeeData.isadmin);
-      console.log(employeeId);
-      console.log(employeeData);
-      navigate("/home");
+      navigate("/home")
     }
   };
 
