@@ -2,7 +2,7 @@ import express from "express";
 import pool from "../DB.js";
 const router = express.Router();
 
-router.post("/create_project", async (req, res) => {
+router.post("/create-project", async (req, res) => {
   const {
     project_name,
     project_description,

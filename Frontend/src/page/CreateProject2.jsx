@@ -1,146 +1,120 @@
-import React, { useState, useRef } from "react";
-import TextInput from "../component/TextInput";
-import TextAreaInput from "../component/TextAreaInput";
-import { Pencil  } from "lucide-react";
+import React, { useState } from "react";
 
-const employees = [
-    { id: 1, name: "Alice Johnson" },
-    { id: 2, name: "Bob Smith" },
-    { id: 3, name: "Charlie Brown" },
-    { id: 4, name: "Diana Prince" },
-    { id: 5, name: "Ethan Hunt" },
-];
+const CreateProject2 = () => {
+  const [formValues, setFormValues] = useState({
+    project_name: "",
+    project_description: "",
+    start_date: "",
+    due_date: "",
+    customername: "",
+    nation: "",
+    cost: "",
+  });
 
-const CreateProject = () => {
-    const [selectedEmployees, setSelectedEmployees] = useState([]);
-    const [searchTerm, setSearchTerm] = useState("");
-    const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-    const dropdownRef = useRef(null);
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormValues({ ...formValues, [name]: value });
+  };
 
-    const availableEmployees = employees.filter(
-        (emp) => !selectedEmployees.some((selected) => selected.id === emp.id) &&
-            emp.name.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const response = await fetch("http://localhost:3000/projects/create-project", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formValues),
+      });
+      const data = await response.json();
+      console.log(data);
+    } catch (error) {
+      console.error("There was a problem creating the project:", error);
+    }
+  };
 
-    const handleAddEmployee = (employee) => {
-        setSelectedEmployees([...selectedEmployees, employee]);
-        setSearchTerm("");
-    };
+  return (
+    <div className="mx-auto max-w-2xl px-6 py-12 sm:px-8 lg:px-10">
+      <div className="rounded-lg bg-white p-8 shadow-lg">
+        <h2 className="text-2xl pb-10 font-extrabold text-gray-900">Create Project</h2>
+        <form className="space-y-4" onSubmit={handleSubmit}>
+          <input
+            id="project_name"
+            name="project_name"
+            value={formValues.project_name}
+            onChange={handleChange}
+            className="mt-1 p-2 h-10 w-full rounded-md border-gray-300 bg-white text-sm text-gray-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 pr-10"
+            placeholder="Project Name"
+          />
 
-    const handleRemoveEmployee = (id) => {
-        setSelectedEmployees(selectedEmployees.filter((e) => e.id !== id));
-    };
+          <textarea
+            id="project_description"
+            name="project_description"
+            value={formValues.project_description}
+            onChange={handleChange}
+            className="mt-1 p-2 h-20 w-full rounded-md border-gray-300 bg-white text-sm text-gray-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            placeholder="Project Description"
+          />
 
-    const handleClickOutside = (event) => {
-        if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-            setIsDropdownOpen(false);
-        }
-    };
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <input
+              type="date"
+              id="start_date"
+              name="start_date"
+              value={formValues.start_date}
+              onChange={handleChange}
+              className="mt-1 p-2 h-10 w-full rounded-md border-gray-300 bg-white text-sm text-gray-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              placeholder="Start Date"
+            />
+            <input
+              type="date"
+              id="due_date"
+              name="due_date"
+              value={formValues.due_date}
+              onChange={handleChange}
+              className="mt-1 p-2 h-10 w-full rounded-md border-gray-300 bg-white text-sm text-gray-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              placeholder="Due Date"
+            />
+          </div>
 
-    React.useEffect(() => {
-        document.addEventListener("mousedown", handleClickOutside);
-        return () => {
-            document.removeEventListener("mousedown", handleClickOutside);
-        };
-    }, []);
+          <input
+            id="customername"
+            name="customername"
+            value={formValues.customername}
+            onChange={handleChange}
+            className="mt-1 p-2 h-10 w-full rounded-md border-gray-300 bg-white text-sm text-gray-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            placeholder="Customer Name"
+          />
+          <select
+            id="nation"
+            name="nation"
+            value={formValues.nation}
+            onChange={handleChange}
+            className="mt-1 p-2 h-10 w-full rounded-md border-gray-300 bg-white text-sm text-gray-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          >
+            <option value="" disabled>Select a nation</option>
+            <option value="Singapore">Singapore</option>
+            <option value="Viet Nam">Viet Nam</option>
+          </select>
 
-    return (
-        <div className="mx-auto max-w-screen-xl py-10 sm:px-6 lg:px-8">
-            <h1 className="text-4xl font-bold text-gray-900 flex items-center gap-2">
-                Create Project
-                <Pencil  className="w-8 h-11 text-red-800 transform" />
-            </h1>
-            <div className="mt-4 grid grid-cols-1 gap-x-16 gap-y-8 lg:grid-cols-2">
-                <div className="rounded-lg bg-white p-8 shadow-lg lg:col-span-1 lg:p-12">
-                    <h2 className="text-2xl pb-10 font-extrabold text-gray-900">Create Project</h2>
-                    <form action="#" className="space-y-4">
-                        <TextInput label="Project Name" id="ProjectName" name="project_name" />
-                        <TextAreaInput label="Project Description" id="projectDescription" name="project_description" />
-                        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                            <div>
-                                <label htmlFor="startDate" className="block text-sm font-medium text-gray-700">
-                                    Start Date
-                                </label>
-                                <input
-                                    type="date"
-                                    id="startDate"
-                                    name="startDate"
-                                    className="w-full rounded-lg border-gray-300 p-3 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                                />
-                            </div>
-                            <div>
-                                <label htmlFor="endDate" className="block text-sm font-medium text-gray-700">
-                                    End Date
-                                </label>
-                                <input
-                                    type="date"
-                                    id="endDate"
-                                    name="endDate"
-                                    className="w-full rounded-lg border-gray-300 p-3 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                                />
-                            </div>
-                        </div>
-                        <TextInput label="Customer Name" id="CustomerName" name="customer_name" />
-                        <TextInput label="Nation" id="Nation" name="nation" />
-                    </form>
-                </div>
-
-                <div className="rounded-lg bg-white p-8 shadow-lg lg:col-span-1 lg:p-12">
-                    <h2 className="text-2xl pb-10 font-extrabold text-gray-900">Create Team</h2>
-                    <div className="mt-4 relative" ref={dropdownRef}>
-                        <input
-                            type="text"
-                            placeholder="Search Members..."
-                            className="w-full p-2 border rounded-md cursor-pointer"
-                            value={searchTerm}
-                            onFocus={() => setIsDropdownOpen(true)}
-                            onChange={(e) => setSearchTerm(e.target.value)}
-                        />
-                        {isDropdownOpen && (
-                            <ul className="absolute w-full mt-2 max-h-40 overflow-auto border rounded-md bg-white shadow-lg">
-                                {availableEmployees.map((emp) => (
-                                    <li key={emp.id} className="p-2 hover:bg-gray-100 cursor-pointer" onClick={() => handleAddEmployee(emp)}>
-                                        {emp.name}
-                                    </li>
-                                ))}
-                            </ul>
-                        )}
-                    </div>
-
-                    {selectedEmployees.length > 0 && (
-                        <div className="mt-4">
-                            <h3 className="text-lg font-semibold">Selected Members</h3>
-                            <table className="w-full mt-2 border-collapse border border-gray-300">
-                                <thead>
-                                    <tr className="bg-gray-100">
-                                        <th className="border p-2">Name</th>
-                                        <th className="border p-2">Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {selectedEmployees.map((emp) => (
-                                        <tr key={emp.id}>
-                                            <td className="border p-2">{emp.name}</td>
-                                            <td className="border p-2 text-center">
-                                                <button className="text-red-500" onClick={() => handleRemoveEmployee(emp.id)} type="button">
-                                                    Remove
-                                                </button>
-                                            </td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        </div>
-                    )}
-                </div>
-            </div>
-            <div className="mt-4 text-right">
-                <button type="submit" className="inline-block w-full rounded-lg bg-black px-5 py-3 font-medium text-white sm:w-auto">
-                    Create Project
-                </button>
-            </div>
-        </div>
-    );
+          <input
+            type="number"
+            id="cost"
+            name="cost"
+            value={formValues.cost}
+            onChange={handleChange}
+            className="mt-1 p-2 h-10 w-full rounded-md border-gray-300 bg-white text-sm text-gray-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            placeholder="Cost"
+          />
+          <div className="mt-6 text-right">
+            <button type="submit" className="inline-block w-full rounded-lg bg-black px-5 py-3 font-medium text-white sm:w-auto">
+              Create Project
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
 };
 
-export default CreateProject;
+export default CreateProject2;
