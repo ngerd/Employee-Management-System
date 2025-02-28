@@ -160,7 +160,7 @@ router.post("/updateEmployee", async (req, res) => {
   }
 });
 
-// Delete Employee
+// Delete Employee endpoint: deletes an employee and associated data in project_member and task_assignment
 router.post("/deleteEmployee", async (req, res) => {
   const { employee_id } = req.body;
   
@@ -169,6 +169,11 @@ router.post("/deleteEmployee", async (req, res) => {
   }
   
   try {
+    // Explicitly delete related rows from project_member and task_assignment
+    await pool.query('DELETE FROM project_employee WHERE employee_id = $1', [employee_id]);
+    await pool.query('DELETE FROM task_assignment WHERE employee_id = $1', [employee_id]);
+    
+    // Now delete the employee record
     const result = await pool.query(
       'DELETE FROM employee WHERE employee_id = $1 RETURNING employee_id',
       [employee_id]
