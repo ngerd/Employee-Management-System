@@ -1,11 +1,18 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
+
 
 const Card = ({ Icon, title, subtitle, description, linkText, href }) => {
+  const navigate = useNavigate();
   console.log("Icon prop:", Icon);
+  const handleClick = () => {
+    console.log(href + " clicked")
+    navigate("/"+href)
+  }
 
   return (
-    <a
-      href={href}
+    <div
+      onClick={()=>handleClick(href)}
       className="group relative block w-54 h-54"
     >
       <span className="absolute inset-0 border-2 rounded-2xl border-dashed border-black"></span>
@@ -31,7 +38,7 @@ const Card = ({ Icon, title, subtitle, description, linkText, href }) => {
           <p className="mt-3 font-bold">{linkText}</p>
         </div>
       </div>
-    </a>
+    </div>
   );
 };
 

@@ -25,7 +25,6 @@ function Navbar() {
 
   const fetchData = async () => {
     try {
-      console.log(formValues);
       const response = await fetch("http://localhost:3000/logout", {
         method: "POST",
         headers: {
