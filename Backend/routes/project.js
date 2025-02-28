@@ -57,7 +57,7 @@ router.post("/get-project", async (req, res) => {
     );
 
     if (result.rows.length === 0) {
-      return res.status(404).json({ error: "Project not found" });
+      return res.status(404).json({ error: "Project or Employee not found" });
     }
 
     return res.status(200).json({ projects: result.rows });
@@ -258,11 +258,11 @@ router.post("/delete-employee", async (req, res) => {
     await client.query("BEGIN");
 
     //Fetch project's detail and pay rate
-    const query = `SELECT p.nation, p.cost, r."pay_rate_sg", r."pay_rate_vn"
-                    FROM public."project" p
-                    JOIN public."project_employee" pm ON pm.project_id = p.project_id
-                    JOIN public."employee" e ON pm.employee_id = e.employee_id
-                    JOIN public."role" r ON r.role_id = e.role_id
+    const query = `SELECT p.nation, p.cost, r.pay_rate_sg, r.pay_rate_vn
+                    FROM public.project p
+                    JOIN public.project_employee pm ON pm.project_id = p.project_id
+                    JOIN public.employee e ON pm.employee_id = e.employee_id
+                    JOIN public.role r ON r.role_id = e.role_id
                     WHERE pm.employee_id = $1 AND pm.project_id = $2`;
     const result = await client.query(query, [employee_id, project_id]);
 
