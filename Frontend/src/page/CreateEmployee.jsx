@@ -131,7 +131,6 @@ const CreateEmployee = () => {
                   clipRule="evenodd"
                 />
               </svg>
-
             </button>
 
             {isOpen && (
@@ -153,7 +152,7 @@ const CreateEmployee = () => {
             )}
           </div>
 
-          <div className="col-span-6 mt-4">
+          <div className="col-span-6 mt-6">
             <label htmlFor="isadmin" className="flex gap-4">
               <input
                 type="checkbox"
@@ -164,11 +163,11 @@ const CreateEmployee = () => {
                 className="size-6 rounded-md border-gray-300 bg-white shadow-sm"
               />
               <span className="block text-sm font-medium text-gray-700">
-                Manager Role
+                Admin Role
               </span>
             </label>
           </div>
-          <div className="mt-4 text-right">
+          <div className="mt-6 text-right">
             <button
               type="submit"
               className="inline-block shrink-0 rounded-md border border-blue-600 bg-blue-600 px-12 py-3 text-sm font-medium text-white transition hover:bg-pink-200 hover:text-blue-800 focus:ring-3 focus:outline-none"
