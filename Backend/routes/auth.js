@@ -10,7 +10,7 @@ dotenv.config();
 const router = express.Router();
 const saltRounds = 10;
 
-// Login
+// Login endpoint using email and password
 router.post("/login", async (req, res) => {
   const { email, password } = req.body;
   
@@ -52,7 +52,7 @@ router.post("/login", async (req, res) => {
   }
 });
 
-// Create Account
+// Create Account endpoint
 router.post("/createAccount", async (req, res) => {
   const { firstname, lastname, email, password, confirmPassword, isadmin, role_id } = req.body;
   
@@ -110,7 +110,7 @@ router.post("/createAccount", async (req, res) => {
   }
 });
 
-// Logout 
+// Logout endpoint: clears the JWT cookie
 router.post("/logout", (req, res) => {
   res.clearCookie("jwt", {
     httpOnly: true,
@@ -160,7 +160,7 @@ router.post("/updateEmployee", async (req, res) => {
   }
 });
 
-// Delete Employee endpoint: deletes an employee and associated data in project_member and task_assignment
+// Delete Employee endpoint: deletes an employee and associated data in project_employee and task_assignment
 router.post("/deleteEmployee", async (req, res) => {
   const { employee_id } = req.body;
   
@@ -169,7 +169,7 @@ router.post("/deleteEmployee", async (req, res) => {
   }
   
   try {
-    // Explicitly delete related rows from project_member and task_assignment
+    // Explicitly delete related rows from project_employee and task_assignment
     await pool.query('DELETE FROM project_employee WHERE employee_id = $1', [employee_id]);
     await pool.query('DELETE FROM task_assignment WHERE employee_id = $1', [employee_id]);
     
@@ -189,6 +189,19 @@ router.post("/deleteEmployee", async (req, res) => {
     });
   } catch (err) {
     console.error("Delete employee error:", err);
+    return res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+//Get All Employees
+router.get("/getEmployee", async (req, res) => {
+  try {
+    const result = await pool.query(
+      'SELECT employee_id, firstname, lastname, email, isadmin, role_id FROM employee'
+    );
+    return res.json({ employees: result.rows });
+  } catch (err) {
+    console.error("Error retrieving employees:", err);
     return res.status(500).json({ error: "Internal server error" });
   }
 });

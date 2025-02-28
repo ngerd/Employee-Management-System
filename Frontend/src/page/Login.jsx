@@ -101,6 +101,7 @@ function Login() {
               value={formValues.email}
               onChange={handleChange}
               className="mt-1 p-2 h-10 w-full rounded-md border-gray-300 bg-white text-sm text-gray-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 pr-10"
+              placeholder="Email"
             />
 
             <input
@@ -110,7 +111,8 @@ function Login() {
               type="password"
               value={formValues.password}
               onChange={handleChange}
-              className="w-full px-6 py-4 text-lg"
+              className="mt-1 p-2 h-10 w-full rounded-md border-gray-300 bg-white text-sm text-gray-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 pr-10"
+              placeholder="Password"
             />
 
             <div className="col-span-6 mt-7 sm:flex sm:items-center sm:gap-4">
