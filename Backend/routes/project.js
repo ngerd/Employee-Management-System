@@ -14,7 +14,7 @@ router.post("/create_project", async (req, res) => {
   } = req.body;
   const project_status = `In Progress`;
   // Validate input
-  if (!project_name && !project_id) {
+  if (!project_name ) {
     return res
       .status(400)
       .json({ error: "Missing required field: projectName" });
@@ -23,7 +23,7 @@ router.post("/create_project", async (req, res) => {
   try {
     // Insert the new project into the Project table
     const result = await pool.query(
-      `INSERT INTO public."Project" ("project_name", "project_description", "start_date", "due_date","project_status","customerName","nation","cost") 
+      `INSERT INTO public.project ("project_name", "project_description", "start_date", "due_date","project_status","customername","nation","cost") 
       VALUES ($1, $2, $3, $4, $5, $6, $7, $8 ) RETURNING *`,
       [
         project_name,
@@ -52,7 +52,7 @@ router.post("/get-project", async (req, res) => {
 
   try {
     const result = await pool.query(
-      'SELECT * FROM public."Project_Member" pm JOIN public."Project" p on pm.project_id = p.project_id WHERE employee_id = $1',
+      'SELECT * FROM public.project_employee pm JOIN public.project p on pm.project_id = p.project_id WHERE employee_id = $1',
       [employee_id]
     );
 
@@ -146,12 +146,12 @@ router.post("/update", async (req, res) => {
   }
 
   try {
-    const updateQuery = `UPDATE public."Project" 
+    const updateQuery = `UPDATE public."project" 
                            SET  project_name = COALESCE($1, project_name),
                                 project_description = COALESCE($2, project_description),
                                 due_date = COALESCE($3, due_date),
                                 project_status = COALESCE($4, project_status),
-                                "customerName" = COALESCE($5, "customerName"),
+                                customername = COALESCE($5, customername),
                                 nation = COALESCE($6, nation),
                                 cost = COALESCE($7, cost)
                             WHERE project_id = $8
@@ -192,7 +192,7 @@ router.post("/add-employee", async (req, res) => {
     await client.query("BEGIN");
 
     //Insert employee into project_member
-    const addEmployeeQuery = `INSERT INTO public."Project_Member" ("isManager", project_id, employee_id)
+    const addEmployeeQuery = `INSERT INTO public."project_employee" (ismanager, project_id, employee_id)
                               VALUES ($1, $2, $3) RETURNING *`;
     const employeeResult = await client.query(addEmployeeQuery, [
       ismanager,
@@ -200,11 +200,11 @@ router.post("/add-employee", async (req, res) => {
       employee_id,
     ]);
 
-    const query = `SELECT p.nation, p.cost, r."pay_rate_SG", r."pay_rate_VN"
-                  FROM public."Project" p
-                  JOIN public."Project_Member" pm ON pm.project_id = p.project_id
-                  JOIN public."Employee" e ON pm.employee_id = e.employee_id
-                  JOIN public."Role" r ON r.role_id = e.role_id
+    const query = `SELECT p.nation, p.cost, r.pay_rate_sg, r.pay_rate_vn
+                  FROM public."project" p
+                  JOIN public."project_employee" pm ON pm.project_id = p.project_id
+                  JOIN public."employee" e ON pm.employee_id = e.employee_id
+                  JOIN public."role" r ON r.role_id = e.role_id
                   WHERE pm.employee_id = $1 AND pm.project_id = $2`;
 
     const result = await client.query(query, [employee_id, project_id]);
@@ -217,18 +217,18 @@ router.post("/add-employee", async (req, res) => {
     const {
       nation,
       cost: currentCost,
-      pay_rate_SG,
-      pay_rate_VN,
+      pay_rate_sg,
+      pay_rate_vn,
     } = result.rows[0];
 
     //Determine the correct pay rate based on the project nation
-    const payRate = nation === "Singapore" ? pay_rate_SG : pay_rate_VN;
+    const payRate = nation === "Singapore" ? pay_rate_sg : pay_rate_vn;
 
     //Calculate and update the new project
     const newCost = parseFloat(currentCost) + parseFloat(payRate);
 
     await client.query(
-      `UPDATE public."Project" SET cost = $1 WHERE project_id = $2`,
+      `UPDATE public."project" SET cost = $1 WHERE project_id = $2`,
       [newCost, project_id]
     );
     await client.query("COMMIT");
@@ -239,35 +239,7 @@ router.post("/add-employee", async (req, res) => {
     });
   } catch (error) {
     await client.query("ROLLBACK");
-    // Handle duplicate key error (assignment already exists)
-    if (error.code === "23505") {
-      return res.status(400).json({
-        error: `Employee ${employee_id}  already exists.`,
-      });
-    }
-    // Check if error is a foreign key violation (error code 23503)
-    if (error.code === "23503") {
-      if (error.detail && error.detail.includes('table public."Project"')) {
-        return res
-          .status(400)
-          .json({ error: `Project with ID ${project_id} does not exist.` });
-      } else if (
-        error.detail &&
-        error.detail.includes('table public."Employee"')
-      ) {
-        return res
-          .status(400)
-          .json({ error: `Employee with ID ${employee_id} does not exist.` });
-      } else if (error.detail && error.detail.includes('table Public."Role"')) {
-        return res
-          .status(400)
-          .json({ error: `Role with ID ${role_id} does not exist.` });
-      }
-      return res
-        .status(400)
-        .json({ error: "Foreign key constraint violation." });
-    }
-    console.error("Error assigning task:", error);
+    console.error("Error adding employee:", error);
     res.status(500).json({ error: "Internal Server Error" });
   } finally {
     client.release();
@@ -286,11 +258,11 @@ router.post("/delete-employee", async (req, res) => {
     await client.query("BEGIN");
 
     //Fetch project's detail and pay rate
-    const query = `SELECT p.nation, p.cost, r."pay_rate_SG", r."pay_rate_VN"
-                    FROM public."Project" p
-                    JOIN public."Project_Member" pm ON pm.project_id = p.project_id
-                    JOIN public."Employee" e ON pm.employee_id = e.employee_id
-                    JOIN public."Role" r ON r.role_id = e.role_id
+    const query = `SELECT p.nation, p.cost, r."pay_rate_sg", r."pay_rate_vn"
+                    FROM public."project" p
+                    JOIN public."project_employee" pm ON pm.project_id = p.project_id
+                    JOIN public."employee" e ON pm.employee_id = e.employee_id
+                    JOIN public."role" r ON r.role_id = e.role_id
                     WHERE pm.employee_id = $1 AND pm.project_id = $2`;
     const result = await client.query(query, [employee_id, project_id]);
 
@@ -302,18 +274,18 @@ router.post("/delete-employee", async (req, res) => {
     const {
       nation,
       cost: currentCost,
-      pay_rate_SG,
-      pay_rate_VN,
+      pay_rate_sg,
+      pay_rate_vn,
     } = result.rows[0];
-    const payRate = nation === "Singapore" ? pay_rate_SG : pay_rate_VN;
+    const payRate = nation === "Singapore" ? pay_rate_sg : pay_rate_vn;
     const newCost = parseFloat(currentCost) - parseFloat(payRate);
 
     await client.query(
-      `UPDATE public."Project" SET cost = $1 WHERE project_id = $2`,
+      `UPDATE public."project" SET cost = $1 WHERE project_id = $2`,
       [newCost, project_id]
     );
 
-    const deleteEmployee = `DELETE FROM public."Project_Member" WHERE employee_id = $1 AND project_id = $2`;
+    const deleteEmployee = `DELETE FROM public."project_employee" WHERE employee_id = $1 AND project_id = $2`;
     const value = [employee_id, project_id];
     await client.query(deleteEmployee, value);
 
