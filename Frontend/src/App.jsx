@@ -5,6 +5,8 @@ import {
   Navigate,
   useLocation,
 } from "react-router-dom";
+
+import CreateProject2 from "./page/CreateProject2";
 import AdminDashboard from "./page/AdminDashboard";
 import Project from "./page/Project";
 import CreateProject from "./page/CreateProject";
@@ -33,6 +35,7 @@ function Layout() {
           <Route path="/login" element={<Login />} />
           <Route path="/project" element={<Project />} />
           <Route path="/create-project" element={<CreateProject />} />
+          <Route path="/create-project2" element={<CreateProject2 />} />
           <Route path="/project-detail" element={<ProjectDetail />} />
           <Route path="/create-employee" element={<CreateEmployee />} />
           <Route path="/home" element={<Home />} />
