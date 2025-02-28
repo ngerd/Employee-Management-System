@@ -2,7 +2,7 @@ import express from "express";
 import pool from "../DB.js";
 const router = express.Router();
 
-router.post("/create_project", async (req, res) => {
+router.post("/create-project", async (req, res) => {
   const {
     project_name,
     project_description,
@@ -183,6 +183,8 @@ router.post("/update", async (req, res) => {
 router.post("/add-employee", async (req, res) => {
   const { employee_id, project_id, ismanager } = req.body;
 
+  const manager = ismanager || "false";
+
   if (!employee_id || !project_id) {
     return res.status(400).json({ error: "Missing reqiured field" });
   }
@@ -195,7 +197,7 @@ router.post("/add-employee", async (req, res) => {
     const addEmployeeQuery = `INSERT INTO public."project_employee" (ismanager, project_id, employee_id)
                               VALUES ($1, $2, $3) RETURNING *`;
     const employeeResult = await client.query(addEmployeeQuery, [
-      ismanager,
+      manager,
       project_id,
       employee_id,
     ]);

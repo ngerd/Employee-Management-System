@@ -11,7 +11,7 @@ function Login() {
   };
   const [formValues, setFormValues] = useState(initialValues);
   const navigate = useNavigate();
-  const { employeeId, setEmployeeId, setisadmin } = useContext(Employee);
+  const { isadmin, employeeId, setEmployeeId, setisadmin } = useContext(Employee);
   const fetchMockData = async () => {
     try {
       console.log(formValues);
@@ -23,6 +23,8 @@ function Login() {
         body: JSON.stringify(formValues),
       });
       const data = await response.json();
+      console.log(data.employee_id)
+      setEmployeeId(data.employee_id)
       return data;
     } catch (error) {
       console.error("There was a problem fetching the mock data:", error);
@@ -40,6 +42,9 @@ function Login() {
         body: JSON.stringify({ employee_id: employeeId }),
       });
       const data = await response.json();
+      
+      console.log(data)
+      setisadmin(data.isadmin);
       return data;
     } catch (error) {
       console.error("There was a problem fetching the mock data:", error);
@@ -58,16 +63,36 @@ function Login() {
 
   const validate = async () => {
     const data = await fetchMockData();
-    if(data.error == null) {
-      console.log(data.employee_id)
-      setEmployeeId(data.employee_id)
-      console.log(employeeId)
-      const employeeData = await fetchEmployeeInfo();
-      console.log(employeeData)
-      setisadmin(employeeData.isadmin);
-      navigate("/home")
+    if (data.error == null) {
+      // `employeeId` is not immediately updated here
+      console.log("Waiting for employeeId update...");
     }
   };
+
+  useEffect(() => {
+    if (employeeId) {
+      console.log("Updated Employee ID:", employeeId);
+      const init = async () => {
+        const data = await fetchEmployeeInfo();
+        if (data.error == null) {
+          console.log("Waiting for employeeId update...");
+        }
+        navigate("/home");
+      }
+      init();
+    };
+
+  }, [employeeId]);
+
+  // const validate = async () => {
+  //   const data = await fetchMockData();
+  //   if(data.error == null) {
+  //     console.log(employeeId)
+  //     const employeeData = await fetchEmployeeInfo();
+  //     console.log(isadmin)
+  //     //navigate("/home")
+  //   }
+  // };
 
   return (
     <div className="lg:grid lg:min-h-screen lg:grid-cols-12">

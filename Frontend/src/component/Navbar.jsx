@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect,useContext } from "react";
+import React, { useState, useRef, useEffect, useContext } from "react";
 import { FaUserCircle } from "react-icons/fa";
 import logo from "../assets/logoICON.png";
 import { CircleUserRound, Bell, BellRing } from "lucide-react"; // Importing icons
@@ -25,7 +25,6 @@ function Navbar() {
 
   const fetchData = async () => {
     try {
-      console.log(formValues);
       const response = await fetch("http://localhost:3000/logout", {
         method: "POST",
         headers: {
