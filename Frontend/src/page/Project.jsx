@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useRef, useEffect,useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
@@ -10,6 +10,9 @@ import { CirclePlus } from "lucide-react";
 import "primereact/resources/themes/lara-light-blue/theme.css";
 import "primereact/resources/primereact.min.css";
 import "primeicons/primeicons.css";
+import {
+  ProjectContext
+} from "../context/ContextProvider";
 
 const Project = () => {
   const navigate = useNavigate();
@@ -17,6 +20,7 @@ const Project = () => {
   const [loading, setLoading] = useState(true);
   const [filters, setFilters] = useState(null);
   const [globalFilterValue, setGlobalFilterValue] = useState('');
+  const {projectId, setProjectId} = useContext(ProjectContext);
 
   useEffect(() => {
     setTimeout(() => {
@@ -59,11 +63,15 @@ const Project = () => {
     }));
     setGlobalFilterValue(value);
   };
+  const handleClick = (rowData) => {
+    setProjectId(rowData.project_id)
+    navigate(`/project-information/`)
+  }
 
   const viewButtonTemplate = (rowData) => {
     return (
       <button
-        onClick={() => navigate(`/project-information/${rowData.project_id}`)}
+        onClick={()=>handleClick(rowData)}
         className="inline-block rounded-md bg-green-700 px-4 py-2 text-xs font-medium text-white hover:bg-green-500"
       >
         View

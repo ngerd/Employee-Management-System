@@ -38,7 +38,7 @@ function Layout() {
           <Route path="/home" element={<Home />} />
           <Route path="/timesheet" element={<Timesheet />} />
           <Route path="/create-timeslot" element={<CreateTimeslot />} />
-          <Route path="/project-information" element={<ProjectInformation />} />
+          <Route path="/project-information/" element={<ProjectInformation />} />
           <Route path="/project-task" element={<ProjectTask />} />
           <Route path="/project-team" element={<ProjectTeam />} />
           <Route path="/staff" element={<Staff />} />
