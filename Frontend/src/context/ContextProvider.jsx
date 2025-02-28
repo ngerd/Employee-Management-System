@@ -1,38 +1,19 @@
 import React from "react";
 import { createContext, useState } from "react";
 
-export const LoginContext = createContext(null);
-export const LoginPageContext = createContext(null);
-export const UserContext = createContext(null);
+export const Employee = createContext(null);
 
 function ContextProvider({ children }) {
-  const [user, setUser] = useState(null);
-  const [duringLogin, setDuringLogin] = useState(false);
-  const [isLogin, setIsLogin] = useState(false);
-  
+  const [employeeId, setEmployeeId] = useState(null);
   return (
-    <UserContext.Provider
+    <Employee.Provider
       value={{
-        user,
-        setUser,
+        employeeId,
+        setEmployeeId,
       }}
     >
-      <LoginPageContext.Provider
-        value={{
-          duringLogin,
-          setDuringLogin,
-        }}
-      >
-        <LoginContext.Provider
-          value={{
-            isLogin,
-            setIsLogin,
-          }}
-        >
-          {children}
-        </LoginContext.Provider>
-      </LoginPageContext.Provider>
-    </UserContext.Provider>
+      {children}
+    </Employee.Provider>
   );
 }
 

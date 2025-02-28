@@ -3,9 +3,7 @@ import TextInput from "../component/TextInput";
 import PasswordInput from "../component/PasswordInput";
 import { useNavigate } from "react-router-dom";
 import {
-  LoginContext,
-  LoginPageContext,
-  UserContext,
+  Employee
 } from "../context/ContextProvider";
 
 function Login() {
@@ -13,17 +11,9 @@ function Login() {
     email: "",
     password: "",
   };
-  
   const [formValues, setFormValues] = useState(initialValues);
-  const [formErrors, setFormErrors] = useState({});
-  const { setIsLogin } = useContext(LoginContext);
-  const { setDuringLogin } = useContext(LoginPageContext);
-  const { setUser } = useContext(UserContext);
+  const { employeeId, setEmployeeId } = useContext(Employee);
   const navigate = useNavigate();
-
-  useEffect(() => {
-    setDuringLogin(true);
-  }, [setDuringLogin]);
 
   const fetchMockData = async () => {
     try {
@@ -55,6 +45,9 @@ function Login() {
   const validate = async () => {
     const data = await fetchMockData();
     console.log(data);
+    console.log(formValues);
+    setEmployeeId(data.employee_id);
+    console.log(employeeId);
   };
 
   return (
@@ -83,18 +76,18 @@ function Login() {
             Login
           </h2>
           <form className="space-y-6" onSubmit={handleSubmit}>
-            <TextInput
-              label="Username"
-              id="Username"
+            <input
+              label="email"
+              id="email"
               name="email"
               value={formValues.email}
               onChange={handleChange}
-              className="w-full px-6 py-4 text-lg"
+              className="mt-1 p-2 h-10 w-full rounded-md border-gray-300 bg-white text-sm text-gray-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 pr-10"
             />
             
-            <PasswordInput
-              label="Password"
-              id="Password"
+            <input
+              label="password"
+              id="password"
               name="password"
               type="password"
               value={formValues.password}
