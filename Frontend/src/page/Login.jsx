@@ -1,8 +1,11 @@
 import React from "react";
 import TextInput from "../component/TextInput";
 import PasswordInput from "../component/PasswordInput";
+import { useNavigate } from "react-router-dom";
 
-const Login = () => {
+function Login() {
+  const navigate = useNavigate();
+
   return (
     <div className="lg:grid lg:min-h-screen lg:grid-cols-12">
       <section className="relative flex h-32 items-end bg-gray-900 lg:col-span-5 lg:h-full xl:col-span-6">
@@ -23,7 +26,7 @@ const Login = () => {
         </div>
       </section>
 
-      <div className="flex items-center justify-center px-12 py-12 sm:px-16 lg:col-span-7 lg:px-32 lg:py-32 xl:col-span-6">
+      <div className="flex items-center justify-center place-items-center px-12 py-12 sm:px-16 lg:col-span-7 lg:px-32 lg:py-32 xl:col-span-6">
         <div className="rounded-lg bg-white p-16 shadow-xl max-w-2xl w-full">
           <h2 className="text-2xl pb-10 font-extrabold text-gray-900">
             Login
@@ -44,7 +47,8 @@ const Login = () => {
             />
 
             <div className="col-span-6 mt-7 sm:flex sm:items-center sm:gap-4">
-              <button className="inline-block shrink-0 rounded-md border border-blue-600 bg-blue-600 px-12 py-3 text-sm font-medium text-white transition hover:bg-pink-200 hover:text-blue-800 focus:ring-3 focus:outline-none">
+              <button className="inline-block shrink-0 rounded-md border border-blue-600 bg-blue-600 px-12 py-3 text-sm font-medium text-white transition hover:bg-pink-200 hover:text-blue-800 focus:ring-3 focus:outline-none"
+              onClick={() => navigate(`/home`)}>
                 Login
               </button>
             </div>

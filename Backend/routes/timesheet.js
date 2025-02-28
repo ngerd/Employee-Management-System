@@ -3,13 +3,7 @@ import pool from "../DB.js";
 
 const router = express.Router();
 
-/**
- * GET Timesheet
- * Input: { employee_id, days (optional) }
- * Output: list of { assignment_id, project_name, task_name, emp_startdate, emp_enddate }
- * If `days` is provided (e.g. 7, 15, 30), returns only records where emp_startdate >= (today - days).
- * If `days` is omitted, returns all records for that employee.
- */
+//GET Timesheet
 router.post("/getTimesheet", async (req, res) => {
   const { employee_id, days } = req.body;
 
@@ -58,7 +52,7 @@ router.post("/getTimesheet", async (req, res) => {
   }
 });
 
-// CREATE Timesheet endpoint with overlap and date order checks
+// CREATE Timesheet
 router.post("/createTimesheet", async (req, res) => {
   const { employee_ids, task_id, project_id, startdate, enddate } = req.body;
 
@@ -190,11 +184,7 @@ router.post("/createTimesheet", async (req, res) => {
   }
 });
 
-/**
- * DELETE Timesheet
- * Input: { assignment_id }
- * Output: { message: "delete successfully" }
- */
+//DELETE Timesheet
 router.post("/deleteTimesheet", async (req, res) => {
   const { assignment_id } = req.body;
 
@@ -219,7 +209,7 @@ router.post("/deleteTimesheet", async (req, res) => {
   }
 });
 
-// UPDATE Timesheet endpoint with overlap check
+// UPDATE Timesheet
 router.post("/updateTimesheet", async (req, res) => {
   const { assignment_id, startdate, enddate } = req.body;
 
