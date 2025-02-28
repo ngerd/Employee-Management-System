@@ -4,7 +4,7 @@ import { FileUser, SquareChartGantt, CalendarRange } from "lucide-react"; // Imp
 import { Employee } from "../context/ContextProvider";
 
 function Home() {
-  const {isadmin, setisadmin} = useContext(Employee);
+  const {isadmin} = useContext(Employee);
   console.log(isadmin)
 
   return (
