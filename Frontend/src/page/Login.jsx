@@ -72,8 +72,16 @@ function Login() {
   useEffect(() => {
     if (employeeId) {
       console.log("Updated Employee ID:", employeeId);
-      fetchEmployeeInfo(); // Now fetch data using the updated state
-    }
+      const init = async () => {
+        const data = await fetchEmployeeInfo();
+        if (data.error == null) {
+          console.log("Waiting for employeeId update...");
+        }
+        navigate("/home");
+      }
+      init();
+    };
+
   }, [employeeId]);
 
   // const validate = async () => {
