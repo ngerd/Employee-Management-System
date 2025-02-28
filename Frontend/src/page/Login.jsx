@@ -42,7 +42,7 @@ function Login() {
         body: JSON.stringify({ employee_id: employeeId }),
       });
       const data = await response.json();
-      
+
       console.log(data)
       setisadmin(data.isadmin);
       return data;
@@ -72,9 +72,21 @@ function Login() {
   useEffect(() => {
     if (employeeId) {
       console.log("Updated Employee ID:", employeeId);
-      fetchEmployeeInfo(); // Now fetch data using the updated state
-    }
+      const init = async () => {
+        const data = await fetchEmployeeInfo();
+        if (data.error == null) {
+          console.log("Waiting for employeeId update...");
+        }
+        navigate("/home");
+      }
+      init();
+    };
+
   }, [employeeId]);
+
+
+
+
 
   // const validate = async () => {
   //   const data = await fetchMockData();

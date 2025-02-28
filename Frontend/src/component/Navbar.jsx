@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect,useContext } from "react";
+import React, { useState, useRef, useEffect, useContext } from "react";
 import { FaUserCircle } from "react-icons/fa";
 import logo from "../assets/logoICON.png";
 import { CircleUserRound, Bell, BellRing } from "lucide-react"; // Importing icons
@@ -18,8 +18,8 @@ function Navbar() {
   };
   const validate = async () => {
     const data = await fetchData();
-    setEmployeeId(null)
-    setisadmin(null)
+    // setEmployeeId(null)
+    // setisadmin(null)
     navigate("/")
   };
 
