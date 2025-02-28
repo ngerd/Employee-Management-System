@@ -83,8 +83,9 @@ function Login() {
               value={formValues.email}
               onChange={handleChange}
               className="mt-1 p-2 h-10 w-full rounded-md border-gray-300 bg-white text-sm text-gray-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 pr-10"
+              placeholder="Email"
             />
-            
+
             <input
               label="password"
               id="password"
@@ -92,15 +93,16 @@ function Login() {
               type="password"
               value={formValues.password}
               onChange={handleChange}
-              className="w-full px-6 py-4 text-lg"
+              className="mt-1 p-2 h-10 w-full rounded-md border-gray-300 bg-white text-sm text-gray-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 pr-10"
+              placeholder="Password"
             />
 
             <div className="col-span-6 mt-7 sm:flex sm:items-center sm:gap-4">
-              <button 
-              type="submit"
-              className="inline-block shrink-0 rounded-md border border-blue-600 bg-blue-600 px-12 py-3 text-sm font-medium text-white transition hover:bg-pink-200 hover:text-blue-800 focus:ring-3 focus:outline-none"
+              <button
+                type="submit"
+                className="inline-block shrink-0 rounded-md border border-blue-600 bg-blue-600 px-12 py-3 text-sm font-medium text-white transition hover:bg-pink-200 hover:text-blue-800 focus:ring-3 focus:outline-none"
               >
-              Login
+                Login
               </button>
             </div>
           </form>
