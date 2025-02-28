@@ -2,9 +2,7 @@ import React, { useContext, useEffect, useState } from "react";
 import TextInput from "../component/TextInput";
 import PasswordInput from "../component/PasswordInput";
 import { useNavigate } from "react-router-dom";
-import {
-  Employee
-} from "../context/ContextProvider";
+import { Employee } from "../context/ContextProvider";
 
 function Login() {
   const initialValues = {
@@ -12,9 +10,8 @@ function Login() {
     password: "",
   };
   const [formValues, setFormValues] = useState(initialValues);
-  const { employeeId, setEmployeeId } = useContext(Employee);
   const navigate = useNavigate();
-
+  const { employeeId, setEmployeeId, setisadmin } = useContext(Employee);
   const fetchMockData = async () => {
     try {
       console.log(formValues);
@@ -24,6 +21,23 @@ function Login() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify(formValues),
+      });
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error("There was a problem fetching the mock data:", error);
+    }
+  };
+
+  const fetchEmployeeInfo = async () => {
+    try {
+      console.log(formValues);
+      const response = await fetch("http://localhost:3000/viewinfo", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ employee_id: employeeId }),
       });
       const data = await response.json();
       return data;
@@ -44,10 +58,16 @@ function Login() {
 
   const validate = async () => {
     const data = await fetchMockData();
-    console.log(data);
-    console.log(formValues);
-    setEmployeeId(data.employee_id);
-    console.log(employeeId);
+    if (data.error == null) {
+      console.log(data);
+      console.log(formValues);
+      setEmployeeId(data.employee_id);
+      const employeeData = await fetchEmployeeInfo();
+      setisadmin(employeeData.isadmin);
+      console.log(employeeId);
+      console.log(employeeData);
+      navigate("/home");
+    }
   };
 
   return (
@@ -72,9 +92,7 @@ function Login() {
 
       <div className="flex items-center justify-center place-items-center px-12 py-12 sm:px-16 lg:col-span-7 lg:px-32 lg:py-32 xl:col-span-6">
         <div className="rounded-lg bg-white p-16 shadow-xl max-w-2xl w-full">
-          <h2 className="text-2xl pb-10 font-extrabold text-gray-900">
-            Login
-          </h2>
+          <h2 className="text-2xl pb-10 font-extrabold text-gray-900">Login</h2>
           <form className="space-y-6" onSubmit={handleSubmit}>
             <input
               label="email"
@@ -84,7 +102,7 @@ function Login() {
               onChange={handleChange}
               className="mt-1 p-2 h-10 w-full rounded-md border-gray-300 bg-white text-sm text-gray-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 pr-10"
             />
-            
+
             <input
               label="password"
               id="password"
@@ -96,11 +114,11 @@ function Login() {
             />
 
             <div className="col-span-6 mt-7 sm:flex sm:items-center sm:gap-4">
-              <button 
-              type="submit"
-              className="inline-block shrink-0 rounded-md border border-blue-600 bg-blue-600 px-12 py-3 text-sm font-medium text-white transition hover:bg-pink-200 hover:text-blue-800 focus:ring-3 focus:outline-none"
+              <button
+                type="submit"
+                className="inline-block shrink-0 rounded-md border border-blue-600 bg-blue-600 px-12 py-3 text-sm font-medium text-white transition hover:bg-pink-200 hover:text-blue-800 focus:ring-3 focus:outline-none"
               >
-              Login
+                Login
               </button>
             </div>
           </form>
@@ -108,6 +126,6 @@ function Login() {
       </div>
     </div>
   );
-};
+}
 
 export default Login;

@@ -18,6 +18,7 @@ router.post("/viewinfo", async (req, res) => {
          e.employee_id, 
          (e.firstname || ' ' || e.lastname) AS fullname, 
          e.email, 
+         e.isadmin,
          r.role_name AS role
        FROM employee e
        JOIN role r ON e.role_id = r.role_id

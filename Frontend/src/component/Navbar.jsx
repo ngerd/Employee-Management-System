@@ -1,11 +1,43 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect,useContext } from "react";
 import { FaUserCircle } from "react-icons/fa";
 import logo from "../assets/logoICON.png";
 import { CircleUserRound, Bell, BellRing } from "lucide-react"; // Importing icons
+import {
+  Employee
+} from "../context/ContextProvider";
+import { useNavigate } from "react-router-dom";
 
 function Navbar() {
+  const navigate = useNavigate();
   const [isActive, setIsActive] = useState(false);
+  const { setEmployeeId, setisadmin } = useContext(Employee);
   const dropdownRef = useRef();
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    validate();
+  };
+  const validate = async () => {
+    const data = await fetchData();
+    setEmployeeId(null)
+    setisadmin(null)
+    navigate("/")
+  };
+
+  const fetchData = async () => {
+    try {
+      console.log(formValues);
+      const response = await fetch("http://localhost:3000/logout", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error("There was a problem fetching the mock data:", error);
+    }
+  };
 
   // Close dropdown if clicked outside
   useEffect(() => {
@@ -124,17 +156,10 @@ function Navbar() {
                 >
                   View Account
                 </a>
-                <a
-                  href="#"
-                  className="block rounded-lg px-4 py-2 text-sm text-gray-500 hover:bg-gray-50 hover:text-gray-700"
-                  role="menuitem"
-                >
-                  Settings
-                </a>
               </div>
 
               <div className="p-2">
-                <form method="POST" action="#">
+                <form method="POST" action="#" onSubmit={handleSubmit}>
                   <button
                     type="submit"
                     className="flex w-full items-center gap-2 rounded-lg px-4 py-2 text-sm text-red-700 hover:bg-red-50"
