@@ -49,4 +49,18 @@ router.get("/get-role", async (req, res) => {
   }
 });
 
+router.get("/get-employees", async (req, res) => {
+  try {
+    const result = await pool.query(
+      `SELECT e.employee_id, e.firstname, e.lastname, r.role_name 
+       FROM employee e 
+       JOIN role r ON e.role_id = r.role_id`
+    );
+    return res.json({ employees: result.rows });
+  } catch (error) {
+    console.error("Error retrieving employee roles: ", error);
+    return res.status(500).json({ error: "Internal server error" });
+  }
+});
+
 export default router;
