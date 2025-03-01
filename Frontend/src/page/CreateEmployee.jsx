@@ -170,7 +170,7 @@ const CreateEmployee = () => {
           <div className="mt-6 text-right">
             <button
               type="submit"
-              className="cursor-pointer inline-block shrink-0 rounded-md border border-blue-600 bg-blue-600 px-12 py-3 text-sm font-medium text-white transition hover:bg-pink-200 hover:text-blue-800 focus:ring-3 focus:outline-none"
+              className="inline-block w-full rounded-lg bg-black px-5 py-3 font-medium text-white sm:w-auto"
             >
               Submit
             </button>

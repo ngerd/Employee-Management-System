@@ -62,9 +62,9 @@ const ProjectTeam = () => {
         <div className="flex gap-2">
           <button
             className="flex items-center gap-2 rounded-md bg-green-700 px-4 py-2 text-white font-medium hover:bg-green-500"
-            onClick={() => navigate("/create-project")}
+            onClick={() => navigate("/create-project2")}
           >
-            <CirclePlus className="w-5 h-5" /> Add Task
+            <CirclePlus className="w-5 h-5" /> Add Member
           </button>
         </div>
       </div>
