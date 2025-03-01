@@ -1,7 +1,7 @@
 import React, { useState, useRef } from "react";
 import TextInput from "../component/TextInput";
 import TextAreaInput from "../component/TextAreaInput";
-import { Pencil  } from "lucide-react";
+import { Pencil } from "lucide-react";
 
 const employees = [
     { id: 1, name: "Alice Johnson" },
@@ -77,7 +77,10 @@ const CreateProject = () => {
                             </div>
                         </div>
                         <TextInput label="Customer Name" id="CustomerName" name="customer_name" />
-                        <TextInput label="Nation" id="Nation" name="nation" />
+                        <select id="Nation" name="nation" classname="relative">
+                            <option value="Vietnam">Vietnam</option>
+                            <option value="Singapore">Singapore</option>
+                        </select>
                     </form>
                 </div>
 
