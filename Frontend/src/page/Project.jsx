@@ -87,6 +87,17 @@ const Project = () => {
     );
   };
 
+  const formatDate = (dateString) => {
+    if (!dateString) return ''; // Handle cases where the date might be null/undefined
+
+    const date = new Date(dateString);
+    return new Intl.DateTimeFormat('en-GB', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+    }).format(date); // Format as DD/MM/YYYY
+  };
+
   return (
     <div className="mx-auto max-w-screen-xl py-10 sm:px-6 lg:px-8">
       <div className="flex items-center justify-between mb-4">
@@ -130,8 +141,8 @@ const Project = () => {
           filterMenuStyle={{ width: '14rem' }}
           style={{ minWidth: '12rem' }}
         />
-        <Column field="start_date" header="Start Date" style={{ minWidth: '10rem' }} />
-        <Column field="due_date" header="Due Date" style={{ minWidth: '10rem' }} />
+        <Column field="start_date" header="Start Date" body={(rowData) => formatDate(rowData.start_date)} style={{ minWidth: '10rem' }} />
+        <Column field="due_date" header="Due Date" body={(rowData) => formatDate(rowData.due_date)} style={{ minWidth: '10rem' }} />
         <Column
           field="project_status"
           header="Status"

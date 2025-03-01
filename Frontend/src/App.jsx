@@ -22,6 +22,8 @@ import ProjectTask from "./page/ProjectTask";
 import ProjectTeam from "./page/ProjectTeam";
 import Staff from "./page/Staff";
 import ContextProvider from "./context/ContextProvider";
+import AddTask from "./page/AddTask";
+import UpdateTask from "./page/UpdateTask";
 
 function Layout() {
   const location = useLocation();
@@ -45,6 +47,9 @@ function Layout() {
           <Route path="/project-task" element={<ProjectTask />} />
           <Route path="/project-team" element={<ProjectTeam />} />
           <Route path="/staff" element={<Staff />} />
+          <Route path="/admin-dashboard" element={<AdminDashboard />} />
+          <Route path="/add-task" element={<AddTask />} />
+          <Route path="/update-task" element={<UpdateTask />} />
         </Routes>
       </ContextProvider>
     </div>
