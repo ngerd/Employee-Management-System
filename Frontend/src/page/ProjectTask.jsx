@@ -78,7 +78,7 @@ const ProjectTask = () => {
           onClick={() => navigate(`/update-task/${rowData.task_id}`)}
           className="inline-block rounded-md bg-teal-600 px-4 py-2 text-xs font-medium text-white hover:bg-teal-500"
         >
-          Edit
+          Update
         </button>
         <button
           onClick={() => handleDelete(rowData.task_id)}
