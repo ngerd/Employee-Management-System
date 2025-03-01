@@ -46,10 +46,6 @@ const CreateProject = () => {
 
     return (
         <div className="mx-auto max-w-screen-xl py-10 sm:px-6 lg:px-8">
-            <h1 className="text-4xl font-bold text-gray-900 flex items-center gap-2">
-                Create Project
-                <Pencil className="w-8 h-11 text-red-800 transform" />
-            </h1>
             <div className="mt-4 grid grid-cols-1 gap-x-16 gap-y-8 lg:grid-cols-2">
                 <div className="rounded-lg bg-white p-8 shadow-lg lg:col-span-1 lg:p-12">
                     <h2 className="text-2xl pb-10 font-extrabold text-gray-900">Create Project</h2>
