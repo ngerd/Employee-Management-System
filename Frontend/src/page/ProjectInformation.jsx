@@ -38,6 +38,7 @@ const ProjectInformation = () => {
         console.error("Error fetching project data:", error);
       }
     };
+    console.log("Project ID: " + projectId)
 
     if (projectId) {
       fetchData();

@@ -1,21 +1,56 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useContext } from "react";
+import { useNavigate } from "react-router-dom";
+import { Employee } from "../context/ContextProvider";
 
 const CreateTimeslot = () => {
+  const navigate = useNavigate();
+  const [formValues, setFormValues] = useState({
+    employee_ids: 1,
+    task_id: "",
+    project_id: "",
+    startdate: "",
+    enddate: "",
+  });
+
+  const { employeeId } = useContext(Employee);
   const [isOpen, setIsOpen] = useState(false);
   const [selectedTask, setSelectedTask] = useState("Choose Task");
+  const [tasks, setTasks] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const task = [
-    { id: 1, name: "Design DB Schema" },
-    { id: 2, name: "Design UI" },
-    { id: 3, name: "Implement feature A" },
-    { id: 4, name: "Implement feature B" },
-    { id: 5, name: "Implement feature C" },
-  ];
+  useEffect(() => {
+    const fetchTasks = async () => {
+      console.log("Employee ID: " + employeeId);
+      try {
+        const response = await fetch("http://localhost:3000/getTimesheet", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ employee_id: employeeId }),
+        });
+        const data = await response.json();
+
+        if (Array.isArray(data)) {
+          setTasks(data);
+        } else {
+          setTasks([]);
+        }
+        console.log("Fetched tasks:", data);
+      } catch (error) {
+        console.error("Error fetching tasks:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchTasks();
+  }, [employeeId]);
 
   const handleSelect = (task) => {
-    setSelectedTask(task.name);
+    setSelectedTask(task.task_name);
+    setFormValues({ ...formValues, task_id: task.assignment_id });
     setIsOpen(false);
-    console.log("Selected Role:", task.name); // You can store this in a form state
   };
 
   return (
@@ -41,7 +76,6 @@ const CreateTimeslot = () => {
                   className="w-full rounded-lg border-gray-300 p-3 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 />
               </div>
-
               <div>
                 <label
                   htmlFor="endDateTime"
@@ -57,7 +91,6 @@ const CreateTimeslot = () => {
                 />
               </div>
             </div>
-
             <div className="relative mt-7">
               <button
                 type="button"
@@ -78,34 +111,50 @@ const CreateTimeslot = () => {
                   />
                 </svg>
               </button>
-
               {isOpen && (
                 <div className="absolute mt-2 w-full bg-white border border-gray-200 rounded-md shadow-lg z-10">
                   <ul className="py-1">
-                    {task.map((task) => (
-                      <li key={task.id}>
-                        <button
-                          type="button"
-                          onClick={() => handleSelect(task)}
-                          className="block w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100"
-                        >
-                          {task.name}
-                        </button>
+                    {loading ? (
+                      <li className="text-center py-2 text-sm text-gray-500">
+                        Loading tasks...
                       </li>
-                    ))}
+                    ) : tasks.length === 0 ? (
+                      <li className="text-center py-2 text-sm text-gray-500">
+                        No tasks found
+                      </li>
+                    ) : (
+                      tasks.map((task) => (
+                        <li key={task.assignment_id}>
+                          <button
+                            type="button"
+                            onClick={() => handleSelect(task)}
+                            className="block w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100"
+                          >
+                            {task.task_name} - {task.project_name}
+                          </button>
+                        </li>
+                      ))
+                    )}
                   </ul>
                 </div>
               )}
             </div>
+            <div className="mt-6 flex justify-between">
+              <button
+                type="button"
+                className="rounded-lg bg-black px-5 py-3 font-medium text-white"
+                onClick={() => navigate("/timesheet")}
+              >
+                Back
+              </button>
+              <button
+                type="submit"
+                className="rounded-lg bg-black px-5 py-3 font-medium text-white"
+              >
+                Create Time Slot
+              </button>
+            </div>
           </form>
-        </div>
-        <div className="mt-4 text-right">
-          <button
-            type="submit"
-            className="inline-block w-full rounded-lg bg-black px-5 py-3 font-medium text-white sm:w-auto"
-          >
-            Submit
-          </button>
         </div>
       </div>
     </section>

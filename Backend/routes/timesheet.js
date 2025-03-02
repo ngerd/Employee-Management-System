@@ -3,7 +3,7 @@ import pool from "../DB.js";
 
 const router = express.Router();
 
-//GET Timesheet
+// GET Timesheet
 router.post("/getTimesheet", async (req, res) => {
   const { employee_id, days } = req.body;
 
@@ -23,6 +23,8 @@ router.post("/getTimesheet", async (req, res) => {
       JOIN task t ON ta.task_id = t.task_id
       JOIN project p ON t.project_id = p.project_id
       WHERE ta.employee_id = $1
+        AND ta.emp_startdate IS NOT NULL
+        AND ta.emp_enddate IS NOT NULL
     `;
     const params = [employee_id];
 

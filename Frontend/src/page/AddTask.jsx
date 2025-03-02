@@ -1,18 +1,48 @@
-import React, { useState } from "react";
-import { DataTable } from 'primereact/datatable';
-import { Column } from 'primereact/column';
+import React, { useState, useEffect, useContext } from "react";
+import { useNavigate } from "react-router-dom";
+import { ProjectContext } from "../context/ContextProvider";
 import "primereact/resources/themes/lara-light-blue/theme.css";
 import "primereact/resources/primereact.min.css";
 import "primeicons/primeicons.css";
 
 const AddTask = () => {
+    const navigate = useNavigate();
+    const { projectId } = useContext(ProjectContext);
     const [formValues, setFormValues] = useState({
-        projectId: 1,
         taskName: "",
         taskDescription: "",
         startDate: "",
         dueDate: "",
     });
+
+    const [tasks, setTasks] = useState([]); // Danh sách công việc
+    const [loading, setLoading] = useState(true);
+
+    // Hàm lấy danh sách task
+    const fetchTasks = async () => {
+        try {
+            const response = await fetch("http://localhost:3000/task/list", { // Thay API lấy danh sách task nếu cần
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ projectId }),
+            });
+            const data = await response.json();
+            setTasks(data.tasks || []);
+        } catch (error) {
+            console.error("Lỗi khi lấy danh sách task:", error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    // Gọi API lấy danh sách task khi component mount
+    useEffect(() => {
+        if (projectId) {
+            fetchTasks();
+        }
+    }, [projectId]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -27,10 +57,24 @@ const AddTask = () => {
                 headers: {
                     "Content-Type": "application/json",
                 },
-                body: JSON.stringify(formValues),
+                body: JSON.stringify({ ...formValues, projectId }),
             });
             const data = await response.json();
-            console.log(data);
+
+            if (response.ok) {
+                alert("Task added successfully!");
+                setFormValues({ // Reset form
+                    taskName: "",
+                    taskDescription: "",
+                    startDate: "",
+                    dueDate: "",
+                });
+
+                // Cập nhật danh sách task ngay sau khi thêm
+                fetchTasks();
+            } else {
+                alert("Failed to add task: " + data.error);
+            }
         } catch (error) {
             console.error("There was a problem adding a task to the project:", error);
         }
@@ -80,17 +124,22 @@ const AddTask = () => {
                         />
                     </div>
 
-                    <div className="mt-6 text-right">
-                        <button type="submit" className="inline-block w-full rounded-lg bg-black px-5 py-3 font-medium text-white sm:w-auto">
+                    <div className="mt-6 flex justify-between">
+                        <button
+                            type="button"
+                            onClick={() => navigate("/project-task")}
+                            className="cursor-pointer rounded-lg bg-black px-5 py-3 font-medium text-white hover:bg-gray-700"
+                        >
+                            Back
+                        </button>
+                        <button
+                            type="submit"
+                            className="cursor-pointer rounded-lg bg-black px-5 py-3 font-medium text-white hover:bg-gray-700"
+                        >
                             Add task
                         </button>
                     </div>
                 </form>
-            </div>
-
-            <div className="rounded-lg bg-white p-8 shadow-lg">
-                <h2 className="text-2xl pb-8 font-extrabold text-gray-900">Task List</h2>
-                {/* Add DataTable here if needed */}
             </div>
         </div>
     );

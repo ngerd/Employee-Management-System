@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
 const CreateEmployee = () => {
+  const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
   const [selectedRole, setSelectedRole] = useState("Choose Role");
   const [roles, setRoles] = useState([]);
@@ -177,15 +179,24 @@ const CreateEmployee = () => {
             </label>
           </div>
 
-          {/* Submit Button */}
-          <div className="mt-6 text-right">
-            <button type="submit" className="inline-block w-full rounded-lg bg-black px-5 py-3 font-medium text-white sm:w-auto">
+          <div className="mt-6 flex justify-between">
+            <button
+              type="button"
+              onClick={() => navigate("/staff")}
+              className="cursor-pointer rounded-lg bg-black px-5 py-3 font-medium text-white hover:bg-gray-700"
+            >
+              Back
+            </button>
+            <button
+              type="submit"
+              className="cursor-pointer rounded-lg bg-black px-5 py-3 font-medium text-white hover:bg-gray-700"
+            >
               Submit
             </button>
           </div>
         </form>
-      </div>
-    </div>
+      </div >
+    </div >
   );
 };
 

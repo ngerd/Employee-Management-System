@@ -386,4 +386,36 @@ router.delete("/unassign", async (req, res) => {
   }
 });
 
+// Get Employee Task endpoint
+router.post("/getEmployeeTask", async (req, res) => {
+  const { employee_id } = req.body;
+
+  if (!employee_id) {
+    return res.status(400).json({ error: "Missing employee_id" });
+  }
+
+  try {
+    const query = `
+      SELECT 
+        p.project_name, 
+        t.task_name, 
+        ta.assignment_id
+      FROM public."task_assignment" ta
+      JOIN public."task" t ON ta.task_id = t.task_id
+      JOIN public."project" p ON t.project_id = p.project_id
+      WHERE ta.employee_id = $1
+    `;
+    const result = await pool.query(query, [employee_id]);
+
+    if (result.rowCount === 0) {
+      return res.status(404).json({ message: "No tasks found for the given employee" });
+    }
+
+    return res.json(result.rows);
+  } catch (err) {
+    console.error("Error fetching employee tasks:", err);
+    return res.status(500).json({ error: "Internal server error" });
+  }
+});
+
 export default router;
