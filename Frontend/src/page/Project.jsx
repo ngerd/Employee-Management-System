@@ -11,12 +11,12 @@ import "primereact/resources/themes/lara-light-blue/theme.css";
 import "primereact/resources/primereact.min.css";
 import "primeicons/primeicons.css";
 
-import { Employee } from '../context/ContextProvider';
-
+import { Employee, ProjectContext } from '../context/ContextProvider';
 
 const Project = () => {
 
   const { employeeId } = useContext(Employee);
+  const { setProjectId } = useContext(ProjectContext);
 
   const fectchproject = async () => {
     try {
@@ -76,16 +76,23 @@ const Project = () => {
     setGlobalFilterValue(value);
   };
 
+
+  const viewproject = async (rowData) => {
+    setProjectId(rowData.project_id);
+    navigate(`/project-information`);
+  }
+
   const viewButtonTemplate = (rowData) => {
     return (
       <button
-        onClick={() => navigate(`/project-information/${rowData.project_id}`)}
+        onClick={() => viewproject(rowData)}
         className="inline-block rounded-md bg-green-700 px-4 py-2 text-xs font-medium text-white hover:bg-green-500"
       >
         View
       </button>
     );
   };
+
 
   const formatDate = (dateString) => {
     if (!dateString) return ''; // Handle cases where the date might be null/undefined

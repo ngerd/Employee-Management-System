@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
@@ -8,9 +8,11 @@ import "primereact/resources/themes/lara-light-blue/theme.css";
 import "primereact/resources/primereact.min.css";
 import "primeicons/primeicons.css";
 
+import { ProjectContext } from '../context/ContextProvider';
+
 const ProjectTeam = () => {
   const navigate = useNavigate();
-  const projectId = 1; // Set the project ID to 1
+  const { projectId } = useContext(ProjectContext);
 
   // const fetchTeam = async () => {
   //   try {

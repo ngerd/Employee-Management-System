@@ -1,12 +1,15 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import "primereact/resources/themes/lara-light-blue/theme.css";
 import "primereact/resources/primereact.min.css";
 import "primeicons/primeicons.css";
 
+
+import { ProjectContext } from '../context/ContextProvider';
+
 const AddMember = () => {
-    const [formValues, setFormValues] = useState({ projectId: 1 });
-    const [projectId, setProjectId] = useState(1);
+    const { projectId } = useContext(ProjectContext);
+    const [formValues, setFormValues] = useState({ projectId });
     const [employees, setEmployees] = useState([]); // All employees
     const [projectMembers, setProjectMembers] = useState([]); // Employees already in project
     const [selectedEmployees, setSelectedEmployees] = useState([]);

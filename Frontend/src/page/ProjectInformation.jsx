@@ -153,13 +153,13 @@ const ProjectInformation = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        console.log("Fetching data for projectId: 4"); // Hardcoded value
+        console.log("Pj in4:" + projectId); // Hardcoded value
         const response = await fetch("http://localhost:3000/projects/info", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ projectId: 4 }), // Hardcoded value
+          body: JSON.stringify({ projectId }), // Hardcoded value
         });
 
         const data = await response.json();
