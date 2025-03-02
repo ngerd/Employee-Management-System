@@ -4,15 +4,15 @@ import { FileUser, SquareChartGantt, CalendarRange } from "lucide-react"; // Imp
 import { Employee } from "../context/ContextProvider";
 
 function Home() {
-  const {isadmin} = useContext(Employee);
-  console.log(isadmin)
+  const { isadmin } = useContext(Employee);
+  console.log("isadmin:" + isadmin);
 
   return (
     <div className="min-h-screen bg-gray-100">
       <div className="py-8 px-4 sm:px-8 lg:px-16">
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-6">
           {/* Staff Card */}
-          {isadmin == "true" && 
+          {isadmin == true && 
           <Card
             Icon={FileUser}
             title="Staff"

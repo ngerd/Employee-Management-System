@@ -12,6 +12,7 @@ function Login() {
   const [formValues, setFormValues] = useState(initialValues);
   const navigate = useNavigate();
   const { isadmin, employeeId, setEmployeeId, setisadmin } = useContext(Employee);
+
   const fetchMockData = async () => {
     try {
       console.log(formValues);
@@ -42,7 +43,7 @@ function Login() {
         body: JSON.stringify({ employee_id: employeeId }),
       });
       const data = await response.json();
-      
+
       console.log(data)
       setisadmin(data.isadmin);
       return data;
@@ -83,6 +84,10 @@ function Login() {
     };
 
   }, [employeeId]);
+
+
+
+
 
   // const validate = async () => {
   //   const data = await fetchMockData();

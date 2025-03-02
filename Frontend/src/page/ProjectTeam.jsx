@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
@@ -8,49 +8,115 @@ import "primereact/resources/themes/lara-light-blue/theme.css";
 import "primereact/resources/primereact.min.css";
 import "primeicons/primeicons.css";
 
+import { ProjectContext } from '../context/ContextProvider';
+
 const ProjectTeam = () => {
   const navigate = useNavigate();
+  const { projectId } = useContext(ProjectContext);
 
-  // Sample Data
-  const [projects, setProjects] = useState([]);
+  // const fetchTeam = async () => {
+  //   try {
+  //     const response = await fetch("http://localhost:3000/projects/info", {
+  //       method: "POST",
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //       },
+  //       body: JSON.stringify({ projectId }),
+  //     });
+  //     const data = await response.json();
+  //     return data;
+  //   } catch (error) {
+  //     console.error("There was a problem fetching the tasks:", error);
+  //   }
+  // };
+
+  const [employees, setEmployees] = useState([]);
   const [loading, setLoading] = useState(true);
 
+
   useEffect(() => {
-    // Simulate API call
-    setTimeout(() => {
-      setProjects([
-        {
-          project_id: 1,
-          project_name: "Project Alpha",
-          start_date: "2024-01-10",
-          due_date: "2024-06-15",
-          project_status: "Active",
-          nation: "USA",
-        },
-        {
-          project_id: 2,
-          project_name: "Project Beta",
-          start_date: "2024-02-05",
-          due_date: "2024-07-20",
-          project_status: "Pending",
-          nation: "Germany",
-        },
-      ]);
-      setLoading(false);
-    }, 1000);
+    const fetchTeam = async () => {
+      try {
+        const response = await fetch("http://localhost:3000/projects/info", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ projectId }),
+        });
+        const data = await response.json();
+
+        if (data && data.employees) {
+          setEmployees(data.employees);
+        } else {
+          setEmployees([]);
+        }
+      } catch (error) {
+        console.error("Error fetching team data:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchTeam();
   }, []);
 
-  // View Button Column
-  const viewButtonTemplate = (rowData) => {
+
+  // // View Button Column
+  // const viewButtonTemplate = (rowData) => {
+  //   return (
+  //     <button
+  //       onClick={() => navigate(`/project-detail/${rowData.project_id}`)}
+  //       className="cursor-pointer inline-block rounded-md bg-green-700 px-4 py-2 text-xs font-medium text-white hover:bg-green-500"
+  //     >
+  //       View
+  //     </button>
+  //   );
+  // };
+
+
+  const handleDelete = async (employee_id) => {
+    try {
+      const response = await fetch("http://localhost:3000/projects/delete-employee", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ employee_id, project_id: projectId }),
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.error || "Failed to delete employee");
+      }
+      alert("Deleted successfully!");
+      // Refresh the task list after deletion
+      const updatedTeam = await fetchTeam();
+      setEmployees(updatedTeam);
+    } catch (error) {
+      console.error("There was a problem deleting the task:", error);
+    }
+  };
+
+  // Action Buttons Column
+  const actionButtonTemplate = (rowData) => {
     return (
-      <button
-        onClick={() => navigate(`/project-detail/${rowData.project_id}`)}
-        className="inline-block rounded-md bg-green-700 px-4 py-2 text-xs font-medium text-white hover:bg-green-500"
-      >
-        View
-      </button>
+      <div className="flex gap-2">
+        <button
+          onClick={() => navigate(`/update-task/${rowData.task_id}`)}
+          className="cursor-pointer inline-block rounded-md bg-teal-600 px-4 py-2 text-xs font-medium text-white hover:bg-teal-500"
+        >
+          Update
+        </button>
+        <button
+          onClick={() => handleDelete(rowData.employee_id)}
+          className="cursor-pointer inline-block rounded-md bg-orange-600 px-4 py-2 text-xs font-medium text-white hover:bg-orange-500"
+        >
+          Delete
+        </button>
+      </div>
     );
   };
+
 
   return (
     <div className="mx-auto max-w-screen-xl py-10 sm:px-6 lg:px-8">
@@ -61,10 +127,10 @@ const ProjectTeam = () => {
         </h1>
         <div className="flex gap-2">
           <button
-            className="flex items-center gap-2 rounded-md bg-green-700 px-4 py-2 text-white font-medium hover:bg-green-500"
-            onClick={() => navigate("/create-project")}
+            className="cursor-pointer flex items-center gap-2 rounded-md bg-green-700 px-4 py-2 text-white font-medium hover:bg-green-500"
+            onClick={() => navigate("/add-member")}
           >
-            <CirclePlus className="w-5 h-5" /> Add Task
+            <CirclePlus className="w-5 h-5" /> Add Member
           </button>
         </div>
       </div>
@@ -114,45 +180,24 @@ const ProjectTeam = () => {
         </div>
       </div>
 
-      {/* DataTable */}
       <DataTable
-        value={projects}
+        value={employees}
         paginator
         rows={10}
         loading={loading}
-        dataKey="project_id"
-        emptyMessage="No projects found."
+        dataKey="employee_id"
+        emptyMessage="No employees found."
         showGridlines
         className="border border-gray-300 bg-white"
       >
-        <Column field="project_id" header="ID" style={{ minWidth: "5rem" }} />
-        <Column
-          field="project_name"
-          header="Project Name"
-          style={{ minWidth: "12rem" }}
-        />
-        <Column
-          field="start_date"
-          header="Start Date"
-          style={{ minWidth: "10rem" }}
-        />
-        <Column
-          field="due_date"
-          header="Due Date"
-          style={{ minWidth: "10rem" }}
-        />
-        <Column
-          field="project_status"
-          header="Status"
-          style={{ minWidth: "10rem" }}
-        />
-        <Column field="nation" header="Nation" style={{ minWidth: "10rem" }} />
-        <Column
-          header="Action"
-          body={viewButtonTemplate}
-          style={{ minWidth: "8rem" }}
-        />
+        <Column field="employee_id" header="ID" style={{ minWidth: "5rem" }} />
+        <Column field="firstname" header="First Name" style={{ minWidth: "12rem" }} />
+        <Column field="lastname" header="Last Name" style={{ minWidth: "12rem" }} />
+        <Column field="email" header="Email" style={{ minWidth: "18rem" }} />
+        <Column field="role_name" header="Role" style={{ minWidth: "10rem" }} />
+        <Column header="Action" body={actionButtonTemplate} style={{ minWidth: "12rem" }} />
       </DataTable>
+
     </div>
   );
 };

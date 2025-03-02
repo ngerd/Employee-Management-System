@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
 const CreateEmployee = () => {
+  const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
   const [selectedRole, setSelectedRole] = useState("Choose Role");
   const [roles, setRoles] = useState([]);
@@ -13,14 +15,14 @@ const CreateEmployee = () => {
     isadmin: false,
     role_id: "",
   });
+  const [message, setMessage] = useState(""); // State for success/error messages
 
-  // Fetch roles from API
   useEffect(() => {
     const fetchRoles = async () => {
       try {
-        const response = await fetch("http://localhost:3000/get-role"); // Adjust the API URL
+        const response = await fetch("http://localhost:3000/get-role"); // Adjust API URL
         const data = await response.json();
-        setRoles(data.Role); // Assuming API returns { Role: [...] }
+        setRoles(data.Role);
       } catch (error) {
         console.error("Error fetching roles:", error);
       }
@@ -50,10 +52,20 @@ const CreateEmployee = () => {
         },
         body: JSON.stringify(formValues),
       });
+
       const data = await response.json();
-      console.log(data);
+
+      if (response.ok) {
+        setMessage("Employee added successfully!");
+        setTimeout(() => {
+          window.location.reload(); // Refresh the page after success
+        }, 1500);
+      } else {
+        setMessage(data.message || "Failed to create employee.");
+      }
     } catch (error) {
-      console.error("There was a problem creating the employee:", error);
+      setMessage("There was a problem creating the employee.");
+      console.error("Error:", error);
     }
   };
 
@@ -61,28 +73,32 @@ const CreateEmployee = () => {
     <div className="mx-auto max-w-2xl px-6 py-12 sm:px-8 lg:px-10">
       <div className="rounded-lg bg-white p-8 shadow-lg">
         <h2 className="text-2xl pb-8 font-extrabold text-gray-900">Create Employee</h2>
+
+        {/* Success/Error Message */}
+        {message && (
+          <div className={`p-3 mb-4 rounded-md text-center ${message.includes("success") ? "bg-green-200 text-green-700" : "bg-red-200 text-red-700"}`}>
+            {message}
+          </div>
+        )}
+
         <form className="space-y-4" onSubmit={handleSubmit}>
           <div className="flex gap-4">
-            <div className="flex-1">
-              <input
-                id="firstname"
-                name="firstname"
-                value={formValues.firstname}
-                onChange={handleChange}
-                className="mt-1 p-2 h-10 w-full rounded-md border-gray-300 bg-white text-sm text-gray-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 pr-10"
-                placeholder="First Name"
-              />
-            </div>
-            <div className="flex-1">
-              <input
-                id="lastname"
-                name="lastname"
-                value={formValues.lastname}
-                onChange={handleChange}
-                className="mt-1 p-2 h-10 w-full rounded-md border-gray-300 bg-white text-sm text-gray-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 pr-10"
-                placeholder="Last Name"
-              />
-            </div>
+            <input
+              id="firstname"
+              name="firstname"
+              value={formValues.firstname}
+              onChange={handleChange}
+              className="mt-1 p-2 h-10 w-full rounded-md border-gray-300 bg-white text-sm text-gray-700 shadow-sm focus:ring-2 focus:ring-blue-500"
+              placeholder="First Name"
+            />
+            <input
+              id="lastname"
+              name="lastname"
+              value={formValues.lastname}
+              onChange={handleChange}
+              className="mt-1 p-2 h-10 w-full rounded-md border-gray-300 bg-white text-sm text-gray-700 shadow-sm focus:ring-2 focus:ring-blue-500"
+              placeholder="Last Name"
+            />
           </div>
           <input
             id="email"
@@ -90,7 +106,7 @@ const CreateEmployee = () => {
             type="email"
             value={formValues.email}
             onChange={handleChange}
-            className="mt-1 p-2 h-10 w-full rounded-md border-gray-300 bg-white text-sm text-gray-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 pr-10"
+            className="mt-1 p-2 h-10 w-full rounded-md border-gray-300 bg-white text-sm text-gray-700 shadow-sm focus:ring-2 focus:ring-blue-500"
             placeholder="Email"
           />
           <input
@@ -99,7 +115,7 @@ const CreateEmployee = () => {
             type="password"
             value={formValues.password}
             onChange={handleChange}
-            className="mt-1 p-2 h-10 w-full rounded-md border-gray-300 bg-white text-sm text-gray-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 pr-10"
+            className="mt-1 p-2 h-10 w-full rounded-md border-gray-300 bg-white text-sm text-gray-700 shadow-sm focus:ring-2 focus:ring-blue-500"
             placeholder="Password"
           />
           <input
@@ -108,10 +124,11 @@ const CreateEmployee = () => {
             type="password"
             value={formValues.confirmPassword}
             onChange={handleChange}
-            className="mt-1 p-2 h-10 w-full rounded-md border-gray-300 bg-white text-sm text-gray-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 pr-10"
-            placeholder="Password Confirmation"
+            className="mt-1 p-2 h-10 w-full rounded-md border-gray-300 bg-white text-sm text-gray-700 shadow-sm focus:ring-2 focus:ring-blue-500"
+            placeholder="Confirm Password"
           />
 
+          {/* Role Dropdown */}
           <div className="relative mt-1">
             <button
               type="button"
@@ -119,12 +136,7 @@ const CreateEmployee = () => {
               className="flex items-center justify-between w-full px-4 py-2 text-sm font-medium text-gray-700 bg-white border rounded-md shadow-sm hover:bg-gray-50"
             >
               {selectedRole}
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="w-4 h-4 ml-2"
-                viewBox="0 0 20 20"
-                fill="currentColor"
-              >
+              <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 ml-2" viewBox="0 0 20 20" fill="currentColor">
                 <path
                   fillRule="evenodd"
                   d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 011.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
@@ -152,6 +164,7 @@ const CreateEmployee = () => {
             )}
           </div>
 
+          {/* Admin Checkbox */}
           <div className="col-span-6 mt-6">
             <label htmlFor="isadmin" className="flex gap-4">
               <input
@@ -162,22 +175,28 @@ const CreateEmployee = () => {
                 onChange={handleChange}
                 className="size-6 rounded-md border-gray-300 bg-white shadow-sm"
               />
-              <span className="block text-sm font-medium text-gray-700">
-                Admin Role
-              </span>
+              <span className="block text-sm font-medium text-gray-700">Admin Role</span>
             </label>
           </div>
-          <div className="mt-6 text-right">
+
+          <div className="mt-6 flex justify-between">
+            <button
+              type="button"
+              onClick={() => navigate("/staff")}
+              className="cursor-pointer rounded-lg bg-black px-5 py-3 font-medium text-white hover:bg-gray-700"
+            >
+              Back
+            </button>
             <button
               type="submit"
-              className="cursor-pointer inline-block shrink-0 rounded-md border border-blue-600 bg-blue-600 px-12 py-3 text-sm font-medium text-white transition hover:bg-pink-200 hover:text-blue-800 focus:ring-3 focus:outline-none"
+              className="cursor-pointer rounded-lg bg-black px-5 py-3 font-medium text-white hover:bg-gray-700"
             >
               Submit
             </button>
           </div>
         </form>
-      </div>
-    </div>
+      </div >
+    </div >
   );
 };
 

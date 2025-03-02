@@ -1,25 +1,35 @@
-import React, { useState, useRef } from "react";
-import TextInput from "../component/TextInput";
-import TextAreaInput from "../component/TextAreaInput";
-import { Pencil  } from "lucide-react";
-
-const employees = [
-    { id: 1, name: "Alice Johnson" },
-    { id: 2, name: "Bob Smith" },
-    { id: 3, name: "Charlie Brown" },
-    { id: 4, name: "Diana Prince" },
-    { id: 5, name: "Ethan Hunt" },
-];
+import React, { useState, useEffect, useRef } from "react";
 
 const CreateProject = () => {
+    const [employees, setEmployees] = useState([]); // Store fetched employees
     const [selectedEmployees, setSelectedEmployees] = useState([]);
     const [searchTerm, setSearchTerm] = useState("");
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const dropdownRef = useRef(null);
 
+    // Fetch employees from API
+    useEffect(() => {
+        const fetchEmployees = async () => {
+            try {
+                const response = await fetch("http://localhost:3000/get-employees");
+                if (!response.ok) {
+                    throw new Error("Failed to fetch employees");
+                }
+                const data = await response.json();
+                console.log(data);
+                setEmployees(data.employees);
+            } catch (error) {
+                console.error("Error fetching employees:", error);
+            }
+        };
+
+        fetchEmployees();
+    }, []);
+
     const availableEmployees = employees.filter(
-        (emp) => !selectedEmployees.some((selected) => selected.id === emp.id) &&
-            emp.name.toLowerCase().includes(searchTerm.toLowerCase())
+        (emp) =>
+            !selectedEmployees.some((selected) => selected.employee_id === emp.employee_id) &&
+            `${emp.firstname} ${emp.lastname} - ${emp.role_name}`.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
     const handleAddEmployee = (employee) => {
@@ -27,8 +37,8 @@ const CreateProject = () => {
         setSearchTerm("");
     };
 
-    const handleRemoveEmployee = (id) => {
-        setSelectedEmployees(selectedEmployees.filter((e) => e.id !== id));
+    const handleRemoveEmployee = (employee_id) => {
+        setSelectedEmployees(selectedEmployees.filter((e) => e.employee_id !== employee_id));
     };
 
     const handleClickOutside = (event) => {
@@ -37,7 +47,7 @@ const CreateProject = () => {
         }
     };
 
-    React.useEffect(() => {
+    useEffect(() => {
         document.addEventListener("mousedown", handleClickOutside);
         return () => {
             document.removeEventListener("mousedown", handleClickOutside);
@@ -46,45 +56,7 @@ const CreateProject = () => {
 
     return (
         <div className="mx-auto max-w-screen-xl py-10 sm:px-6 lg:px-8">
-            <h1 className="text-4xl font-bold text-gray-900 flex items-center gap-2">
-                Create Project
-                <Pencil  className="w-8 h-11 text-red-800 transform" />
-            </h1>
             <div className="mt-4 grid grid-cols-1 gap-x-16 gap-y-8 lg:grid-cols-2">
-                <div className="rounded-lg bg-white p-8 shadow-lg lg:col-span-1 lg:p-12">
-                    <h2 className="text-2xl pb-10 font-extrabold text-gray-900">Create Project</h2>
-                    <form action="#" className="space-y-4">
-                        <TextInput label="Project Name" id="ProjectName" name="project_name" />
-                        <TextAreaInput label="Project Description" id="projectDescription" name="project_description" />
-                        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                            <div>
-                                <label htmlFor="startDate" className="block text-sm font-medium text-gray-700">
-                                    Start Date
-                                </label>
-                                <input
-                                    type="date"
-                                    id="startDate"
-                                    name="startDate"
-                                    className="w-full rounded-lg border-gray-300 p-3 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                                />
-                            </div>
-                            <div>
-                                <label htmlFor="endDate" className="block text-sm font-medium text-gray-700">
-                                    End Date
-                                </label>
-                                <input
-                                    type="date"
-                                    id="endDate"
-                                    name="endDate"
-                                    className="w-full rounded-lg border-gray-300 p-3 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                                />
-                            </div>
-                        </div>
-                        <TextInput label="Customer Name" id="CustomerName" name="customer_name" />
-                        <TextInput label="Nation" id="Nation" name="nation" />
-                    </form>
-                </div>
-
                 <div className="rounded-lg bg-white p-8 shadow-lg lg:col-span-1 lg:p-12">
                     <h2 className="text-2xl pb-10 font-extrabold text-gray-900">Create Team</h2>
                     <div className="mt-4 relative" ref={dropdownRef}>
@@ -96,11 +68,15 @@ const CreateProject = () => {
                             onFocus={() => setIsDropdownOpen(true)}
                             onChange={(e) => setSearchTerm(e.target.value)}
                         />
-                        {isDropdownOpen && (
+                        {isDropdownOpen && availableEmployees.length > 0 && (
                             <ul className="absolute w-full mt-2 max-h-40 overflow-auto border rounded-md bg-white shadow-lg">
                                 {availableEmployees.map((emp) => (
-                                    <li key={emp.id} className="p-2 hover:bg-gray-100 cursor-pointer" onClick={() => handleAddEmployee(emp)}>
-                                        {emp.name}
+                                    <li
+                                        key={emp.employee_id}
+                                        className="p-2 hover:bg-gray-100 cursor-pointer"
+                                        onClick={() => handleAddEmployee(emp)}
+                                    >
+                                        {`${emp.firstname} ${emp.lastname} - ${emp.role_name}`}
                                     </li>
                                 ))}
                             </ul>
@@ -114,15 +90,17 @@ const CreateProject = () => {
                                 <thead>
                                     <tr className="bg-gray-100">
                                         <th className="border p-2">Name</th>
+                                        <th className="border p-2">Role</th>
                                         <th className="border p-2">Action</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     {selectedEmployees.map((emp) => (
-                                        <tr key={emp.id}>
-                                            <td className="border p-2">{emp.name}</td>
+                                        <tr key={emp.employee_id}>
+                                            <td className="border p-2">{emp.firstname} {emp.lastname}</td>
+                                            <td className="border p-2">{emp.role_name}</td>
                                             <td className="border p-2 text-center">
-                                                <button className="text-red-500" onClick={() => handleRemoveEmployee(emp.id)} type="button">
+                                                <button className="text-red-500" onClick={() => handleRemoveEmployee(emp.employee_id)} type="button">
                                                     Remove
                                                 </button>
                                             </td>

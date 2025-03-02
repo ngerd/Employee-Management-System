@@ -206,4 +206,24 @@ router.get("/getEmployee", async (req, res) => {
   }
 });
 
+router.get("/getEmployee2", async (req, res) => {
+  try {
+      const result = await pool.query(`
+          SELECT 
+              e.employee_id,
+              e.firstname,
+              e.lastname,
+              e.email,
+              e.isAdmin,
+              r.role_name
+          FROM Employee e
+          JOIN Role r ON e.role_id = r.role_id;
+      `);
+      res.json(result.rows);
+  } catch (error) {
+      console.error("Error fetching employees:", error);
+      res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
 export default router;

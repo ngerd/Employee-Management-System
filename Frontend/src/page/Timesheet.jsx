@@ -57,6 +57,7 @@ function Timesheet() {
         <button
           className="rounded-md bg-blue-600 px-4 py-2 text-white font-medium hover:bg-blue-700"
           onClick={() => navigate(`/create-timeslot`)}
+          aria-label="Create a new time slot"
         >
           Create Time Slot
         </button>
@@ -98,7 +99,6 @@ function Timesheet() {
           </summary>
 
           <div className="border-t border-gray-200 bg-white">
-
             <ul className="space-y-1 border-t border-gray-200 p-4">
               <li>
                 <label
