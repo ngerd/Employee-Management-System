@@ -222,11 +222,12 @@ const CreateProject2 = () => {
                   <li
                     key={emp.employee_id}
                     className="p-2 hover:bg-gray-100 cursor-pointer"
+                    onMouseDown={(e) => e.preventDefault()}
                     onClick={() => {
                       if (!selectedEmployees.some((selected) => selected.employee_id === emp.employee_id)) {
                         setSelectedEmployees([...selectedEmployees, emp]);
                       }
-                      setIsDropdownOpen(false);
+                      // setIsDropdownOpen(false);
                     }}
                   >
                     {`${emp.firstname} ${emp.lastname} - ${emp.role_name}`}
@@ -269,7 +270,7 @@ const CreateProject2 = () => {
               type="button"
               onClick={handleAddEmployee}
               disabled={!projectId} // Disable button if projectId is null
-              className={`inline-block w-full rounded-lg px-5 py-3 font-medium text-white sm:w-auto ${!projectId ? "bg-gray-400 cursor-not-allowed" : "bg-green-600"}`}
+              className={`inline-block w-full rounded-lg px-5 py-3 font-medium text-white sm:w-auto ${!projectId ? "bg-gray-400 cursor-not-allowed" : "bg-black"}`}
             >
               Add Employee
             </button>
@@ -280,7 +281,7 @@ const CreateProject2 = () => {
         <button
           type="button"
           onClick={handleFinish}
-          className="inline-block w-full rounded-lg bg-blue-600 px-5 py-3 font-medium text-white sm:w-auto"
+          className="inline-block w-full rounded-lg bg-black px-5 py-3 font-medium text-white sm:w-auto"
         >
           Finish
         </button>

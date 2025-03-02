@@ -23,6 +23,7 @@ import ProjectTeam from "./page/ProjectTeam";
 import Staff from "./page/Staff";
 import ContextProvider from "./context/ContextProvider";
 import AddTask from "./page/AddTask";
+import AddMember from "./page/AddMember";
 import UpdateTask from "./page/UpdateTask";
 
 function Layout() {
@@ -50,6 +51,7 @@ function Layout() {
           <Route path="/admin-dashboard" element={<AdminDashboard />} />
           <Route path="/add-task" element={<AddTask />} />
           <Route path="/update-task" element={<UpdateTask />} />
+          <Route path="/add-member" element={<AddMember />} />
         </Routes>
       </ContextProvider>
     </div>
