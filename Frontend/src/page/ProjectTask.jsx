@@ -276,13 +276,13 @@ const ProjectTask = () => {
     <div className="flex gap-2">
       <button
         onClick={() => navigate(`/update-task/${rowData.task_id}`)}
-        className="rounded-md bg-teal-600 px-4 py-2 text-xs font-medium text-white hover:bg-teal-500"
+        className="cursor-pointer rounded-md bg-teal-600 px-4 py-2 text-xs font-medium text-white hover:bg-teal-500"
       >
         Update
       </button>
       <button
         onClick={() => handleDelete(rowData.task_id)}
-        className="rounded-md bg-orange-600 px-4 py-2 text-xs font-medium text-white hover:bg-orange-500"
+        className="cursor-pointer rounded-md bg-orange-600 px-4 py-2 text-xs font-medium text-white hover:bg-orange-500"
       >
         Delete
       </button>
@@ -298,13 +298,13 @@ const ProjectTask = () => {
         </h1>
         <div className="flex gap-2">
           <button
-            className="flex items-center gap-2 rounded-md bg-green-700 px-4 py-2 text-white font-medium hover:bg-green-500"
+            className="cursor-pointer flex items-center gap-2 rounded-md bg-green-700 px-4 py-2 text-white font-medium hover:bg-green-500"
             onClick={() => navigate("/add-task")}
           >
             <CirclePlus className="w-5 h-5" /> Add Task
           </button>
           <button
-            className="flex items-center gap-2 rounded-md bg-green-700 px-4 py-2 text-white font-medium hover:bg-green-500"
+            className="cursor-pointer flex items-center gap-2 rounded-md bg-green-700 px-4 py-2 text-white font-medium hover:bg-green-500"
             onClick={() => navigate("#")}
           >
             <Download className="w-5 h-5" /> Download

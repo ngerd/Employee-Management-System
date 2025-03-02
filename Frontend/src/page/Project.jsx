@@ -86,7 +86,7 @@ const Project = () => {
     return (
       <button
         onClick={() => viewproject(rowData)}
-        className="inline-block rounded-md bg-green-700 px-4 py-2 text-xs font-medium text-white hover:bg-green-500"
+        className="cursor-pointer inline-block rounded-md bg-green-700 px-4 py-2 text-xs font-medium text-white hover:bg-green-500"
       >
         View
       </button>
@@ -127,7 +127,7 @@ const Project = () => {
             className="pl-10 py-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
           />
           <button
-            className="flex items-center gap-2 rounded-md bg-green-700 px-4 py-2 text-white font-medium hover:bg-green-500"
+            className="cursor-pointer flex items-center gap-2 rounded-md bg-green-700 px-4 py-2 text-white font-medium hover:bg-green-500"
             onClick={() => navigate("/create-project2")}
           >
             <CirclePlus className="w-5 h-5" /> Create new project

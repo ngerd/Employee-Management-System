@@ -67,7 +67,7 @@ const ProjectTeam = () => {
   //   return (
   //     <button
   //       onClick={() => navigate(`/project-detail/${rowData.project_id}`)}
-  //       className="inline-block rounded-md bg-green-700 px-4 py-2 text-xs font-medium text-white hover:bg-green-500"
+  //       className="cursor-pointer inline-block rounded-md bg-green-700 px-4 py-2 text-xs font-medium text-white hover:bg-green-500"
   //     >
   //       View
   //     </button>
@@ -103,13 +103,13 @@ const ProjectTeam = () => {
       <div className="flex gap-2">
         <button
           onClick={() => navigate(`/update-task/${rowData.task_id}`)}
-          className="inline-block rounded-md bg-teal-600 px-4 py-2 text-xs font-medium text-white hover:bg-teal-500"
+          className="cursor-pointer inline-block rounded-md bg-teal-600 px-4 py-2 text-xs font-medium text-white hover:bg-teal-500"
         >
           Update
         </button>
         <button
           onClick={() => handleDelete(rowData.employee_id)}
-          className="inline-block rounded-md bg-orange-600 px-4 py-2 text-xs font-medium text-white hover:bg-orange-500"
+          className="cursor-pointer inline-block rounded-md bg-orange-600 px-4 py-2 text-xs font-medium text-white hover:bg-orange-500"
         >
           Delete
         </button>
@@ -127,7 +127,7 @@ const ProjectTeam = () => {
         </h1>
         <div className="flex gap-2">
           <button
-            className="flex items-center gap-2 rounded-md bg-green-700 px-4 py-2 text-white font-medium hover:bg-green-500"
+            className="cursor-pointer flex items-center gap-2 rounded-md bg-green-700 px-4 py-2 text-white font-medium hover:bg-green-500"
             onClick={() => navigate("/add-member")}
           >
             <CirclePlus className="w-5 h-5" /> Add Member
