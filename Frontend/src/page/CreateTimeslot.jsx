@@ -30,7 +30,7 @@ const CreateTimeslot = () => {
         });
         const data = await response.json();
 
-        if (data) {
+        if (Array.isArray(data)) {
           setTasks(data);
         } else {
           setTasks([]);
@@ -116,6 +116,10 @@ const CreateTimeslot = () => {
                     {loading ? (
                       <li className="text-center py-2 text-sm text-gray-500">
                         Loading tasks...
+                      </li>
+                    ) : tasks.length === 0 ? (
+                      <li className="text-center py-2 text-sm text-gray-500">
+                        No tasks found
                       </li>
                     ) : (
                       tasks.map((task) => (
