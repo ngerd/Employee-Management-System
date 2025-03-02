@@ -109,12 +109,6 @@ const Project = () => {
     <div className="mx-auto max-w-screen-xl py-10 sm:px-6 lg:px-8">
       <div className="flex items-center justify-between mb-4">
         <h1 className="text-4xl font-bold text-gray-900">Project Dashboard</h1>
-        {/* <button
-          className="flex items-center gap-2 rounded-md bg-green-700 px-4 py-2 text-white font-medium hover:bg-green-500"
-          onClick={() => navigate("/create-project")}
-        >
-          <CirclePlus className="w-5 h-5" /> Create new project
-        </button> */}
       </div>
 
       <div className="flex justify-between mb-4">
