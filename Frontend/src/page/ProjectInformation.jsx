@@ -1,21 +1,28 @@
 import React, { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Info, ClipboardList, Users, CirclePlus } from "lucide-react"; // Importing icons
-
-import "primereact/resources/themes/lara-light-blue/theme.css";
-import "primereact/resources/primereact.min.css";
-import "primeicons/primeicons.css";
+import { Info, ClipboardList, Users } from "lucide-react"; // Importing icons
 import { ProjectContext } from "../context/ContextProvider";
 
 const ProjectInformation = () => {
   const navigate = useNavigate();
   const { projectId } = useContext(ProjectContext);
-  const [projects, setProjects] = useState(null);
+  const [project, setProject] = useState(null);
+  const [employees, setEmployees] = useState([]);
+
+  const formatDate = (dateString) => {
+    if (!dateString) return ''; // Handle cases where the date might be null/undefined
+
+    const date = new Date(dateString);
+    return new Intl.DateTimeFormat('en-GB', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+    }).format(date); // Format as DD/MM/YYYY
+  };
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        console.log("Project information:" + projectId);
         const response = await fetch("http://localhost:3000/projects/info", {
           method: "POST",
           headers: {
@@ -25,8 +32,8 @@ const ProjectInformation = () => {
         });
 
         const data = await response.json();
-        console.log("data");
-        setProjects(data.projects);
+        setProject(data.project);
+        setEmployees(data.employees);
       } catch (error) {
         console.error("Error fetching project data:", error);
       }
@@ -35,7 +42,7 @@ const ProjectInformation = () => {
     if (projectId) {
       fetchData();
     }
-  }, [projectId]); // Added dependency
+  }, [projectId]);
 
   return (
     <div className="mx-auto max-w-screen-xl py-10 sm:px-6 lg:px-8">
@@ -97,32 +104,45 @@ const ProjectInformation = () => {
           <div className="grid grid-cols-1 gap-1 p-3 sm:grid-cols-3 sm:gap-4">
             <dt className="font-medium text-gray-900">Project Name</dt>
             <dd className="text-gray-700 sm:col-span-2">
-            {projects.project_name || "N/A"}
+              {project ? project.project_name : "N/A"}
             </dd>
           </div>
 
           <div className="grid grid-cols-1 gap-1 p-3 sm:grid-cols-3 sm:gap-4">
-            <dt className="font-medium text-gray-900">Name</dt>
-            <dd className="text-gray-700 sm:col-span-2">John Frusciante</dd>
-          </div>
-
-          <div className="grid grid-cols-1 gap-1 p-3 sm:grid-cols-3 sm:gap-4">
-            <dt className="font-medium text-gray-900">Occupation</dt>
-            <dd className="text-gray-700 sm:col-span-2">Guitarist</dd>
-          </div>
-
-          <div className="grid grid-cols-1 gap-1 p-3 sm:grid-cols-3 sm:gap-4">
-            <dt className="font-medium text-gray-900">Salary</dt>
-            <dd className="text-gray-700 sm:col-span-2">$1,000,000+</dd>
-          </div>
-
-          <div className="grid grid-cols-1 gap-1 p-3 sm:grid-cols-3 sm:gap-4">
-            <dt className="font-medium text-gray-900">Bio</dt>
+            <dt className="font-medium text-gray-900">Project Description</dt>
             <dd className="text-gray-700 sm:col-span-2">
-              Lorem ipsum dolor, sit amet consectetur adipisicing elit. Et
-              facilis debitis explicabo doloremque impedit nesciunt dolorem
-              facere, dolor quasi veritatis quia fugit aperiam aspernatur neque
-              molestiae labore aliquam soluta architecto?
+              {project ? project.project_description : "N/A"}
+            </dd>
+          </div>
+
+          <div className="grid grid-cols-1 gap-1 p-3 sm:grid-cols-3 sm:gap-4">
+            <dt className="font-medium text-gray-900">Start Date</dt>
+            <dd className="text-gray-700 sm:col-span-2">
+              {project ? formatDate(project.start_date) : "N/A"}
+            </dd>
+          </div>
+
+          <div className="grid grid-cols-1 gap-1 p-3 sm:grid-cols-3 sm:gap-4">
+            <dt className="font-medium text-gray-900">Due Date</dt>
+            <dd className="text-gray-700 sm:col-span-2">
+              {project ? formatDate(project.due_date) : "N/A"}
+            </dd>
+          </div>
+
+          <div className="grid grid-cols-1 gap-1 p-3 sm:grid-cols-3 sm:gap-4">
+            <dt className="font-medium text-gray-900">Employees</dt>
+            <dd className="text-gray-700 sm:col-span-2">
+              {employees.length > 0 ? (
+                <ul>
+                  {employees.map((emp) => (
+                    <li key={emp.employee_id}>
+                      {emp.firstname} {emp.lastname} - {emp.role_name}
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                "No employees assigned"
+              )}
             </dd>
           </div>
         </dl>

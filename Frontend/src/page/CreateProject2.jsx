@@ -80,6 +80,10 @@ const CreateProject2 = () => {
     }
   };
 
+  const handleFinish = () => {
+    navigate("/project");
+  };
+
   useEffect(() => {
     const fetchEmployees = async () => {
       try {
@@ -193,7 +197,7 @@ const CreateProject2 = () => {
               placeholder="Cost"
             />
             <div className="mt-6 text-right">
-              <button type="submit" className="cursor-pointer inline-block w-full rounded-lg bg-black px-5 py-3 font-medium text-white sm:w-auto">
+              <button type="submit" className="inline-block w-full rounded-lg bg-black px-5 py-3 font-medium text-white sm:w-auto">
                 {isEditing ? "Save" : "Create Project"}
               </button>
             </div>
@@ -218,12 +222,11 @@ const CreateProject2 = () => {
                   <li
                     key={emp.employee_id}
                     className="p-2 hover:bg-gray-100 cursor-pointer"
-                    onMouseDown={(e) => e.preventDefault()}
                     onClick={() => {
                       if (!selectedEmployees.some((selected) => selected.employee_id === emp.employee_id)) {
                         setSelectedEmployees([...selectedEmployees, emp]);
                       }
-                      // setIsDropdownOpen(false);
+                      setIsDropdownOpen(false);
                     }}
                   >
                     {`${emp.firstname} ${emp.lastname} - ${emp.role_name}`}
@@ -250,7 +253,7 @@ const CreateProject2 = () => {
                       <td className="border p-2">{emp.firstname} {emp.lastname}</td>
                       <td className="border p-2">{emp.role_name}</td>
                       <td className="border p-2 text-center">
-                        <button className="cursor-pointer text-red-500" onClick={() => setSelectedEmployees(selectedEmployees.filter((e) => e.employee_id !== emp.employee_id))} type="button">
+                        <button className="text-red-500" onClick={() => setSelectedEmployees(selectedEmployees.filter((e) => e.employee_id !== emp.employee_id))} type="button">
                           Remove
                         </button>
                       </td>
@@ -264,19 +267,23 @@ const CreateProject2 = () => {
           <div className="mt-6 text-right">
             <button
               type="button"
-              onClick={() => {
-                handleAddEmployee(); 
-                navigate("/project"); 
-              }}
-              disabled={!projectId}
-              className={`cursor-pointer inline-block w-full rounded-lg px-5 py-3 font-medium text-white sm:w-auto ${!projectId ? "bg-gray-400 cursor-not-allowed" : "bg-black"
-                }`}
+              onClick={handleAddEmployee}
+              disabled={!projectId} // Disable button if projectId is null
+              className={`inline-block w-full rounded-lg px-5 py-3 font-medium text-white sm:w-auto ${!projectId ? "bg-gray-400 cursor-not-allowed" : "bg-green-600"}`}
             >
               Add Employee
             </button>
-
           </div>
         </div>
+      </div>
+      <div className="mt-6 text-right">
+        <button
+          type="button"
+          onClick={handleFinish}
+          className="inline-block w-full rounded-lg bg-blue-600 px-5 py-3 font-medium text-white sm:w-auto"
+        >
+          Finish
+        </button>
       </div>
     </div>
   );
