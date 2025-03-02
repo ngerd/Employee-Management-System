@@ -12,16 +12,16 @@ function Home() {
       <div className="py-8 px-4 sm:px-8 lg:px-16">
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-6">
           {/* Staff Card */}
-          {isadmin == "true" && 
-          <Card
-            Icon={FileUser}
-            title="Staff"
-            subtitle="Lorem ipsum dolor"
-            description="Lorem ipsum dolor sit amet consectetur adipisicing elit. Cupiditate, praesentium voluptatem omnis atque culpa repellendus."
-            linkText="See details"
-            href="staff"
-          />}
-          
+          {isadmin == true &&
+            <Card
+              Icon={FileUser}
+              title="Staff"
+              subtitle="Lorem ipsum dolor"
+              description="Lorem ipsum dolor sit amet consectetur adipisicing elit. Cupiditate, praesentium voluptatem omnis atque culpa repellendus."
+              linkText="See details"
+              href="staff"
+            />}
+
           {/* Project Card */}
           <Card
             Icon={SquareChartGantt}
