@@ -5,7 +5,7 @@ import { Employee } from "../context/ContextProvider";
 
 function Home() {
   const {isadmin} = useContext(Employee);
-  console.log(isadmin)
+  console.log("isadmin:" + isadmin);
 
   return (
     <div className="min-h-screen bg-gray-100">

@@ -43,7 +43,7 @@ const Project = () => {
 
   useEffect(() => {
     async function init(params) {
-      console.log(employeeId)
+      console.log("Employee ID: " + employeeId)
       const data = await fectchproject();
       setProjects(data.projects)
       setLoading(false)

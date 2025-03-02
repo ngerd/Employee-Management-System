@@ -18,8 +18,8 @@ function Navbar() {
   };
   const validate = async () => {
     const data = await fetchData();
-    // setEmployeeId(null)
-    // setisadmin(null)
+    setEmployeeId(null)
+    setisadmin(null)
     navigate("/")
   };
 
