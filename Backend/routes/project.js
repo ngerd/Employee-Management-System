@@ -103,7 +103,7 @@ router.post("/info", async (req, res) => {
         project_name: project.project_name,
         project_description: project.project_description,
         start_date: project.start_date,
-        end_date: project.end_date,
+        due_date: project.due_date,
         created_at: project.created_at,
       },
       employees: employeesResult.rows,
