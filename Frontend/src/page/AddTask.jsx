@@ -76,12 +76,12 @@ const AddTask = () => {
                 alert("Failed to add task: " + data.error);
             }
         } catch (error) {
-            console.error("There was a problem adding a task:", error);
+            console.error("There was a problem adding a task to the project:", error);
         }
     };
 
     return (
-        <div className="mx-auto max-w-xl px-6 py-12 sm:px-8 lg:px-10 grid grid-cols-1  gap-6">
+        <div className="mx-auto max-w-screen-xl px-6 py-12 sm:px-8 lg:px-10 grid grid-cols-1 lg:grid-cols-2 gap-6">
             <div className="rounded-lg bg-white p-8 shadow-lg">
                 <h2 className="text-2xl pb-8 font-extrabold text-gray-900">Add Task</h2>
                 <form className="space-y-4" onSubmit={handleSubmit}>
@@ -111,6 +111,7 @@ const AddTask = () => {
                             value={formValues.startDate}
                             onChange={handleChange}
                             className="mt-1 p-2 h-10 w-full rounded-md border-gray-300 bg-white text-sm text-gray-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            placeholder="Start Date"
                         />
                         <input
                             type="date"
@@ -119,6 +120,7 @@ const AddTask = () => {
                             value={formValues.dueDate}
                             onChange={handleChange}
                             className="mt-1 p-2 h-10 w-full rounded-md border-gray-300 bg-white text-sm text-gray-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            placeholder="Due Date"
                         />
                     </div>
 
@@ -144,3 +146,4 @@ const AddTask = () => {
 };
 
 export default AddTask;
+
