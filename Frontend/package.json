@@ -25,6 +25,7 @@
     "@schedule-x/theme-default": "^2.21.0",
     "@tailwindcss/vite": "^4.0.8",
     "dayjs": "^1.11.13",
+    "employee-management-system": "file:..",
     "lucide-react": "^0.476.0",
     "primeicons": "^7.0.0",
     "primereact": "^10.9.2",

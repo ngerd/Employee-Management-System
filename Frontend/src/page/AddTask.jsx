@@ -81,7 +81,7 @@ const AddTask = () => {
     };
 
     return (
-        <div className="mx-auto max-w-screen-xl px-6 py-12 sm:px-8 lg:px-10 grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="mx-auto max-w-xl px-6 py-12 sm:px-8 lg:px-10 gap-6 ">
             <div className="rounded-lg bg-white p-8 shadow-lg">
                 <h2 className="text-2xl pb-8 font-extrabold text-gray-900">Add Task</h2>
                 <form className="space-y-4" onSubmit={handleSubmit}>

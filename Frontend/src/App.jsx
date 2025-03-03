@@ -14,6 +14,7 @@ import Home from "./page/Home";
 import ProjectDetail from "./page/ProjectDetail";
 import Navbar from "./component/Navbar";
 import Timesheet from "./page/Timesheet";
+import Timesheet2 from "./page/Timesheet2";
 import Login from "./page/Login";
 import CreateEmployee from "./page/CreateEmployee";
 import CreateTimeslot from "./page/CreateTimeslot";
@@ -26,6 +27,8 @@ import AddTask from "./page/AddTask";
 import AddMember from "./page/AddMember";
 import UpdateTask from "./page/UpdateTask";
 import ViewEmployeeInfo from "./page/ViewEmployeeInfo";
+import EditTimeslot from "./page/EditTimeslot";
+import UpdateTimeslot from "./page/UpdateTimeslot";
 
 function Layout() {
   const location = useLocation();
@@ -54,6 +57,10 @@ function Layout() {
           <Route path="/update-task/:taskId" element={<UpdateTask />} />
           <Route path="/add-member" element={<AddMember />} />
           <Route path="/view-account" element={<ViewEmployeeInfo />} />
+          <Route path="/edit-timeslot" element={<EditTimeslot />} />
+          <Route path="/timesheet2" element={<Timesheet2 />} />
+          <Route path="/update-timeslot" element={<UpdateTimeslot />} />
+
         </Routes>
       </ContextProvider>
     </div>
