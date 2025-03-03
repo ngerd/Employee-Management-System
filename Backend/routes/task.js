@@ -396,14 +396,16 @@ router.post("/getEmployeeTask", async (req, res) => {
 
   try {
     const query = `
-      SELECT 
-        p.project_name, 
-        t.task_name, 
+      SELECT DISTINCT ON (t.task_id)
+        p.project_name,
+        t.task_name,
+        t.task_id,
         ta.assignment_id
       FROM public."task_assignment" ta
       JOIN public."task" t ON ta.task_id = t.task_id
       JOIN public."project" p ON t.project_id = p.project_id
       WHERE ta.employee_id = $1
+      ORDER BY t.task_id, ta.assignment_id;
     `;
     const result = await pool.query(query, [employee_id]);
 
