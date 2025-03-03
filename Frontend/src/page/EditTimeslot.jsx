@@ -147,7 +147,7 @@ const EditTimeslot = () => {
         <Column
           field="emp_enddate"
           header="End Date"
-          body={(rowData) => formatDate(rowData.emp_startdate)}
+          body={(rowData) => formatDate(rowData.emp_enddate)}
           style={{ minWidth: "10rem" }}
         />
         <Column

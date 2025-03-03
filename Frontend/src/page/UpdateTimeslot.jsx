@@ -1,51 +1,52 @@
 import React, { useState, useEffect, useContext } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { ProjectContext } from "../context/ContextProvider";
 import "primereact/resources/themes/lara-light-blue/theme.css";
 import "primereact/resources/primereact.min.css";
 import "primeicons/primeicons.css";
+import { Employee } from '../context/ContextProvider';
 
 const UpdateTimeslot = () => {
   const navigate = useNavigate();
-  const { projectId } = useContext(ProjectContext);
-  const { taskId } = useParams();
+  const { employeeId } = useContext(Employee);
+  const { assignment_id } = useParams();
   const [formValues, setFormValues] = useState({
-    taskName: "",
-    taskDescription: "",
     startDate: "",
-    dueDate: "",
+    endDate: "",
   });
 
   useEffect(() => {
     const fetchTask = async () => {
       try {
-        const response = await fetch("http://localhost:3000/task/info", {
+        const response = await fetch("http://localhost:3000/getTimesheet", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ taskId }),
+          body: JSON.stringify({ employee_id: employeeId }),
         });
         const data = await response.json();
-        if (response.ok) {
-          setFormValues({
-            taskName: data.task.task_name,
-            taskDescription: data.task.task_description,
-            startDate: new Date(data.task.start_date).toISOString().slice(0, 16),
-            dueDate: new Date(data.task.due_date).toISOString().slice(0, 16),
-          });
+        if (response.ok && data.length > 0) {
+          const timeslot = data.find(slot => slot.assignment_id === parseInt(assignment_id));
+          if (timeslot) {
+            setFormValues({
+              startDate: new Date(timeslot.emp_startdate).toISOString().slice(0, 16),
+              endDate: new Date(timeslot.emp_enddate).toISOString().slice(0, 16),
+            });
+          } else {
+            alert("Timeslot not found");
+          }
         } else {
-          alert("Failed to fetch task: " + data.error);
+          alert("Failed to fetch timeslot: " + (data.error || "No data found"));
         }
       } catch (error) {
-        console.error("There was a problem fetching the task:", error);
+        console.error("There was a problem fetching the timeslot:", error);
       }
     };
 
-    if (taskId) {
+    if (assignment_id) {
       fetchTask();
     }
-  }, [taskId]);
+  }, [assignment_id, employeeId]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -55,23 +56,27 @@ const UpdateTimeslot = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch("http://localhost:3000/task/update", {
+      const response = await fetch("http://localhost:3000/updateTimesheet", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ ...formValues, taskId, projectId }),
+        body: JSON.stringify({
+          assignment_id,
+          startdate: formValues.startDate,
+          enddate: formValues.endDate,
+        }),
       });
       const data = await response.json();
 
       if (response.ok) {
-        alert("Task updated successfully!");
-        navigate("/project-task");
+        alert("Timeslot updated successfully!");
+        navigate("/edit-timeslot");
       } else {
-        alert("Failed to update task: " + data.error);
+        alert("Failed to update timeslot: " + data.error);
       }
     } catch (error) {
-      console.error("There was a problem updating the task:", error);
+      console.error("There was a problem updating the timeslot:", error);
     }
   };
 
@@ -80,24 +85,6 @@ const UpdateTimeslot = () => {
       <div className="rounded-lg bg-white p-8 shadow-lg">
         <h2 className="text-2xl pb-8 font-extrabold text-gray-900">Update Task</h2>
         <form className="space-y-4" onSubmit={handleSubmit}>
-          <input
-            id="taskName"
-            name="taskName"
-            value={formValues.taskName}
-            onChange={handleChange}
-            className="mt-1 p-2 h-10 w-full rounded-md border-gray-300 bg-white text-sm text-gray-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 pr-10"
-            placeholder="Task Name"
-          />
-
-          <textarea
-            id="taskDescription"
-            name="taskDescription"
-            value={formValues.taskDescription}
-            onChange={handleChange}
-            className="mt-1 p-2 h-20 w-full rounded-md border-gray-300 bg-white text-sm text-gray-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            placeholder="Task Description"
-          />
-
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <input
               type="datetime-local"
@@ -109,9 +96,9 @@ const UpdateTimeslot = () => {
             />
             <input
               type="datetime-local"
-              id="dueDate"
-              name="dueDate"
-              value={formValues.dueDate}
+              id="endDate"
+              name="endDate"
+              value={formValues.endDate}
               onChange={handleChange}
               className="mt-1 p-2 h-10 w-full rounded-md border-gray-300 bg-white text-sm text-gray-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             />
@@ -120,7 +107,7 @@ const UpdateTimeslot = () => {
           <div className="mt-6 flex justify-between">
             <button
               type="button"
-              onClick={() => navigate("/project-task")}
+              onClick={() => navigate("/edit-timeslot")}
               className="cursor-pointer rounded-lg bg-black px-5 py-3 font-medium text-white hover:bg-gray-700"
             >
               Back
@@ -129,7 +116,7 @@ const UpdateTimeslot = () => {
               type="submit"
               className="cursor-pointer rounded-lg bg-black px-5 py-3 font-medium text-white hover:bg-gray-700"
             >
-              Update Task
+              Update Timeslot
             </button>
           </div>
         </form>

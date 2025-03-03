@@ -59,7 +59,7 @@ function Layout() {
           <Route path="/view-account" element={<ViewEmployeeInfo />} />
           <Route path="/edit-timeslot" element={<EditTimeslot />} />
           <Route path="/timesheet2" element={<Timesheet2 />} />
-          <Route path="/update-timeslot" element={<UpdateTimeslot />} />
+          <Route path="/update-timeslot/:assignment_id" element={<UpdateTimeslot />} />
 
         </Routes>
       </ContextProvider>
