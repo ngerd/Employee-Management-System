@@ -425,7 +425,7 @@ const ProjectTeam = () => {
 
       {/* Assign Task Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 flex items-center justify-center bg-gray-900/20 backdrop-blur-sm">
+        <div className="fixed inset-0 flex items-center justify-center bg-gray-900/10 backdrop-blur-sm">
           <div className="bg-white p-6 rounded-lg shadow-xl">
             <h2 className="text-xl font-bold mb-4">Assign Task</h2>
             <DataTable value={tasks} paginator rows={5} emptyMessage="No tasks found.">
