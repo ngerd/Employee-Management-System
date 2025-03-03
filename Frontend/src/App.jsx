@@ -14,6 +14,7 @@ import Home from "./page/Home";
 import ProjectDetail from "./page/ProjectDetail";
 import Navbar from "./component/Navbar";
 import Timesheet from "./page/Timesheet";
+import Timesheet2 from "./page/Timesheet2";
 import Login from "./page/Login";
 import CreateEmployee from "./page/CreateEmployee";
 import CreateTimeslot from "./page/CreateTimeslot";
@@ -56,6 +57,7 @@ function Layout() {
           <Route path="/add-member" element={<AddMember />} />
           <Route path="/view-account" element={<ViewEmployeeInfo />} />
           <Route path="/edit-timeslot" element={<EditTimeslot />} />
+          <Route path="/timesheet2" element={<Timesheet2 />} />
         </Routes>
       </ContextProvider>
     </div>
