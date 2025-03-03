@@ -272,7 +272,7 @@ const CreateProject2 = () => {
                 navigate("/project");
               }}
               disabled={!projectId} // Disable button if projectId is null
-              className={`cursor-pointer inline-block w-full rounded-lg px-5 py-3 font-medium text-white sm:w-auto ${!projectId ? "bg-gray-400 cursor-not-allowed" : "bg-black hover:bg-gray-700"
+              className={`inline-block w-full rounded-lg px-5 py-3 font-medium text-white sm:w-auto ${!projectId ? "bg-gray-400 cursor-not-allowed" : "bg-black hover:bg-gray-700 cursor-pointer "
                 }`}
             >
               Add Employee
