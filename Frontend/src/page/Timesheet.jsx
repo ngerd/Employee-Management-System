@@ -48,7 +48,7 @@ function Timesheet() {
           body: JSON.stringify({ employee_id: employeeId }),
         });
 
-        const data = await response.json();
+       const data = await response.json();
 
         if (Array.isArray(data)) {
           data.forEach((task) => {
@@ -94,7 +94,7 @@ function Timesheet() {
           className="cursor-pointer flex items-center gap-2 rounded-md bg-green-700 px-4 py-2 text-white font-medium hover:bg-green-500"
           onClick={() => navigate(`/create-timeslot`)}
         >
-          <CirclePlus className="w-5 h-5" /> Create Timeslot
+          <CirclePlus className="w-5 h-5" /> Create imeslot
         </button>
           <button
             className="cursor-pointer flex items-center gap-2 rounded-md bg-green-700 px-4 py-2 text-white font-medium hover:bg-green-500"
@@ -114,4 +114,4 @@ function Timesheet() {
   );
 }
 
-export default Timesheet;
+export default Timesheet; 

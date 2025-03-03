@@ -44,13 +44,16 @@ const EditTimeslot = () => {
   }, [employeeId]);
 
   const handleDelete = async (taskId) => {
+    console.log("Task ID: " + taskId);
+    const requestBody = JSON.stringify({ assignment_id: taskId }); // Ensure correct structure
+    console.log("Request Body:", requestBody); // Debugging log to verify structure
     try {
-      const response = await fetch("http://localhost:3000/task/delete", {
-        method: "DELETE",
+      const response = await fetch("http://localhost:3000/deleteTimesheet", {
+        method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ taskId }),
+        body: JSON.stringify({ assignment_id: taskId }),
       });
 
       if (!response.ok) {
@@ -65,24 +68,34 @@ const EditTimeslot = () => {
 
   const formatDate = (dateString) => {
     if (!dateString) return "";
+
     const date = new Date(dateString);
-    return new Intl.DateTimeFormat("en-GB", {
-      day: "2-digit",
-      month: "2-digit",
-      year: "numeric",
-    }).format(date);
+
+    return (
+      new Intl.DateTimeFormat("en-GB", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+      }).format(date) +
+      " " +
+      date.toLocaleTimeString("en-GB", {
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: false, // Ensures 24-hour format
+      })
+    );
   };
 
   const actionButtonTemplate = (rowData) => (
     <div className="flex gap-2">
       <button
-        onClick={() => navigate(`/update-task/${rowData.task_id}`)}
+        onClick={() => navigate(`/update-timeslot/${rowData.assignment_id}`)}
         className="cursor-pointer rounded-md bg-teal-600 px-4 py-2 text-xs font-medium text-white hover:bg-teal-500"
       >
         Update
       </button>
       <button
-        onClick={() => handleDelete(rowData.task_id)}
+        onClick={() => handleDelete(rowData.assignment_id)}
         className="cursor-pointer rounded-md bg-orange-600 px-4 py-2 text-xs font-medium text-white hover:bg-orange-500"
       >
         Delete
@@ -128,13 +141,13 @@ const EditTimeslot = () => {
         <Column
           field="emp_startdate"
           header="Start Date"
-          body={(rowData) => formatDate(rowData.start_date)}
+          body={(rowData) => formatDate(rowData.emp_startdate)}
           style={{ minWidth: "10rem" }}
         />
         <Column
           field="emp_enddate"
           header="End Date"
-          body={(rowData) => formatDate(rowData.due_date)}
+          body={(rowData) => formatDate(rowData.emp_startdate)}
           style={{ minWidth: "10rem" }}
         />
         <Column
