@@ -92,13 +92,13 @@ const ProjectTeam = () => {
 
   const assigntask = (rowData) => (
     <div className="flex gap-2">
-      <button onClick={openAssignModal} className="cursor-pointer rounded-md bg-teal-600 px-4 py-2 text-xs font-medium text-white hover:bg-teal-500"
+      <button className="cursor-pointer rounded-md bg-teal-600 px-4 py-2 text-xs font-medium text-white hover:bg-teal-500"
       >
-        Assign
+        Select
       </button>
-      <button onClick={() => handleDelete(rowData.employee_id)} className="cursor-pointer rounded-md bg-orange-600 px-4 py-2 text-xs font-medium text-white hover:bg-orange-500">
+      {/* <button onClick={() => handleDelete(rowData.employee_id)} className="cursor-pointer rounded-md bg-orange-600 px-4 py-2 text-xs font-medium text-white hover:bg-orange-500">
         Unassign
-      </button>
+      </button> */}
     </div>
   );
 
