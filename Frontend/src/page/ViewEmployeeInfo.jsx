@@ -83,7 +83,7 @@ const ViewEmployeeInfo = () => {
       return;
     }
     try {
-      const response = await fetch("http://localhost:3000/auth/updateEmployee", {
+      const response = await fetch("http://localhost:3000/updateEmployee", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

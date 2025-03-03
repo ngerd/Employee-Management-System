@@ -2,7 +2,6 @@ import React, { useEffect, useState, useContext } from "react";
 import { createEventModalPlugin } from "@schedule-x/event-modal";
 import { createDragAndDropPlugin } from "@schedule-x/drag-and-drop";
 import { useNavigate } from "react-router-dom";
-
 import { useCalendarApp, ScheduleXCalendar } from "@schedule-x/react";
 import {
   createViewDay,
@@ -11,47 +10,30 @@ import {
   createViewWeek,
 } from "@schedule-x/calendar";
 import { createEventsServicePlugin } from "@schedule-x/events-service";
-import { CirclePlus } from "lucide-react";
 import { Employee } from "../context/ContextProvider";
 import "@schedule-x/theme-default/dist/index.css";
+import { Info, ClipboardList, Users, CirclePlus, Download, Pencil } from "lucide-react";
 
 function Timesheet() {
   const navigate = useNavigate();
   const { employeeId } = useContext(Employee);
 
-  const [tasks, setTasks] = useState([]);
-  const [loading, setLoading] = useState(true);
+  // Create event service plugin
+  const eventsServicePlugin = useState(() => createEventsServicePlugin())[0];
 
-  // Create Calendar Instance
-  const eventsService = useState(() => createEventsServicePlugin())[0];
-
-  // const calendar = useCalendarApp({
-  //   views: [
-  //     createViewDay(),
-  //     createViewWeek(),
-  //     createViewMonthGrid(),
-  //     createViewMonthAgenda(),
-  //   ],
-  //   events: tasks, // Updated dynamically
-  //   plugins: [
-  //     eventsService,
-  //     createEventModalPlugin(),
-  //     createDragAndDropPlugin(),
-  //   ],
-  // });
-
+  // Initialize ScheduleX Calendar
   const calendar = useCalendarApp({
-    views: [createViewDay(), createViewWeek(), createViewMonthGrid(), createViewMonthAgenda()],
-    events: [
-      {
-        id: "25",
-        title: "Hardcoded Event",
-        start: "2025-03-15 10:00",
-        end: "2025-03-15 12:00",
-        description: "ahihidongok"
-      },
+    views: [
+      createViewDay(),
+      createViewWeek(),
+      createViewMonthGrid(),
+      createViewMonthAgenda(),
     ],
-    plugins: [eventsService, createEventModalPlugin(), createDragAndDropPlugin()],
+    plugins: [
+      eventsServicePlugin,
+      createEventModalPlugin(),
+      createDragAndDropPlugin(),
+    ],
   });
 
   useEffect(() => {
@@ -69,80 +51,67 @@ function Timesheet() {
         const data = await response.json();
 
         if (Array.isArray(data)) {
-          const formattedEvents = data.map((task) => ({
-            id: String(task.assignment_id),
-            title: task.task_name,
-            // description: task.project_name,
-            start: formatDateTime(task.emp_startdate),
-            end: formatDateTime(task.emp_enddate),
-          }));
+          data.forEach((task) => {
+            const formattedEvent = {
+              id: task.assignment_id,
+              title: task.task_name,
+              start: task.emp_startdate.replace("T", " ").slice(0, 16), // Format to 'YYYY-MM-DD HH:mm'
+              end: task.emp_enddate.replace("T", " ").slice(0, 16),
+            };
 
-          console.log("Formatted API Events:", formattedEvents);
-
-          // 🔥 Guarantee the hardcoded test event is included
-          const testEvent = {
-            id: "test-1",
-            title: "Test Event",
-            start: "2025-03-15 10:00",
-            end: "2025-03-15 12:00",
-            // description: "This is a manually added test event.",
-          };
-
-          // 🔹 Ensure events are always an array
-          setTasks([...formattedEvents, testEvent]);
+            eventsServicePlugin.add(formattedEvent);
+          });
         } else {
-          setTasks([]);
+          console.error("Invalid API response format:", data);
         }
       } catch (error) {
         console.error("Error fetching tasks:", error);
-      } finally {
-        setLoading(false);
       }
     };
 
     fetchTasks();
   }, [employeeId]);
 
+  // Add a hardcoded test event
+  useEffect(() => {
+    const testEvent = {
+      id: 999,
+      title: "Test Event",
+      start: "2025-03-10 14:00",
+      end: "2025-03-10 16:00",
+    };
+    eventsServicePlugin.add(testEvent);
+  }, []);
+
   return (
     <div className="flex flex-col p-4">
-      <div className="flex items-center justify-between w-full px-20 mt-5 mb-4">
-        <h1 className="text-4xl font-bold text-gray-900">Timesheet</h1>
-      </div>
-
-      <div className="flex justify-between items-center mb-4 ml-20 mr-20">
+      <div className="flex items-center justify-between py-4 px-11">
+        <h1 className="text-4xl font-bold text-gray-900 flex items-center gap-2">
+          Time Schedule
+        </h1>
+        <div className="flex gap-2">
         <button
           className="cursor-pointer flex items-center gap-2 rounded-md bg-green-700 px-4 py-2 text-white font-medium hover:bg-green-500"
           onClick={() => navigate(`/create-timeslot`)}
         >
-          <CirclePlus className="w-5 h-5" /> Create timeslot
+          <CirclePlus className="w-5 h-5" /> Create Timeslot
         </button>
+          <button
+            className="cursor-pointer flex items-center gap-2 rounded-md bg-green-700 px-4 py-2 text-white font-medium hover:bg-green-500"
+            onClick={() => navigate("/edit-timeslot")}
+          >
+            <Pencil className="w-5 h-5" /> Edit Timeslot
+          </button>
+        </div>
       </div>
 
       <div className="flex justify-center items-center w-full p-4">
         <div className="w-full max-w-[1400px]">
-          {loading ? (
-            <p>Loading...</p>
-          ) : (
-            <ScheduleXCalendar calendarApp={calendar} />
-          )}
+          <ScheduleXCalendar calendarApp={calendar} />
         </div>
       </div>
     </div>
   );
 }
-
-// 🔹 Format date correctly for ScheduleX
-const formatDateTime = (dateString) => {
-  if (!dateString) return "";
-
-  const date = new Date(dateString);
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const day = String(date.getDate()).padStart(2, "0");
-  const hours = String(date.getHours()).padStart(2, "0");
-  const minutes = String(date.getMinutes()).padStart(2, "0");
-
-  return `${year}-${month}-${day} ${hours}:${minutes}`;
-};
 
 export default Timesheet;
