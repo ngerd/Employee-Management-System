@@ -22,7 +22,7 @@ const CreateTimeslot = () => {
     const fetchTasks = async () => {
       console.log("Employee ID: " + employeeId);
       try {
-        const response = await fetch("http://localhost:3000/getTimesheet", {
+        const response = await fetch("http://localhost:3000/task/getEmployeeTask", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
