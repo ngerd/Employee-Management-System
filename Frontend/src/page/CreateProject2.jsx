@@ -197,7 +197,7 @@ const CreateProject2 = () => {
               placeholder="Cost"
             />
             <div className="mt-6 text-right">
-              <button type="submit" className="inline-block w-full rounded-lg bg-black px-5 py-3 font-medium text-white sm:w-auto">
+              <button type="submit" className="cursor-pointer inline-block w-full rounded-lg bg-black hover:bg-gray-700 px-5 py-3 font-medium text-white sm:w-auto">
                 {isEditing ? "Save" : "Create Project"}
               </button>
             </div>
@@ -253,7 +253,7 @@ const CreateProject2 = () => {
                       <td className="border p-2">{emp.firstname} {emp.lastname}</td>
                       <td className="border p-2">{emp.role_name}</td>
                       <td className="border p-2 text-center">
-                        <button className="text-red-500" onClick={() => setSelectedEmployees(selectedEmployees.filter((e) => e.employee_id !== emp.employee_id))} type="button">
+                        <button className="cursor-pointer text-red-500 hover:text-red-700" onClick={() => setSelectedEmployees(selectedEmployees.filter((e) => e.employee_id !== emp.employee_id))} type="button">
                           Remove
                         </button>
                       </td>
@@ -267,23 +267,18 @@ const CreateProject2 = () => {
           <div className="mt-6 text-right">
             <button
               type="button"
-              onClick={handleAddEmployee}
+              onClick={() => {
+                handleAddEmployee();
+                navigate("/project");
+              }}
               disabled={!projectId} // Disable button if projectId is null
-              className={`inline-block w-full rounded-lg px-5 py-3 font-medium text-white sm:w-auto ${!projectId ? "bg-gray-400 cursor-not-allowed" : "bg-green-600"}`}
+              className={`cursor-pointer inline-block w-full rounded-lg px-5 py-3 font-medium text-white sm:w-auto ${!projectId ? "bg-gray-400 cursor-not-allowed" : "bg-black hover:bg-gray-700"
+                }`}
             >
               Add Employee
             </button>
           </div>
         </div>
-      </div>
-      <div className="mt-6 text-right">
-        <button
-          type="button"
-          onClick={handleFinish}
-          className="inline-block w-full rounded-lg bg-blue-600 px-5 py-3 font-medium text-white sm:w-auto"
-        >
-          Finish
-        </button>
       </div>
     </div>
   );
