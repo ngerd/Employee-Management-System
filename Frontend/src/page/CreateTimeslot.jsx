@@ -1,8 +1,9 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect, useContext, use } from "react";
 import { useNavigate } from "react-router-dom";
 import { Employee, TaskContext } from "../context/ContextProvider";
 
 const CreateTimeslot = () => {
+  const navigate = useNavigate();
   const [formValues, setFormValues] = useState({
     employee_ids: [],
     task_id: "",
@@ -47,6 +48,36 @@ const CreateTimeslot = () => {
     fetchTasks();
   }, [employeeId]);
 
+  // getTimesheet API
+  // useEffect(() => {
+  //   const fetchTasks = async () => {
+  //     console.log("Employee ID: " + employeeId);
+  //     try {
+  //       const response = await fetch("http://localhost:3000/getTimesheet", {
+  //         method: "POST",
+  //         headers: {
+  //           "Content-Type": "application/json",
+  //         },
+  //         body: JSON.stringify({ employee_id: employeeId }),
+  //       });
+  //       const data = await response.json();
+
+  //       if (Array.isArray(data)) {
+  //         setTasks(data);
+  //       } else {
+  //         setTasks([]);
+  //       }
+  //       console.log("Fetched tasks:", data);
+  //     } catch (error) {
+  //       console.error("Error fetching tasks:", error);
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   };
+
+  //   fetchTasks();
+  // }, [employeeId]);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormValues({ ...formValues, [name]: value });
@@ -54,23 +85,29 @@ const CreateTimeslot = () => {
 
   const handleSelect = (task) => {
     setSelectedTask(task.task_name);
-    setFormValues({ ...formValues, task_id: task.assignment_id });
+    setFormValues({ ...formValues, task_id: task.task_id });
     setIsOpen(false);
+    console.log("task_id " + formValues.task_id);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
+
     if (!employeeId) {
       alert("Error: No employee ID found.");
       return;
     }
-  
+
     const updatedFormValues = {
       ...formValues,
       employee_ids: [employeeId], // Ensure it's an array
     };
-  
+
+    console.log("employee_ids", updatedFormValues.employee_ids);
+    console.log("task_id", updatedFormValues.task_id);
+    console.log("startdate", updatedFormValues.startdate);
+    console.log("enddate", updatedFormValues.enddate);
+
     try {
       const response = await fetch("http://localhost:3000/createTimesheet", {
         method: "POST",
@@ -79,9 +116,9 @@ const CreateTimeslot = () => {
         },
         body: JSON.stringify(updatedFormValues),
       });
-  
+
       const data = await response.json();
-  
+
       if (response.ok) {
         alert("Timeslot added successfully!");
         setFormValues({
@@ -96,7 +133,7 @@ const CreateTimeslot = () => {
     } catch (error) {
       console.error("There was a problem adding a task to the project:", error);
     }
-  };  
+  };
 
   return (
     <section className="bg-gray-100">
@@ -177,7 +214,7 @@ const CreateTimeslot = () => {
                       </li>
                     ) : (
                       tasks.map((task) => (
-                        <li key={task.assignment_id}>
+                        <li key={task.task_id}>
                           <button
                             type="button"
                             onClick={() => handleSelect(task)}
@@ -195,6 +232,7 @@ const CreateTimeslot = () => {
             <div className="mt-6 flex justify-between">
               <button
                 type="button"
+                onClick={() => navigate("/timesheet")}
                 className="rounded-lg bg-black px-5 py-3 font-medium text-white"
               >
                 Back
