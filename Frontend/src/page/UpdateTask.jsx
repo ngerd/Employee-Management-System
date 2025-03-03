@@ -31,8 +31,8 @@ const UpdateTask = () => {
           setFormValues({
             taskName: data.task.task_name,
             taskDescription: data.task.task_description,
-            startDate: data.task.start_date,
-            dueDate: data.task.due_date,
+            startDate: new Date(data.task.start_date).toISOString().slice(0, 16),
+            dueDate: new Date(data.task.due_date).toISOString().slice(0, 16),
           });
         } else {
           alert("Failed to fetch task: " + data.error);
@@ -100,7 +100,7 @@ const UpdateTask = () => {
 
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <input
-              type="date"
+              type="datetime-local"
               id="startDate"
               name="startDate"
               value={formValues.startDate}
@@ -108,7 +108,7 @@ const UpdateTask = () => {
               className="mt-1 p-2 h-10 w-full rounded-md border-gray-300 bg-white text-sm text-gray-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             />
             <input
-              type="date"
+              type="datetime-local"
               id="dueDate"
               name="dueDate"
               value={formValues.dueDate}
