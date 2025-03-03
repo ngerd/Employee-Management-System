@@ -12,159 +12,137 @@ import {
 } from "@schedule-x/calendar";
 import { createEventsServicePlugin } from "@schedule-x/events-service";
 import { CirclePlus } from "lucide-react";
-
+import { Employee } from "../context/ContextProvider";
 import "@schedule-x/theme-default/dist/index.css";
 
 function Timesheet() {
   const navigate = useNavigate();
-  // Initialize ScheduleX Calendar
+  const { employeeId } = useContext(Employee);
+
+  const [tasks, setTasks] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  // Create Calendar Instance
   const eventsService = useState(() => createEventsServicePlugin())[0];
 
+  // const calendar = useCalendarApp({
+  //   views: [
+  //     createViewDay(),
+  //     createViewWeek(),
+  //     createViewMonthGrid(),
+  //     createViewMonthAgenda(),
+  //   ],
+  //   events: tasks, // Updated dynamically
+  //   plugins: [
+  //     eventsService,
+  //     createEventModalPlugin(),
+  //     createDragAndDropPlugin(),
+  //   ],
+  // });
+
   const calendar = useCalendarApp({
-    views: [
-      createViewDay(),
-      createViewWeek(),
-      createViewMonthGrid(),
-      createViewMonthAgenda(),
-    ],
+    views: [createViewDay(), createViewWeek(), createViewMonthGrid(), createViewMonthAgenda()],
     events: [
       {
-        id: "1",
-        title: "Event 1",
-        start: "2025-02-27 10:00",
-        end: "2025-02-27 12:00",
+        id: "25",
+        title: "Hardcoded Event",
+        start: "2025-03-15 10:00",
+        end: "2025-03-15 12:00",
+        description: "ahihidongok"
       },
     ],
-    plugins: [
-      eventsService,
-      createEventModalPlugin(),
-      createDragAndDropPlugin(),
-    ],
-    // selectedDate: "2025-02-27"
+    plugins: [eventsService, createEventModalPlugin(), createDragAndDropPlugin()],
   });
 
   useEffect(() => {
-    // Fetch all events
-    eventsService.getAll();
-  }, []);
+    const fetchTasks = async () => {
+      console.log("Fetching timesheet for Employee ID:", employeeId);
+      try {
+        const response = await fetch("http://localhost:3000/getTimesheet", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ employee_id: employeeId }),
+        });
+
+        const data = await response.json();
+
+        if (Array.isArray(data)) {
+          const formattedEvents = data.map((task) => ({
+            id: String(task.assignment_id),
+            title: task.task_name,
+            // description: task.project_name,
+            start: formatDateTime(task.emp_startdate),
+            end: formatDateTime(task.emp_enddate),
+          }));
+
+          console.log("Formatted API Events:", formattedEvents);
+
+          // 🔥 Guarantee the hardcoded test event is included
+          const testEvent = {
+            id: "test-1",
+            title: "Test Event",
+            start: "2025-03-15 10:00",
+            end: "2025-03-15 12:00",
+            // description: "This is a manually added test event.",
+          };
+
+          // 🔹 Ensure events are always an array
+          setTasks([...formattedEvents, testEvent]);
+        } else {
+          setTasks([]);
+        }
+      } catch (error) {
+        console.error("Error fetching tasks:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchTasks();
+  }, [employeeId]);
 
   return (
     <div className="flex flex-col p-4">
-      {/* Header Section */}
       <div className="flex items-center justify-between w-full px-20 mt-5 mb-4">
-        <h1 className="text-4xl font-bold text-gray-900 flex items-center gap-2">
-          Timesheet
-        </h1>
+        <h1 className="text-4xl font-bold text-gray-900">Timesheet</h1>
       </div>
+
       <div className="flex justify-between items-center mb-4 ml-20 mr-20">
-        {/* Availability Dropdown */}
-        <div className="w-2xs border-gray-100">
-          <details className="overflow-hidden rounded-lg border border-gray-300 [&_summary::-webkit-details-marker]:hidden">
-            <summary className="flex cursor-pointer items-center justify-between gap-2 bg-white p-4 text-gray-900 transition">
-              <span className="text-sm font-medium"> Availability </span>
-              <span className="transition group-open:-rotate-180">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  strokeWidth="1.5"
-                  stroke="currentColor"
-                  className="size-4"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M19.5 8.25l-7.5 7.5-7.5-7.5"
-                  />
-                </svg>
-              </span>
-            </summary>
-
-            <div className="border-t border-gray-200 bg-white">
-              <ul className="space-y-1 border-t border-gray-200 p-4">
-                <li>
-                  <label
-                    htmlFor="FilterInStock"
-                    className="inline-flex items-center gap-2"
-                  >
-                    <input
-                      type="checkbox"
-                      id="FilterInStock"
-                      className="size-5 rounded-sm border-gray-300"
-                    />
-                    <span className="text-sm font-medium text-gray-700">
-                      In Stock (5+)
-                    </span>
-                  </label>
-                </li>
-
-                <li>
-                  <label
-                    htmlFor="FilterPreOrder"
-                    className="inline-flex items-center gap-2"
-                  >
-                    <input
-                      type="checkbox"
-                      id="FilterPreOrder"
-                      className="size-5 rounded-sm border-gray-300"
-                    />
-                    <span className="text-sm font-medium text-gray-700">
-                      Pre Order (3+)
-                    </span>
-                  </label>
-                </li>
-
-                <li>
-                  <label
-                    htmlFor="FilterOutOfStock"
-                    className="inline-flex items-center gap-2"
-                  >
-                    <input
-                      type="checkbox"
-                      id="FilterOutOfStock"
-                      className="size-5 rounded-sm border-gray-300"
-                    />
-                    <span className="text-sm font-medium text-gray-700">
-                      Out of Stock (10+)
-                    </span>
-                  </label>
-                </li>
-              </ul>
-            </div>
-          </details>
-        </div>
-
-        {/* Create Button */}
-        <div className="flex items-center gap-4">
-          <button
-            className="cursor-pointer flex items-center gap-2 rounded-md bg-green-700 px-4 py-2 text-white font-medium hover:bg-green-500"
-            onClick={() => navigate(`/create-timeslot`)}
-          >
-            <CirclePlus className="w-5 h-5" /> Create new project
-          </button>
-        </div>
+        <button
+          className="cursor-pointer flex items-center gap-2 rounded-md bg-green-700 px-4 py-2 text-white font-medium hover:bg-green-500"
+          onClick={() => navigate(`/create-timeslot`)}
+        >
+          <CirclePlus className="w-5 h-5" /> Create timeslot
+        </button>
       </div>
-
-      {/* Calendar Section - Two calendars side by side 
-      <div className="flex gap-6 mt-5">
-        <div className="bg-white rounded-lg shadow-md p-4 border border-gray-300 w-fit h-fit">
-          <LocalizationProvider dateAdapter={AdapterDayjs}>
-            <DateCalendar />
-          </LocalizationProvider>
-        </div>
-
-        <div className="flex-1 p-4">
-          <ScheduleXCalendar calendarApp={calendar} />
-        </div>
-      </div>*/}
 
       <div className="flex justify-center items-center w-full p-4">
-        <div className="w-full max-w-[1400px] ">
-          <ScheduleXCalendar calendarApp={calendar} />
+        <div className="w-full max-w-[1400px]">
+          {loading ? (
+            <p>Loading...</p>
+          ) : (
+            <ScheduleXCalendar calendarApp={calendar} />
+          )}
         </div>
       </div>
     </div>
   );
 }
+
+// 🔹 Format date correctly for ScheduleX
+const formatDateTime = (dateString) => {
+  if (!dateString) return "";
+
+  const date = new Date(dateString);
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  const hours = String(date.getHours()).padStart(2, "0");
+  const minutes = String(date.getMinutes()).padStart(2, "0");
+
+  return `${year}-${month}-${day} ${hours}:${minutes}`;
+};
 
 export default Timesheet;

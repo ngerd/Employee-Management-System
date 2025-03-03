@@ -11,35 +11,35 @@ function Home() {
     <div className="min-h-screen bg-gray-100">
       <div className="py-8 px-4 sm:px-8 lg:px-16">
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-6">
-          {/* Staff Card */}
-          {isadmin == true && 
-          <Card
-            Icon={FileUser}
-            title="Staff"
-            subtitle="Lorem ipsum dolor"
-            description="Lorem ipsum dolor sit amet consectetur adipisicing elit. Cupiditate, praesentium voluptatem omnis atque culpa repellendus."
-            linkText="See details"
-            href="staff"
-          />}
-          
-          {/* Project Card */}
+          {isadmin && (
+            <Card
+              Icon={FileUser}
+              title="Staff"
+              subtitle="Manage team members and roles"
+              description="Oversee staff details, assign responsibilities, and manage access levels to ensure smooth collaboration within the organization."
+              linkText="See details"
+              href="staff"
+            />
+          )}
+
           <Card
             Icon={SquareChartGantt}
             title="Project"
-            subtitle="Lorem ipsum dolor"
-            description="Lorem ipsum dolor sit amet consectetur adipisicing elit. Cupiditate, praesentium voluptatem omnis atque culpa repellendus."
+            subtitle="Track and manage projects"
+            description="Monitor project progress, track key milestones, and streamline workflows to improve team efficiency and project outcomes."
             linkText="See details"
             href="project"
           />
-          {/* Timesheet Card */}
+
           <Card
             Icon={CalendarRange}
             title="Timesheet"
-            subtitle="Lorem ipsum dolor"
-            description="Lorem ipsum dolor sit amet consectetur adipisicing elit. Cupiditate, praesentium voluptatem omnis atque culpa repellendus."
+            subtitle="Record and review working hours"
+            description="Track employee attendance, log working hours, and ensure accurate timesheet management for improved payroll accuracy and productivity."
             linkText="See details"
             href="timesheet"
           />
+
         </div>
       </div>
     </div>
