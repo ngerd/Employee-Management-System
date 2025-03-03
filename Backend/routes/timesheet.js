@@ -54,9 +54,9 @@ router.post("/getTimesheet", async (req, res) => {
   }
 });
 
-// CREATE Timesheet
+// CREATE Timesheet endpoint (updated without project_id input)
 router.post("/createTimesheet", async (req, res) => {
-  const { employee_ids, task_id, project_id, startdate, enddate } = req.body;
+  const { employee_ids, task_id, startdate, enddate } = req.body;
 
   // Validate required fields
   if (!employee_ids || !Array.isArray(employee_ids) || employee_ids.length === 0 || !task_id) {
@@ -86,11 +86,6 @@ router.post("/createTimesheet", async (req, res) => {
     }
     const { project_id: taskProject, start_date: taskStart, due_date: taskDue } = taskResult.rows[0];
 
-    // If project_id is provided, verify that it matches the task's project.
-    if (project_id && project_id !== taskProject) {
-      return res.status(400).json({ error: "Task does not belong to the given project" });
-    }
-
     // If dates are provided, ensure they fall within the task's date range.
     if (startdate && enddate) {
       if (new Date(startdate) < new Date(taskStart) || new Date(startdate) > new Date(taskDue)) {
@@ -111,7 +106,7 @@ router.post("/createTimesheet", async (req, res) => {
         [emp_id, taskProject]
       );
       if (pmResult.rowCount === 0) {
-        results.push({ employee_id: emp_id, status: "Employee is not assigned to this task" });
+        results.push({ employee_id: emp_id, status: "Employee is not assigned to the project of this task" });
         continue;
       }
 

@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import { Employee, TaskContext } from "../context/ContextProvider";
 
 const CreateTimeslot = () => {
-  const navigate = useNavigate();
   const [formValues, setFormValues] = useState({
     employee_ids: [],
     task_id: "",
@@ -197,7 +196,6 @@ const CreateTimeslot = () => {
               <button
                 type="button"
                 className="rounded-lg bg-black px-5 py-3 font-medium text-white"
-                onClick={() => navigate("/timesheet")}
               >
                 Back
               </button>
