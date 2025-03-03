@@ -14,7 +14,7 @@ router.post("/create-project", async (req, res) => {
   } = req.body;
   const project_status = `In Progress`;
   // Validate input
-  if (!project_name ) {
+  if (!project_name) {
     return res
       .status(400)
       .json({ error: "Missing required field: projectName" });
@@ -65,6 +65,39 @@ router.post("/get-project", async (req, res) => {
     return res.status(500).json({ error: err.message });
   }
 });
+
+
+router.post("/checkmanager", async (req, res) => {
+  const { projectId } = req.body;
+
+  if (!projectId) {
+    return res.status(400).json({ error: "project ID is required" });
+  }
+
+  const client = await pool.connect();
+  try {
+    const query = `
+      SELECT employee_id 
+      FROM public.project_employee  
+      WHERE project_id = $1 AND ismanager = true
+    `;
+
+    const result = await client.query(query, [projectId]);
+
+    await client.release();
+
+    if (result.rows.length === 0) {
+      return res.status(200).json({ manager: null });
+    }
+
+    return res.status(200).json({ manager: result.rows[0].employee_id });
+  } catch (err) {
+    await client.release();
+    console.error("Error checking manager:", err);
+    return res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
 
 //Get Project info
 router.post("/info", async (req, res) => {

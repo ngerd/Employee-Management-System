@@ -1,5 +1,6 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useContext } from "react";
 import { useNavigate } from "react-router-dom";
+import { Employee } from '../context/ContextProvider';
 
 const CreateProject2 = () => {
   const [formValues, setFormValues] = useState({
@@ -19,11 +20,64 @@ const CreateProject2 = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
   const navigate = useNavigate();
+  const { employeeId } = useContext(Employee);
+
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormValues({ ...formValues, [name]: value });
   };
+
+  // const handleSubmit = async (e) => {
+  //   e.preventDefault();
+  //   try {
+  //     const response = await fetch("http://localhost:3000/projects/create-project", {
+  //       method: "POST",
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //       },
+  //       body: JSON.stringify(formValues),
+  //     });
+  //     const data = await response.json();
+  //     setProjectId(data.project.project_id);
+  //     setIsEditing(true);
+  //   } catch (error) {
+  //     console.error("There was a problem creating the project:", error);
+  //   }
+  // };
+
+
+
+  // const handleSubmit = async (e) => {
+  //   e.preventDefault();
+  //   try {
+  //     const response = await fetch("http://localhost:3000/projects/create-project", {
+  //       method: "POST",
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //       },
+  //       body: JSON.stringify(formValues),
+  //     });
+
+  //     const data = await response.json();
+
+  //     if (data.project && data.project.project_id) {
+  //       setProjectId(data.project.project_id);
+  //       setIsEditing(true);
+
+  //       await fetch("http://localhost:3000/projects/add-employee", {
+  //         method: "POST",
+  //         headers: {
+  //           "Content-Type": "application/json",
+  //         },
+  //         body: JSON.stringify({ employee_id: employeeId, project_id: data.project.project_id }),
+  //       });
+  //     }
+  //   } catch (error) {
+  //     console.error("There was a problem creating the project:", error);
+  //   }
+  // };
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -35,13 +89,32 @@ const CreateProject2 = () => {
         },
         body: JSON.stringify(formValues),
       });
+
       const data = await response.json();
-      setProjectId(data.project.project_id);
-      setIsEditing(true);
+
+      if (data.project && data.project.project_id) {
+        setProjectId(data.project.project_id);
+        setIsEditing(true);
+
+        await fetch("http://localhost:3000/projects/add-employee", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            employee_id: employeeId,
+            project_id: data.project.project_id,
+            ismanager: true
+          }),
+        });
+      }
     } catch (error) {
       console.error("There was a problem creating the project:", error);
     }
   };
+
+
+
 
   const handleSave = async (e) => {
     e.preventDefault();
