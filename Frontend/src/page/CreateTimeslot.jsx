@@ -1,19 +1,17 @@
-import React, { useState, useEffect, useContext, use } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { useNavigate } from "react-router-dom";
-import { Employee, TaskContext } from "../context/ContextProvider";
+import { Employee } from "../context/ContextProvider";
 
 const CreateTimeslot = () => {
-  const navigate = useNavigate();
   const [formValues, setFormValues] = useState({
-    employee_ids: [],
+    employee_ids: 1,
     task_id: "",
+    project_id: "",
     startdate: "",
     enddate: "",
   });
 
   const { employeeId } = useContext(Employee);
-  const { taskId, setTaskID } = useContext(TaskContext);
-
   const [isOpen, setIsOpen] = useState(false);
   const [selectedTask, setSelectedTask] = useState("Choose Task");
   const [tasks, setTasks] = useState([]);
@@ -23,7 +21,7 @@ const CreateTimeslot = () => {
     const fetchTasks = async () => {
       console.log("Employee ID: " + employeeId);
       try {
-        const response = await fetch("http://localhost:3000/task/getEmployeeTask", {
+        const response = await fetch("http://localhost:3000/getTimesheet", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -48,91 +46,10 @@ const CreateTimeslot = () => {
     fetchTasks();
   }, [employeeId]);
 
-  // getTimesheet API
-  // useEffect(() => {
-  //   const fetchTasks = async () => {
-  //     console.log("Employee ID: " + employeeId);
-  //     try {
-  //       const response = await fetch("http://localhost:3000/getTimesheet", {
-  //         method: "POST",
-  //         headers: {
-  //           "Content-Type": "application/json",
-  //         },
-  //         body: JSON.stringify({ employee_id: employeeId }),
-  //       });
-  //       const data = await response.json();
-
-  //       if (Array.isArray(data)) {
-  //         setTasks(data);
-  //       } else {
-  //         setTasks([]);
-  //       }
-  //       console.log("Fetched tasks:", data);
-  //     } catch (error) {
-  //       console.error("Error fetching tasks:", error);
-  //     } finally {
-  //       setLoading(false);
-  //     }
-  //   };
-
-  //   fetchTasks();
-  // }, [employeeId]);
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormValues({ ...formValues, [name]: value });
-  };
-
   const handleSelect = (task) => {
     setSelectedTask(task.task_name);
-    setFormValues({ ...formValues, task_id: task.task_id });
+    setFormValues({ ...formValues, task_id: task.assignment_id });
     setIsOpen(false);
-    console.log("task_id " + formValues.task_id);
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    if (!employeeId) {
-      alert("Error: No employee ID found.");
-      return;
-    }
-
-    const updatedFormValues = {
-      ...formValues,
-      employee_ids: [employeeId], // Ensure it's an array
-    };
-
-    console.log("employee_ids", updatedFormValues.employee_ids);
-    console.log("task_id", updatedFormValues.task_id);
-    console.log("startdate", updatedFormValues.startdate);
-    console.log("enddate", updatedFormValues.enddate);
-
-    try {
-      const response = await fetch("http://localhost:3000/createTimesheet", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(updatedFormValues),
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        alert("Timeslot added successfully!");
-        setFormValues({
-          employee_ids: [],
-          task_id: "",
-          startdate: "",
-          enddate: "",
-        });
-      } else {
-        alert("Failed to add task: " + (data.error || "Unknown error"));
-      }
-    } catch (error) {
-      console.error("There was a problem adding a task to the project:", error);
-    }
   };
 
   return (
@@ -142,7 +59,7 @@ const CreateTimeslot = () => {
           <h2 className="text-2xl pb-8 font-extrabold text-gray-900">
             Create Time Slot
           </h2>
-          <form className="space-y-4" onSubmit={handleSubmit}>
+          <form className="space-y-4">
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div>
                 <label
@@ -153,30 +70,22 @@ const CreateTimeslot = () => {
                 </label>
                 <input
                   type="datetime-local"
-                  id="startdate"
-                  name="startdate"
-                  value={formValues.startdate}
-                  onChange={handleChange}
+                  id="startDateTime"
+                  name="startDateTime"
                   className="w-full rounded-lg border-gray-300 p-3 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 />
               </div>
               <div>
                 <label
                   htmlFor="endDateTime"
-                  id="enddate"
-                  name="enddate"
-                  value={formValues.enddate}
-                  onChange={handleChange}
                   className="block text-sm font-medium text-gray-700"
                 >
                   End Date & Time
                 </label>
                 <input
                   type="datetime-local"
-                  id="enddate"
-                  name="enddate" // Corrected name
-                  value={formValues.enddate} // Ensures state is used
-                  onChange={handleChange} // Ensures state updates
+                  id="endDateTime"
+                  name="endDateTime"
                   className="w-full rounded-lg border-gray-300 p-3 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 />
               </div>
@@ -214,7 +123,7 @@ const CreateTimeslot = () => {
                       </li>
                     ) : (
                       tasks.map((task) => (
-                        <li key={task.task_id}>
+                        <li key={task.assignment_id}>
                           <button
                             type="button"
                             onClick={() => handleSelect(task)}
@@ -232,14 +141,13 @@ const CreateTimeslot = () => {
             <div className="mt-6 flex justify-between">
               <button
                 type="button"
-                onClick={() => navigate("/timesheet")}
-                className="cursor-pointer rounded-lg bg-black hover:bg-gray-700 px-5 py-3 font-medium text-white"
+                className="rounded-lg bg-black px-5 py-3 font-medium text-white"
               >
                 Back
               </button>
               <button
                 type="submit"
-                className="cursor-pointer rounded-lg bg-black hover:bg-gray-700 px-5 py-3 font-medium text-white"
+                className="rounded-lg bg-black px-5 py-3 font-medium text-white"
               >
                 Create Time Slot
               </button>
