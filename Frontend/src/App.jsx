@@ -26,6 +26,7 @@ import AddTask from "./page/AddTask";
 import AddMember from "./page/AddMember";
 import UpdateTask from "./page/UpdateTask";
 import ViewEmployeeInfo from "./page/ViewEmployeeInfo";
+import EditTimeslot from "./page/EditTimeslot";
 
 function Layout() {
   const location = useLocation();
@@ -54,6 +55,7 @@ function Layout() {
           <Route path="/update-task/:taskId" element={<UpdateTask />} />
           <Route path="/add-member" element={<AddMember />} />
           <Route path="/view-account" element={<ViewEmployeeInfo />} />
+          <Route path="/edit-timeslot" element={<EditTimeslot />} />
         </Routes>
       </ContextProvider>
     </div>
