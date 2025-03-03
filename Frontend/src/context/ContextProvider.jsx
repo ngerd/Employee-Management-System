@@ -53,7 +53,7 @@ function ContextProvider({ children }) {
   });
 
   const [isadmin, setisadmin] = useState(() => {
-    return sessionStorage.getItem("isadmin") === "true"; // Chuyển đổi từ string -> boolean
+    return sessionStorage.getItem("isadmin") === "true";
   });
 
   const [projectId, setProjectId] = useState(() => {
@@ -64,7 +64,7 @@ function ContextProvider({ children }) {
     return sessionStorage.getItem("taskId") || null;
   });
 
-  // Cập nhật sessionStorage mỗi khi giá trị thay đổi
+
   useEffect(() => {
     sessionStorage.setItem("employeeId", employeeId);
   }, [employeeId]);
