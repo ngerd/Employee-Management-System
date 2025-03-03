@@ -1,17 +1,18 @@
 import React, { useState, useEffect, useContext } from "react";
 import { useNavigate } from "react-router-dom";
-import { Employee } from "../context/ContextProvider";
+import { Employee, TaskContext } from "../context/ContextProvider";
 
 const CreateTimeslot = () => {
   const [formValues, setFormValues] = useState({
-    employee_ids: 1,
+    employee_ids: [],
     task_id: "",
-    project_id: "",
     startdate: "",
     enddate: "",
   });
 
   const { employeeId } = useContext(Employee);
+  const { taskId, setTaskID } = useContext(TaskContext);
+
   const [isOpen, setIsOpen] = useState(false);
   const [selectedTask, setSelectedTask] = useState("Choose Task");
   const [tasks, setTasks] = useState([]);
@@ -46,11 +47,56 @@ const CreateTimeslot = () => {
     fetchTasks();
   }, [employeeId]);
 
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormValues({ ...formValues, [name]: value });
+  };
+
   const handleSelect = (task) => {
     setSelectedTask(task.task_name);
     setFormValues({ ...formValues, task_id: task.assignment_id });
     setIsOpen(false);
   };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+  
+    if (!employeeId) {
+      alert("Error: No employee ID found.");
+      return;
+    }
+  
+    const updatedFormValues = {
+      ...formValues,
+      employee_ids: [employeeId], // Ensure it's an array
+    };
+  
+    try {
+      const response = await fetch("http://localhost:3000/createTimesheet", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(updatedFormValues),
+      });
+  
+      const data = await response.json();
+  
+      if (response.ok) {
+        alert("Timeslot added successfully!");
+        setFormValues({
+          employee_ids: [],
+          task_id: "",
+          startdate: "",
+          enddate: "",
+        });
+      } else {
+        alert("Failed to add task: " + (data.error || "Unknown error"));
+      }
+    } catch (error) {
+      console.error("There was a problem adding a task to the project:", error);
+    }
+  };  
 
   return (
     <section className="bg-gray-100">
@@ -59,7 +105,7 @@ const CreateTimeslot = () => {
           <h2 className="text-2xl pb-8 font-extrabold text-gray-900">
             Create Time Slot
           </h2>
-          <form className="space-y-4">
+          <form className="space-y-4" onSubmit={handleSubmit}>
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div>
                 <label
@@ -70,22 +116,30 @@ const CreateTimeslot = () => {
                 </label>
                 <input
                   type="datetime-local"
-                  id="startDateTime"
-                  name="startDateTime"
+                  id="startdate"
+                  name="startdate"
+                  value={formValues.startdate}
+                  onChange={handleChange}
                   className="w-full rounded-lg border-gray-300 p-3 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 />
               </div>
               <div>
                 <label
                   htmlFor="endDateTime"
+                  id="enddate"
+                  name="enddate"
+                  value={formValues.enddate}
+                  onChange={handleChange}
                   className="block text-sm font-medium text-gray-700"
                 >
                   End Date & Time
                 </label>
                 <input
                   type="datetime-local"
-                  id="endDateTime"
-                  name="endDateTime"
+                  id="enddate"
+                  name="enddate" // Corrected name
+                  value={formValues.enddate} // Ensures state is used
+                  onChange={handleChange} // Ensures state updates
                   className="w-full rounded-lg border-gray-300 p-3 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 />
               </div>
