@@ -215,7 +215,7 @@ const ProjectTask = () => {
 
   const fetchTasks = async () => {
     console.log("Pj task:" + projectId);
-    if (!projectId) return; // Tránh gọi API khi chưa có projectId
+    if (!projectId) return;
     try {
       const response = await fetch("http://localhost:3000/task/get", {
         method: "POST",
@@ -229,7 +229,7 @@ const ProjectTask = () => {
       }
 
       const data = await response.json();
-      setTasks(data || []); // Đảm bảo không bị `undefined`
+      setTasks(data || []);
     } catch (error) {
       console.error("Error fetching tasks:", error);
     } finally {
@@ -239,7 +239,7 @@ const ProjectTask = () => {
 
   useEffect(() => {
     fetchTasks();
-  }, [projectId]); // Chạy lại khi `projectId` thay đổi
+  }, [projectId]);
 
   const handleDelete = async (taskId) => {
     try {
@@ -255,7 +255,7 @@ const ProjectTask = () => {
         throw new Error("Failed to delete task");
       }
 
-      // Cập nhật danh sách sau khi xóa
+
       fetchTasks();
     } catch (error) {
       console.error("Error deleting task:", error);
