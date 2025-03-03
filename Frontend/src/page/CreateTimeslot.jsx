@@ -233,13 +233,13 @@ const CreateTimeslot = () => {
               <button
                 type="button"
                 onClick={() => navigate("/timesheet")}
-                className="rounded-lg bg-black px-5 py-3 font-medium text-white"
+                className="cursor-pointer rounded-lg bg-black hover:bg-gray-700 px-5 py-3 font-medium text-white"
               >
                 Back
               </button>
               <button
                 type="submit"
-                className="rounded-lg bg-black px-5 py-3 font-medium text-white"
+                className="cursor-pointer rounded-lg bg-black hover:bg-gray-700 px-5 py-3 font-medium text-white"
               >
                 Create Time Slot
               </button>
