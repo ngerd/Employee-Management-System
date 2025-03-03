@@ -25,6 +25,7 @@ import ContextProvider from "./context/ContextProvider";
 import AddTask from "./page/AddTask";
 import AddMember from "./page/AddMember";
 import UpdateTask from "./page/UpdateTask";
+import ViewEmployeeInfo from "./page/ViewEmployeeInfo";
 
 function Layout() {
   const location = useLocation();
@@ -52,6 +53,7 @@ function Layout() {
           <Route path="/add-task" element={<AddTask />} />
           <Route path="/update-task/:taskId" element={<UpdateTask />} />
           <Route path="/add-member" element={<AddMember />} />
+          <Route path="/view-account" element={<ViewEmployeeInfo />} />
         </Routes>
       </ContextProvider>
     </div>
