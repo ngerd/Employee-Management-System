@@ -131,7 +131,13 @@ const ProjectTeam = () => {
   };
 
   // Close modal
-  const closeAssignModal = () => setIsModalOpen(false);
+  // const closeAssignModal = () => setIsModalOpen(false);
+
+  const closeAssignModal = () => {
+    setIsModalOpen(false);
+    fetchTeam(); // Re-fetch team data
+  };
+
 
   // API call to assign or unassign task
   const toggleTaskAssignment = async (taskId) => {
