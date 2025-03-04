@@ -96,6 +96,9 @@ const UpdateTimeslot = () => {
       <div className="rounded-lg bg-white p-8 shadow-lg">
         <h2 className="text-2xl pb-8 font-extrabold text-gray-900">Update Timeslot</h2>
         <form className="space-y-4" onSubmit={handleSubmit}>
+          <label htmlFor="projectName" className="text-sm font-medium text-gray-700">
+            Project Name
+          </label>
           <input
             id="projectName"
             name="projectName"
@@ -104,6 +107,9 @@ const UpdateTimeslot = () => {
             className="mt-1 p-2 h-10 w-full rounded-md border-gray-300 bg-gray-200 text-sm text-gray-700 shadow-sm focus:outline-none"
             placeholder="Project Name"
           />
+          <label htmlFor="taskName" className="text-sm font-medium text-gray-700">
+            Task Name
+          </label>
           <input
             id="taskName"
             name="taskName"
