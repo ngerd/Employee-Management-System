@@ -6,7 +6,7 @@ CREATE TABLE Project
   start_date DATE NOT NULL,
   due_date DATE NOT NULL,
   project_status VARCHAR(50) NOT NULL,
-  customerName VARCHAR(255) NOT NULL,
+  customername VARCHAR(255) NOT NULL,
   nation VARCHAR(100) NOT NULL,
   cost DECIMAL(10,2) NOT NULL
 );
@@ -28,8 +28,8 @@ CREATE TABLE Role
 (
   role_id SERIAL PRIMARY KEY,
   role_name VARCHAR(255) NOT NULL,
-  pay_rate_SG DECIMAL(10,2) NOT NULL,
-  pay_rate_VN DECIMAL(10,2) NOT NULL
+  pay_rate_sg DECIMAL(10,2) NOT NULL,
+  pay_rate_vn DECIMAL(10,2) NOT NULL
 );
 
 CREATE TABLE Employee
@@ -39,7 +39,6 @@ CREATE TABLE Employee
   lastname VARCHAR(255) NOT NULL,
   email VARCHAR(255) UNIQUE NOT NULL,
   password VARCHAR(255) NOT NULL,
-  createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   isAdmin BOOLEAN NOT NULL,
   role_id INT NOT NULL,
   FOREIGN KEY (role_id) REFERENCES Role(role_id) 
@@ -48,7 +47,7 @@ CREATE TABLE Employee
 
 CREATE TABLE Project_Member
 (
-  isManager BOOLEAN NOT NULL,
+  ismanager BOOLEAN NOT NULL,
   project_id INT NOT NULL,
   employee_id INT NOT NULL,
   PRIMARY KEY (project_id, employee_id),
@@ -60,8 +59,8 @@ CREATE TABLE Project_Member
 
 CREATE TABLE Task_Assignment
 (
-  emp_startdate DATE NOT NULL,
-  emp_enddate DATE NOT NULL,
+  emp_startdate DATE,
+  emp_enddate DATE,
   employee_id INT NOT NULL,
   task_id INT NOT NULL,
   PRIMARY KEY (employee_id, task_id),
