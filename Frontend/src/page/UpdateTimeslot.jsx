@@ -4,6 +4,7 @@ import "primereact/resources/themes/lara-light-blue/theme.css";
 import "primereact/resources/primereact.min.css";
 import "primeicons/primeicons.css";
 import { Employee } from '../context/ContextProvider';
+import Alert from "../component/Alert";
 
 const UpdateTimeslot = () => {
   const navigate = useNavigate();
@@ -15,6 +16,7 @@ const UpdateTimeslot = () => {
     startDate: "",
     endDate: "",
   });
+  const [alert, setAlert] = useState({ show: false, message: "", type: "" });
 
   useEffect(() => {
     const fetchTask = async () => {
@@ -37,13 +39,14 @@ const UpdateTimeslot = () => {
               endDate: new Date(timeslot.emp_enddate).toISOString().slice(0, 16),
             });
           } else {
-            alert("Timeslot not found");
+            setAlert({ show: true, message: "Timeslot not found", type: "error" });
           }
         } else {
-          alert("Failed to fetch timeslot: " + (data.error || "No data found"));
+          setAlert({ show: true, message: "Failed to fetch timeslot: " + (data.error || "No data found"), type: "error" });
         }
       } catch (error) {
         console.error("There was a problem fetching the timeslot:", error);
+        setAlert({ show: true, message: "There was a problem fetching the timeslot", type: "error" });
       }
     };
 
@@ -74,18 +77,22 @@ const UpdateTimeslot = () => {
       const data = await response.json();
 
       if (response.ok) {
-        alert("Timeslot updated successfully!");
-        navigate("/edit-timeslot");
+        setAlert({ show: true, message: "Timeslot updated successfully!", type: "success" });
+        setTimeout(() => {
+          navigate("/edit-timeslot");
+        }, 3000); // Delay the navigation by 2 seconds to show the alert
       } else {
-        alert("Failed to update timeslot: " + data.error);
+        setAlert({ show: true, message: "Failed to update timeslot: " + data.error, type: "error" });
       }
     } catch (error) {
       console.error("There was a problem updating the timeslot:", error);
+      setAlert({ show: true, message: "There was a problem updating the timeslot", type: "error" });
     }
   };
 
   return (
     <div className="mx-auto max-w-xl px-6 py-12 sm:px-8 lg:px-10 grid grid-cols-1 gap-6">
+      {alert.show && <Alert message={alert.message} type={alert.type} onClose={() => setAlert({ show: false, message: "", type: "" })} />}
       <div className="rounded-lg bg-white p-8 shadow-lg">
         <h2 className="text-2xl pb-8 font-extrabold text-gray-900">Update Timeslot</h2>
         <form className="space-y-4" onSubmit={handleSubmit}>
