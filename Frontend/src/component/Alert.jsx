@@ -19,7 +19,7 @@ const Alert = ({ message, type, onClose }) => {
   return (
     <div
       role="alert"
-      className={`rounded-xl border p-4 ${alertStyles[type]} ${!visible && "hidden"}`}
+      className={`mb-3 rounded-xl border p-4 ${alertStyles[type]} ${!visible && "hidden"}`}
     >
       <div className="flex items-start gap-4">
         <span className={type === "success" ? "text-green-600" : "text-red-600"}>
