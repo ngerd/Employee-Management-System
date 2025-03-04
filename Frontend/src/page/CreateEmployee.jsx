@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import Alert from "../component/Alert";
 
 const CreateEmployee = () => {
   const navigate = useNavigate();
@@ -15,7 +16,7 @@ const CreateEmployee = () => {
     isadmin: false,
     role_id: "",
   });
-  const [message, setMessage] = useState(""); // State for success/error messages
+  const [alert, setAlert] = useState({ show: false, message: "", type: "" });
 
   useEffect(() => {
     const fetchRoles = async () => {
@@ -56,30 +57,26 @@ const CreateEmployee = () => {
       const data = await response.json();
 
       if (response.ok) {
-        setMessage("Employee added successfully!");
+        setAlert({ show: true, message: "Employee added successfully!", type: "success" });
         setTimeout(() => {
           window.location.reload(); // Refresh the page after success
         }, 1500);
       } else {
-        setMessage(data.message || "Failed to create employee.");
+        setAlert({ show: true, message: data.message || "Failed to create employee.", type: "error" });
       }
     } catch (error) {
-      setMessage("There was a problem creating the employee.");
+      setAlert({ show: true, message: "There was a problem creating the employee.", type: "error" });
       console.error("Error:", error);
     }
   };
 
   return (
+
     <div className="mx-auto max-w-2xl px-6 py-12 sm:px-8 lg:px-10">
+      {alert.show && <Alert message={alert.message} type={alert.type} onClose={() => setAlert({ show: false, message: "", type: "" })} />}
+
       <div className="rounded-lg bg-white p-8 shadow-lg">
         <h2 className="text-2xl pb-8 font-extrabold text-gray-900">Create Employee</h2>
-
-        {/* Success/Error Message */}
-        {message && (
-          <div className={`p-3 mb-4 rounded-md text-center ${message.includes("success") ? "bg-green-200 text-green-700" : "bg-red-200 text-red-700"}`}>
-            {message}
-          </div>
-        )}
 
         <form className="space-y-4" onSubmit={handleSubmit}>
           <div className="flex gap-4">
@@ -128,7 +125,6 @@ const CreateEmployee = () => {
             placeholder="Confirm Password"
           />
 
-          {/* Role Dropdown */}
           <div className="relative mt-1">
             <button
               type="button"
@@ -164,7 +160,6 @@ const CreateEmployee = () => {
             )}
           </div>
 
-          {/* Admin Checkbox */}
           <div className="col-span-6 mt-6">
             <label htmlFor="isadmin" className="flex gap-4">
               <input
@@ -195,8 +190,8 @@ const CreateEmployee = () => {
             </button>
           </div>
         </form>
-      </div >
-    </div >
+      </div>
+    </div>
   );
 };
 
