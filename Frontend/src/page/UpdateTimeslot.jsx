@@ -1,4 +1,4 @@
-import  { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import "primereact/resources/themes/lara-light-blue/theme.css";
 import "primereact/resources/primereact.min.css";
@@ -10,6 +10,8 @@ const UpdateTimeslot = () => {
   const { employeeId } = useContext(Employee);
   const { assignment_id } = useParams();
   const [formValues, setFormValues] = useState({
+    projectName: "",
+    taskName: "",
     startDate: "",
     endDate: "",
   });
@@ -29,6 +31,8 @@ const UpdateTimeslot = () => {
           const timeslot = data.find(slot => slot.assignment_id === parseInt(assignment_id));
           if (timeslot) {
             setFormValues({
+              projectName: timeslot.project_name,
+              taskName: timeslot.task_name,
               startDate: new Date(timeslot.emp_startdate).toISOString().slice(0, 16),
               endDate: new Date(timeslot.emp_enddate).toISOString().slice(0, 16),
             });
@@ -83,8 +87,24 @@ const UpdateTimeslot = () => {
   return (
     <div className="mx-auto max-w-xl px-6 py-12 sm:px-8 lg:px-10 grid grid-cols-1 gap-6">
       <div className="rounded-lg bg-white p-8 shadow-lg">
-        <h2 className="text-2xl pb-8 font-extrabold text-gray-900">Update Task</h2>
+        <h2 className="text-2xl pb-8 font-extrabold text-gray-900">Update Timeslot</h2>
         <form className="space-y-4" onSubmit={handleSubmit}>
+          <input
+            id="projectName"
+            name="projectName"
+            value={formValues.projectName}
+            readOnly
+            className="mt-1 p-2 h-10 w-full rounded-md border-gray-300 bg-gray-200 text-sm text-gray-700 shadow-sm focus:outline-none"
+            placeholder="Project Name"
+          />
+          <input
+            id="taskName"
+            name="taskName"
+            value={formValues.taskName}
+            readOnly
+            className="mt-1 p-2 h-10 w-full rounded-md border-gray-300 bg-gray-200 text-sm text-gray-700 shadow-sm focus:outline-none"
+            placeholder="Task Name"
+          />
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <input
               type="datetime-local"
