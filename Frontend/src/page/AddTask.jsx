@@ -73,6 +73,9 @@ const AddTask = () => {
 
         // Cập nhật danh sách task ngay sau khi thêm
         fetchTasks();
+        setTimeout(() => {
+          navigate("/project-task");
+        }, 3000); // Delay the navigation by 3 seconds to show the alert
       } else {
         setAlert({ show: true, message: "Failed to add task: " + data.error, type: "error" });
       }
