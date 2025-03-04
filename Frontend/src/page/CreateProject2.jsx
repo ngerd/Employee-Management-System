@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { Employee } from '../context/ContextProvider';
+import Alert from "../component/Alert";
 
 const CreateProject2 = () => {
   const [formValues, setFormValues] = useState({
@@ -18,66 +19,15 @@ const CreateProject2 = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [isEditing, setIsEditing] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [alert, setAlert] = useState({ show: false, message: "", type: "" });
   const dropdownRef = useRef(null);
   const navigate = useNavigate();
   const { employeeId } = useContext(Employee);
-
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormValues({ ...formValues, [name]: value });
   };
-
-  // const handleSubmit = async (e) => {
-  //   e.preventDefault();
-  //   try {
-  //     const response = await fetch("http://localhost:3000/projects/create-project", {
-  //       method: "POST",
-  //       headers: {
-  //         "Content-Type": "application/json",
-  //       },
-  //       body: JSON.stringify(formValues),
-  //     });
-  //     const data = await response.json();
-  //     setProjectId(data.project.project_id);
-  //     setIsEditing(true);
-  //   } catch (error) {
-  //     console.error("There was a problem creating the project:", error);
-  //   }
-  // };
-
-
-
-  // const handleSubmit = async (e) => {
-  //   e.preventDefault();
-  //   try {
-  //     const response = await fetch("http://localhost:3000/projects/create-project", {
-  //       method: "POST",
-  //       headers: {
-  //         "Content-Type": "application/json",
-  //       },
-  //       body: JSON.stringify(formValues),
-  //     });
-
-  //     const data = await response.json();
-
-  //     if (data.project && data.project.project_id) {
-  //       setProjectId(data.project.project_id);
-  //       setIsEditing(true);
-
-  //       await fetch("http://localhost:3000/projects/add-employee", {
-  //         method: "POST",
-  //         headers: {
-  //           "Content-Type": "application/json",
-  //         },
-  //         body: JSON.stringify({ employee_id: employeeId, project_id: data.project.project_id }),
-  //       });
-  //     }
-  //   } catch (error) {
-  //     console.error("There was a problem creating the project:", error);
-  //   }
-  // };
-
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -107,14 +57,16 @@ const CreateProject2 = () => {
             ismanager: true
           }),
         });
+
+        setAlert({ show: true, message: "Project created successfully!", type: "success" });
+      } else {
+        setAlert({ show: true, message: "Failed to create project.", type: "error" });
       }
     } catch (error) {
+      setAlert({ show: true, message: "There was a problem creating the project.", type: "error" });
       console.error("There was a problem creating the project:", error);
     }
   };
-
-
-
 
   const handleSave = async (e) => {
     e.preventDefault();
@@ -148,8 +100,13 @@ const CreateProject2 = () => {
       setEmployees([...employees, ...selectedEmployees]);
       setSelectedEmployees([]);
       setSearchTerm("");
+      setAlert({ show: true, message: "Employees added successfully!", type: "success" });
+      setTimeout(() => {
+        navigate("/project");
+      }, 3000); // Delay the navigation by 3 seconds to show the alert
     } catch (error) {
       console.error("There was a problem adding the employees:", error);
+      setAlert({ show: true, message: "There was a problem adding the employees.", type: "error" });
     }
   };
 
@@ -194,6 +151,7 @@ const CreateProject2 = () => {
 
   return (
     <div className="mx-auto max-w-screen-xl py-10 sm:px-6 lg:px-8">
+      {alert.show && <Alert message={alert.message} type={alert.type} onClose={() => setAlert({ show: false, message: "", type: "" })} />}
       <div className="mt-4 grid grid-cols-1 gap-x-16 gap-y-8 lg:grid-cols-2">
         {/* Create/Edit project */}
         <div className="rounded-lg bg-white p-8 shadow-lg">
@@ -342,7 +300,6 @@ const CreateProject2 = () => {
               type="button"
               onClick={() => {
                 handleAddEmployee();
-                navigate("/project");
               }}
               disabled={!projectId} // Disable button if projectId is null
               className={`inline-block w-full rounded-lg px-5 py-3 font-medium text-white sm:w-auto ${!projectId ? "bg-gray-400 cursor-not-allowed" : "bg-black hover:bg-gray-700 cursor-pointer "
