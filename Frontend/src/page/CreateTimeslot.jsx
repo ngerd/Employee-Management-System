@@ -177,6 +177,7 @@ const CreateTimeslot = () => {
               <button
                 type="button"
                 className="rounded-lg bg-black px-5 py-3 font-medium text-white"
+                onClick={() => navigate("/timesheet")}
               >
                 Back
               </button>
