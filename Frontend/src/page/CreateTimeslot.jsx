@@ -75,7 +75,7 @@ const CreateTimeslot = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     fetchCreateTimeSlot();
-    navigate("/timesheet2");
+    navigate("/timesheet");
   }
   const handleChange = (e) => {
     const { name, value } = e.target;
