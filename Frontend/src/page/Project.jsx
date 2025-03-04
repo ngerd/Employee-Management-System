@@ -142,6 +142,7 @@ const Project = () => {
         filters={filters}
         globalFilterFields={['project_name', 'project_status', 'nation']}
         filterDisplay="menu"
+        rowClassName={(rowData) => rowData.ismanager ? 'font-bold' : ''}
       >
         <Column field="project_id" header="ID" style={{ minWidth: '5rem' }} />
         <Column
