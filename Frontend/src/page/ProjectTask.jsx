@@ -195,11 +195,14 @@
 
 
 
-import React, { useState, useEffect, useContext } from "react"; // Thêm useContext
+import React, { useState, useEffect, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import { Info, ClipboardList, Users, CirclePlus, Download } from "lucide-react";
+import * as XLSX from "xlsx";
+import { saveAs } from "file-saver";
+
 
 import "primereact/resources/themes/lara-light-blue/theme.css";
 import "primereact/resources/primereact.min.css";
@@ -289,6 +292,25 @@ const ProjectTask = () => {
     </div>
   );
 
+  // Download task list
+  const exportToExcel = () => {
+    if (tasks.length === 0) {
+      alert("No tasks to export!");
+      return;
+    }
+
+    const worksheet = XLSX.utils.json_to_sheet(tasks);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Tasks");
+
+    // Export and save
+    const excelBuffer = XLSX.write(workbook, { bookType: "xlsx", type: "array" });
+    const data = new Blob([excelBuffer], { type: "application/octet-stream" });
+
+    saveAs(data, "Project_Tasks.xlsx");
+  };
+
+
   return (
     <div className="mx-auto max-w-screen-xl py-10 sm:px-6 lg:px-8">
       {/* Header */}
@@ -305,7 +327,7 @@ const ProjectTask = () => {
           </button>
           <button
             className="cursor-pointer flex items-center gap-2 rounded-md bg-green-700 px-4 py-2 text-white font-medium hover:bg-green-500"
-            onClick={() => navigate("#")}
+            onClick={exportToExcel}
           >
             <Download className="w-5 h-5" /> Download
           </button>
