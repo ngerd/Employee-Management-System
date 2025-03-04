@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 // import React, { useEffect, useState, useContext } from "react";
 // import { createEventModalPlugin } from "@schedule-x/event-modal";
 // import { createDragAndDropPlugin } from "@schedule-x/drag-and-drop";
@@ -146,7 +147,7 @@
 
 // export default Timesheet;
 
-import React, { useEffect, useState, useContext } from "react";
+import { useEffect, useState, useContext } from "react";
 import { createEventModalPlugin } from "@schedule-x/event-modal";
 import { createDragAndDropPlugin } from "@schedule-x/drag-and-drop";
 import { useNavigate } from "react-router-dom";
@@ -162,28 +163,27 @@ import { Employee } from "../context/ContextProvider";
 import "@schedule-x/theme-default/dist/index.css";
 import { CirclePlus, Pencil } from "lucide-react";
 
-function Timesheet() {
-  const navigate = useNavigate();
-  const { employeeId } = useContext(Employee);
 
-  const [tasks, setTasks] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [calendarKey, setCalendarKey] = useState(0); // Force re-render key
-
-  // Initialize empty calendar
-  const calendarApp = useCalendarApp({
-    views: [createViewDay(), createViewWeek(), createViewMonthGrid(), createViewMonthAgenda()],
-    events: tasks, // This will update with the component
-    plugins: [createEventsServicePlugin(), createEventModalPlugin(), createDragAndDropPlugin()],
-    defaultView: 'week', // Try specifying a default view
+function CalendarWrapper({ tasks, eventsService }) {
+  const calendar = useCalendarApp({
+    views: [
+      createViewDay(),
+      createViewWeek(),
+      createViewMonthGrid(),
+      createViewMonthAgenda(),
+    ],
+    events: tasks,
+    plugins: [eventsService, createEventModalPlugin(), createDragAndDropPlugin()],
+    callbacks: {
+      onEventUpdate(updatedEvent) {
+        console.log("onEventUpdate", updatedEvent);
+      },
+    },
   });
+  return <ScheduleXCalendar calendarApp={calendar} />;
+}
 
-  // Add date debug utility
-  const isValidDate = (dateStr) => {
-    const d = new Date(dateStr);
-    return !isNaN(d.getTime());
-  };
-
+function Timesheet() {
   // Format date correctly for ScheduleX
   const formatDateTime = (dateString) => {
     if (!dateString) {
@@ -213,7 +213,16 @@ function Timesheet() {
       return "";
     }
   };
+  const navigate = useNavigate();
+  const { employeeId } = useContext(Employee);
 
+  const [tasks, setTasks] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  // Create a stable eventsService instance.
+  const eventsService = useState(() => createEventsServicePlugin())[0];
+
+  // Fetch tasks from the backend and update tasks state.
   useEffect(() => {
     const fetchTasks = async () => {
       console.log("Fetching timesheet for Employee ID:", employeeId);
@@ -223,54 +232,21 @@ function Timesheet() {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ employee_id: employeeId }),
         });
-
-        if (!response.ok) {
-          throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-
         const data = await response.json();
-        console.log("Raw API response:", data);
 
-        if (!Array.isArray(data)) {
-          console.warn("Unexpected API response format:", data);
+        if (Array.isArray(data)) {
+          const formattedEvents = data.map((task) => ({
+            id: String(task.assignment_id),
+            title: task.task_name,
+            description: task.project_name,
+            start: formatDateTime(task.emp_startdate),
+            end: formatDateTime(task.emp_enddate),
+          }));
+
+          setTasks([...formattedEvents]);
+        } else {
           setTasks([]);
-          return;
         }
-
-        // Enhanced validation and formatting
-        const formattedEvents = data
-          .filter(task => task.emp_startdate && task.emp_enddate) // Only include tasks with dates
-          .map((task) => {
-            const startDate = formatDateTime(task.emp_startdate);
-            const endDate = formatDateTime(task.emp_enddate);
-            
-            // Verify dates are valid after formatting
-            if (!startDate || !endDate) {
-              console.warn("Skipping event with invalid dates:", task);
-              return null;
-            }
-
-            return {
-              id: String(task.assignment_id),
-              title: task.task_name || "Untitled Task",
-              description: task.project_name || "",
-              start: startDate,
-              end: endDate,
-              // Add color for better visibility
-              color: "#4287f5",
-            };
-          })
-          .filter(Boolean); // Remove any null entries
-
-        console.log("Formatted events:", formattedEvents);
-        
-        if (formattedEvents.length === 0) {
-          console.warn("No valid events found after formatting");
-        }
-        
-        setTasks(formattedEvents);
-        // Force calendar to re-render with new data
-        setCalendarKey(prev => prev + 1);
       } catch (error) {
         console.error("Error fetching tasks:", error);
       } finally {
@@ -284,9 +260,6 @@ function Timesheet() {
   // Debug rendered calendar
   useEffect(() => {
     if (tasks.length > 0) {
-      console.log("Current events in calendar:", tasks);
-      console.log("Calendar app configuration:", calendarApp);
-      
       // Check for date range issues
       const now = new Date();
       const oneMonthAgo = new Date(now);
@@ -304,7 +277,7 @@ function Timesheet() {
         console.log("Event date ranges:", tasks.map(e => ({ title: e.title, start: e.start, end: e.end })));
       }
     }
-  }, [tasks, calendarApp]);
+  }, [tasks]);
 
   return (
     <div className="flex flex-col p-4">
@@ -339,8 +312,7 @@ function Timesheet() {
                 </div>
               )}
               
-              {/* Key forces re-render when tasks change */}
-              <ScheduleXCalendar key={calendarKey} calendarApp={calendarApp} />
+              <CalendarWrapper key={tasks.length} tasks={tasks} eventsService={eventsService} />
             </>
           )}
         </div>

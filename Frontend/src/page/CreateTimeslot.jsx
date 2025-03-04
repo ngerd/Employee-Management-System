@@ -3,25 +3,24 @@ import { useNavigate } from "react-router-dom";
 import { Employee } from "../context/ContextProvider";
 
 const CreateTimeslot = () => {
+  const { employeeId } = useContext(Employee);
   const [formValues, setFormValues] = useState({
-    employee_ids: 1,
-    task_id: "",
-    project_id: "",
+    employee_ids: [employeeId],
+    task_id: null,
     startdate: "",
     enddate: "",
   });
-
-  const { employeeId } = useContext(Employee);
   const [isOpen, setIsOpen] = useState(false);
   const [selectedTask, setSelectedTask] = useState("Choose Task");
   const [tasks, setTasks] = useState([]);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchTasks = async () => {
       console.log("Employee ID: " + employeeId);
       try {
-        const response = await fetch("http://localhost:3000/getTimesheet", {
+        const response = await fetch("http://localhost:3000/task/getEmployeeTask", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -48,8 +47,40 @@ const CreateTimeslot = () => {
 
   const handleSelect = (task) => {
     setSelectedTask(task.task_name);
-    setFormValues({ ...formValues, task_id: task.assignment_id });
+    setFormValues({ ...formValues, task_id: task.task_id });
+    console.log(task.task_name,task.task_id);
     setIsOpen(false);
+  };
+  
+  const fetchCreateTimeSlot = async () => {
+    console.log("requestData:", formValues);
+    try {
+      const response = await fetch("http://localhost:3000/createTimesheet", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formValues),
+      });
+      const data = await response.json();
+
+      console.log("Fetched tasks:", data);
+    } catch (error) {
+      console.error("Error fetching tasks:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    fetchCreateTimeSlot();
+    navigate("/timesheet2");
+  }
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    console.log(name, value);
+    setFormValues({ ...formValues, [name]: value });
   };
 
   return (
@@ -59,7 +90,7 @@ const CreateTimeslot = () => {
           <h2 className="text-2xl pb-8 font-extrabold text-gray-900">
             Create Time Slot
           </h2>
-          <form className="space-y-4">
+          <form className="space-y-4" onSubmit={handleSubmit}>
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div>
                 <label
@@ -70,9 +101,11 @@ const CreateTimeslot = () => {
                 </label>
                 <input
                   type="datetime-local"
-                  id="startDateTime"
-                  name="startDateTime"
+                  id="startdate"
+                  name="startdate"
                   className="w-full rounded-lg border-gray-300 p-3 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  onChange={handleChange}
+                  value={formValues.startdate}
                 />
               </div>
               <div>
@@ -84,8 +117,10 @@ const CreateTimeslot = () => {
                 </label>
                 <input
                   type="datetime-local"
-                  id="endDateTime"
-                  name="endDateTime"
+                  id="enddate"
+                  name="enddate"
+                  onChange={handleChange}
+                  value={formValues.enddate}
                   className="w-full rounded-lg border-gray-300 p-3 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 />
               </div>
