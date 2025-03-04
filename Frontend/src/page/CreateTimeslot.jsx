@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { Employee } from "../context/ContextProvider";
+import Alert from "../component/Alert";
 
 const CreateTimeslot = () => {
   const { employeeId } = useContext(Employee);
@@ -14,6 +15,7 @@ const CreateTimeslot = () => {
   const [selectedTask, setSelectedTask] = useState("Choose Task");
   const [tasks, setTasks] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [alert, setAlert] = useState({ show: false, message: "", type: "" });
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -48,10 +50,10 @@ const CreateTimeslot = () => {
   const handleSelect = (task) => {
     setSelectedTask(task.task_name);
     setFormValues({ ...formValues, task_id: task.task_id });
-    console.log(task.task_name,task.task_id);
+    console.log(task.task_name, task.task_id);
     setIsOpen(false);
   };
-  
+
   const fetchCreateTimeSlot = async () => {
     console.log("requestData:", formValues);
     try {
@@ -64,19 +66,25 @@ const CreateTimeslot = () => {
       });
       const data = await response.json();
 
-      console.log("Fetched tasks:", data);
+      if (response.ok) {
+        setAlert({ show: true, message: "Timeslot created successfully!", type: "success" });
+        setTimeout(() => {
+          navigate("/timesheet");
+        }, 3000); // Delay the navigation by 3 seconds to show the alert
+      } else {
+        setAlert({ show: true, message: "Failed to create timeslot: " + data.error, type: "error" });
+      }
     } catch (error) {
-      console.error("Error fetching tasks:", error);
-    } finally {
-      setLoading(false);
+      console.error("Error creating timeslot:", error);
+      setAlert({ show: true, message: "There was a problem creating the timeslot", type: "error" });
     }
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
     fetchCreateTimeSlot();
-    navigate("/timesheet2");
-  }
+  };
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     console.log(name, value);
@@ -86,6 +94,7 @@ const CreateTimeslot = () => {
   return (
     <section className="bg-gray-100">
       <div className="mx-auto max-w-2xl px-6 py-12 sm:px-8 lg:px-10">
+        {alert.show && <Alert message={alert.message} type={alert.type} onClose={() => setAlert({ show: false, message: "", type: "" })} />}
         <div className="rounded-lg bg-white p-8 shadow-lg">
           <h2 className="text-2xl pb-8 font-extrabold text-gray-900">
             Create Time Slot
@@ -177,6 +186,7 @@ const CreateTimeslot = () => {
               <button
                 type="button"
                 className="rounded-lg bg-black px-5 py-3 font-medium text-white"
+                onClick={() => navigate("/timesheet")}
               >
                 Back
               </button>

@@ -147,7 +147,7 @@ function Login() {
             <div className="col-span-6 mt-7 sm:flex sm:items-center sm:gap-4">
               <button
                 type="submit"
-                className="inline-block shrink-0 rounded-md border border-blue-600 bg-blue-600 px-12 py-3 text-sm font-medium text-white transition hover:bg-pink-200 hover:text-blue-800 focus:ring-3 focus:outline-none"
+                className="cursor-pointer rounded-lg bg-black px-5 py-3 font-medium text-white hover:bg-gray-700"
               >
                 Login
               </button>
