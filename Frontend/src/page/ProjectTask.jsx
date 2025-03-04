@@ -11,13 +11,58 @@ import "primereact/resources/themes/lara-light-blue/theme.css";
 import "primereact/resources/primereact.min.css";
 import "primeicons/primeicons.css";
 
-import { ProjectContext } from '../context/ContextProvider';
+import { ProjectContext, Employee } from "../context/ContextProvider";
 
 const ProjectTask = () => {
   const navigate = useNavigate();
   const { projectId } = useContext(ProjectContext);
+  const { employeeId } = useContext(Employee);
+
+  const [employees, setEmployees] = useState([]);
+  const [isUserManager, setIsUserManager] = useState();
   const [tasks, setTasks] = useState([]);
   const [loading, setLoading] = useState(true);
+
+
+  useEffect(() => {
+    const checkIfManager = async () => {
+      if (!projectId || !employeeId) return;
+
+      const result = await isManager(projectId, employeeId);
+      console.log("result" + result)
+      setIsUserManager(result);
+    };
+
+    checkIfManager();
+  }, [projectId, employeeId]);
+
+  const isManager = async (projectId, employeeId) => {
+    try {
+      const response = await fetch("http://localhost:3000/projects/checkmanager", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ projectId }),
+      });
+
+      if (!response.ok) throw new Error("Failed to fetch manager");
+
+      const data1 = await response.json();
+      console.log("Data received:", JSON.stringify(data1, null, 2));
+      console.log("Employee ID:", employeeId);
+
+      if (!data1.manager) {
+        console.log("No manager assigned to this project.");
+        return false;
+      }
+
+      console.log("Comparison result:", Number(data1.manager) === Number(employeeId));
+      return Number(data1.manager) === Number(employeeId);
+
+    } catch (error) {
+      console.error("Error checking manager:", error);
+      return false;
+    }
+  };
 
   const fetchTasks = async () => {
     console.log("Pj task:" + projectId);
@@ -122,12 +167,14 @@ const ProjectTask = () => {
           Project Tasks
         </h1>
         <div className="flex gap-2">
-          <button
-            className="cursor-pointer flex items-center gap-2 rounded-md bg-green-700 px-4 py-2 text-white font-medium hover:bg-green-500"
-            onClick={() => navigate("/add-task")}
-          >
-            <CirclePlus className="w-5 h-5" /> Add Task
-          </button>
+          {isUserManager && (
+            <button
+              className="cursor-pointer flex items-center gap-2 rounded-md bg-green-700 px-4 py-2 text-white font-medium hover:bg-green-500"
+              onClick={() => navigate("/add-task")}
+            >
+              <CirclePlus className="w-5 h-5" /> Add Task
+            </button>
+          )}
           <button
             className="cursor-pointer flex items-center gap-2 rounded-md bg-green-700 px-4 py-2 text-white font-medium hover:bg-green-500"
             onClick={exportToExcel}
