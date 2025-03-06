@@ -177,7 +177,14 @@ const AddMember = () => {
             </div>
           )}
 
-          <div className="mt-6 text-right">
+          <div className="mt-6 flex justify-between">
+            <button
+              type="button"
+              onClick={() => navigate("/project-team")}
+              className="cursor-pointer rounded-lg bg-black px-5 py-3 font-medium text-white hover:bg-gray-700"
+            >
+              Back
+            </button>
             <button
               type="button"
               onClick={() => {

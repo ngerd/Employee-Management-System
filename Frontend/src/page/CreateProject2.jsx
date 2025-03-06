@@ -80,8 +80,11 @@ const CreateProject2 = () => {
       });
       const data = await response.json();
       console.log(data);
+      setAlert({ show: true, message: "Update project successfully!", type: "success" });
+
     } catch (error) {
       console.error("There was a problem updating the project:", error);
+      setAlert({ show: true, message: "There was a problem updating the project.", type: "error" });
     }
   };
 
