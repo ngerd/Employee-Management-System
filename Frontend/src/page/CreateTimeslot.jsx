@@ -185,14 +185,14 @@ const CreateTimeslot = () => {
             <div className="mt-6 flex justify-between">
               <button
                 type="button"
-                className="rounded-lg bg-black px-5 py-3 font-medium text-white"
+                className="rounded-lg bg-black px-5 py-3 font-medium text-white cursor-pointer hover:bg-gray-700"
                 onClick={() => navigate("/timesheet")}
               >
                 Back
               </button>
               <button
                 type="submit"
-                className="rounded-lg bg-black px-5 py-3 font-medium text-white"
+                className="rounded-lg bg-black px-5 py-3 font-medium text-white cursor-pointer hover:bg-gray-700"
               >
                 Create Time Slot
               </button>
