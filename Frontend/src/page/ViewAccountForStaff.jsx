@@ -2,9 +2,9 @@ import React, { useState, useEffect, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { Employee } from "../context/ContextProvider";
 
-const ViewEmployeeInfo = () => {
+const ViewAccountForStaff = () => {
   const navigate = useNavigate();
-  const { employeeId } = useContext(Employee);
+  const { currentEmployeeId } = useContext(Employee);
   const [formValues, setFormValues] = useState({
     firstname: "",
     lastname: "",
@@ -19,14 +19,14 @@ const ViewEmployeeInfo = () => {
 
   useEffect(() => {
     const fetchEmployeeInfo = async () => {
-      console.log("Meow " + employeeId);
+      console.log("Meow " + currentEmployeeId);
       try {
         const response = await fetch("http://localhost:3000/getEmployeeById", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ employee_id: employeeId }),
+          body: JSON.stringify({ employee_id: currentEmployeeId }),
         });
         if (!response.ok) {
           throw new Error("Failed to fetch employee info");
@@ -59,11 +59,11 @@ const ViewEmployeeInfo = () => {
       }
     };
 
-    if (employeeId) {
+    if (currentEmployeeId) {
       fetchEmployeeInfo();
       fetchRoles();
     }
-  }, [employeeId]);
+  }, [currentEmployeeId]);
 
   const handleSelect = (role) => {
     setSelectedRole(role.role_name);
@@ -88,7 +88,7 @@ const ViewEmployeeInfo = () => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ ...formValues, employee_id: employeeId }),
+        body: JSON.stringify({ ...formValues, employee_id: currentEmployeeId }),
       });
       if (!response.ok) {
         throw new Error("Failed to update account");
@@ -203,4 +203,4 @@ const ViewEmployeeInfo = () => {
   );
 };
 
-export default ViewEmployeeInfo;
+export default ViewAccountForStaff;

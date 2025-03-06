@@ -29,6 +29,7 @@ import UpdateTask from "./page/UpdateTask";
 import ViewEmployeeInfo from "./page/ViewEmployeeInfo";
 import EditTimeslot from "./page/EditTimeslot";
 import UpdateTimeslot from "./page/UpdateTimeslot";
+import ViewAccountForStaff from "./page/ViewAccountForStaff";
 
 function Layout() {
   const location = useLocation();
@@ -57,6 +58,7 @@ function Layout() {
           <Route path="/update-task/:taskId" element={<UpdateTask />} />
           <Route path="/add-member" element={<AddMember />} />
           <Route path="/view-account" element={<ViewEmployeeInfo />} />
+          <Route path="/view-account-for-staff" element={<ViewAccountForStaff />} />
           <Route path="/edit-timeslot" element={<EditTimeslot />} />
           <Route path="/timesheet2" element={<Timesheet2 />} />
           <Route path="/update-timeslot/:assignment_id" element={<UpdateTimeslot />} />

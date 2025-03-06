@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { useNavigate } from "react-router-dom";
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
@@ -6,6 +6,7 @@ import { Button } from 'primereact/button';
 import { InputText } from 'primereact/inputtext';
 import { FilterMatchMode } from 'primereact/api';
 import { CirclePlus } from "lucide-react";
+import { Employee } from '../context/ContextProvider';
 
 import "primereact/resources/themes/lara-light-blue/theme.css";
 import "primereact/resources/primereact.min.css";
@@ -13,6 +14,7 @@ import "primeicons/primeicons.css";
 
 const Staff = () => {
   const navigate = useNavigate();
+  const { currentEmployeeId, setCurrentEmployeeId } = useContext(Employee);
   const [employees, setEmployees] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filters, setFilters] = useState(null);
@@ -79,13 +81,25 @@ const Staff = () => {
     }
   };
 
-  const deleteButtonTemplate = (rowData) => (
-    <button
-      onClick={() => deleteEmployee(rowData.employee_id)}
-      className="cursor-pointer inline-block rounded-md bg-red-700 px-4 py-2 text-xs font-medium text-white hover:bg-red-500"
-    >
-      Delete
-    </button>
+  const actionButtonTemplate = (rowData) => (
+    <div className="flex gap-2">
+      <button
+        onClick={() => {
+          setCurrentEmployeeId(rowData.employee_id);
+          console.log("Employee ID: " + currentEmployeeId);
+          navigate("/view-account-for-staff");
+        }}
+        className="cursor-pointer rounded-md bg-teal-600 px-4 py-2 text-xs font-medium text-white hover:bg-teal-500"
+      >
+        Edit
+      </button>
+      <button
+        onClick={() => deleteEmployee(rowData.employee_id)}
+        className="cursor-pointer rounded-md bg-red-700 px-4 py-2 text-xs font-medium text-white hover:bg-red-500"
+      >
+        Delete
+      </button>
+    </div>
   );
 
   return (
@@ -138,7 +152,7 @@ const Staff = () => {
           filterMenuStyle={{ width: '10rem' }}
           style={{ minWidth: '8rem' }}
         />
-        <Column header="Action" body={deleteButtonTemplate} style={{ minWidth: "8rem" }} />
+        <Column header="Action" body={actionButtonTemplate} style={{ minWidth: "12rem" }} />
       </DataTable>
     </div>
   );

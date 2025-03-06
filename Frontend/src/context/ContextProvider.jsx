@@ -1,46 +1,3 @@
-// import React from "react";
-// import { createContext, useState } from "react";
-
-// export const Employee = createContext(null);
-// export const ProjectContext = createContext(null);
-// export const TaskContext = createContext(null);
-
-// function ContextProvider({ children }) {
-//   const [employeeId, setEmployeeId] = useState(null);
-//   const [isadmin, setisadmin] = useState(false);
-//   const [projectId, setProjectId] = useState(null);
-//   const [taskId, setTaskID] = useState(null);
-
-//   return (
-//     <TaskContext.Provider 
-//     value={(
-//       taskId, 
-//       setTaskID)}>
-//       <ProjectContext.Provider
-//         value={{
-//           projectId,
-//           setProjectId,
-//         }}
-//       >
-//         <Employee.Provider
-//           value={{
-//             employeeId,
-//             setEmployeeId,
-//             isadmin,
-//             setisadmin,
-//           }}
-//         >
-//           {children}
-//         </Employee.Provider>
-//       </ProjectContext.Provider>
-//     </TaskContext.Provider>
-//   );
-// }
-
-// export default ContextProvider;
-
-
-
 import React, { createContext, useState, useEffect } from "react";
 
 export const Employee = createContext(null);
@@ -64,6 +21,7 @@ function ContextProvider({ children }) {
     return sessionStorage.getItem("taskId") || null;
   });
 
+  const [currentEmployeeId, setCurrentEmployeeId] = useState(null);
 
   useEffect(() => {
     sessionStorage.setItem("employeeId", employeeId);
@@ -81,10 +39,14 @@ function ContextProvider({ children }) {
     sessionStorage.setItem("taskId", taskId);
   }, [taskId]);
 
+  useEffect(() => {
+    sessionStorage.setItem("currentEmployeeId", currentEmployeeId);
+  }, [currentEmployeeId]);
+
   return (
     <TaskContext.Provider value={{ taskId, setTaskID }}>
       <ProjectContext.Provider value={{ projectId, setProjectId }}>
-        <Employee.Provider value={{ employeeId, setEmployeeId, isadmin, setisadmin }}>
+        <Employee.Provider value={{ employeeId, setEmployeeId, isadmin, setisadmin, currentEmployeeId, setCurrentEmployeeId }}>
           {children}
         </Employee.Provider>
       </ProjectContext.Provider>
