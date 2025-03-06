@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { ProjectContext } from "../context/ContextProvider";
+import { ProjectContext, TaskContext } from "../context/ContextProvider";
 import "primereact/resources/themes/lara-light-blue/theme.css";
 import "primereact/resources/primereact.min.css";
 import "primeicons/primeicons.css";
@@ -8,7 +8,7 @@ import "primeicons/primeicons.css";
 const UpdateTask = () => {
   const navigate = useNavigate();
   const { projectId } = useContext(ProjectContext);
-  const { taskId } = useParams();
+  const { currentTaskId } = useContext(TaskContext);
   const [formValues, setFormValues] = useState({
     taskName: "",
     taskDescription: "",
@@ -24,7 +24,7 @@ const UpdateTask = () => {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ taskId }),
+          body: JSON.stringify({ taskId : currentTaskId }),
         });
         const data = await response.json();
         if (response.ok) {
@@ -42,10 +42,10 @@ const UpdateTask = () => {
       }
     };
 
-    if (taskId) {
+    if (currentTaskId) {
       fetchTask();
     }
-  }, [taskId]);
+  }, [currentTaskId]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -60,7 +60,7 @@ const UpdateTask = () => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ ...formValues, taskId, projectId }),
+        body: JSON.stringify({ ...formValues, taskId : currentTaskId, projectId }),
       });
       const data = await response.json();
 

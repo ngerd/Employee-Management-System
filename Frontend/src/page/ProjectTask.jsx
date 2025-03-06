@@ -11,10 +11,11 @@ import "primereact/resources/themes/lara-light-blue/theme.css";
 import "primereact/resources/primereact.min.css";
 import "primeicons/primeicons.css";
 
-import { ProjectContext, Employee } from "../context/ContextProvider";
+import { ProjectContext, Employee, TaskContext } from "../context/ContextProvider";
 
 const ProjectTask = () => {
   const navigate = useNavigate();
+  const { currentTaskId, setCurrentTaskId } = useContext(TaskContext);
   const { projectId } = useContext(ProjectContext);
   const { employeeId } = useContext(Employee);
 
@@ -126,11 +127,16 @@ const ProjectTask = () => {
   const actionButtonTemplate = (rowData) => (
     <div className="flex gap-2">
       <button
-        onClick={() => navigate(`/update-task/${rowData.task_id}`)}
+        onClick={() => {
+          setCurrentTaskId(rowData.task_id);
+          console.log("Task ID:" + currentTaskId);
+          navigate("/update-task");
+        }}
         className="cursor-pointer rounded-md bg-teal-600 px-4 py-2 text-xs font-medium text-white hover:bg-teal-500"
       >
         Update
       </button>
+
       <button
         onClick={() => handleDelete(rowData.task_id)}
         className="cursor-pointer rounded-md bg-orange-600 px-4 py-2 text-xs font-medium text-white hover:bg-orange-500"

@@ -55,7 +55,7 @@ function Layout() {
           <Route path="/staff" element={<Staff />} />
           <Route path="/admin-dashboard" element={<AdminDashboard />} />
           <Route path="/add-task" element={<AddTask />} />
-          <Route path="/update-task/:taskId" element={<UpdateTask />} />
+          <Route path="/update-task" element={<UpdateTask />} />
           <Route path="/add-member" element={<AddMember />} />
           <Route path="/view-account" element={<ViewEmployeeInfo />} />
           <Route path="/view-account-for-staff" element={<ViewAccountForStaff />} />

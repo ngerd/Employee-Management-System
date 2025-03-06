@@ -22,6 +22,7 @@ function ContextProvider({ children }) {
   });
 
   const [currentEmployeeId, setCurrentEmployeeId] = useState(null);
+  const [currentTaskId, setCurrentTaskId] = useState(null);
 
   useEffect(() => {
     sessionStorage.setItem("employeeId", employeeId);
@@ -43,8 +44,12 @@ function ContextProvider({ children }) {
     sessionStorage.setItem("currentEmployeeId", currentEmployeeId);
   }, [currentEmployeeId]);
 
+  useEffect(() => {
+    sessionStorage.setItem("currentTaskId", currentTaskId);
+  }, [currentTaskId]);
+
   return (
-    <TaskContext.Provider value={{ taskId, setTaskID }}>
+    <TaskContext.Provider value={{ taskId, setTaskID, currentTaskId, setCurrentTaskId }}>
       <ProjectContext.Provider value={{ projectId, setProjectId }}>
         <Employee.Provider value={{ employeeId, setEmployeeId, isadmin, setisadmin, currentEmployeeId, setCurrentEmployeeId }}>
           {children}
