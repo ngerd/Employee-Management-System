@@ -185,7 +185,7 @@ const ViewEmployeeInfo = () => {
           <div className="mt-6 flex justify-between">
             <button
               type="button"
-              onClick={() => navigate("/staff")}
+              onClick={() => navigate("/home")}
               className="cursor-pointer rounded-lg bg-black px-5 py-3 font-medium text-white hover:bg-gray-700"
             >
               Back
