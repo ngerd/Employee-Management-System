@@ -3,17 +3,29 @@ import { useNavigate } from "react-router-dom";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import { Button } from "primereact/button";
+import { InputText } from "primereact/inputtext";
 import { FilterMatchMode } from "primereact/api";
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
 import { Download } from "lucide-react";
-
 
 import "primereact/resources/themes/lara-light-blue/theme.css";
 import "primereact/resources/primereact.min.css";
 import "primeicons/primeicons.css";
 
 import { ProjectContext, Employee } from "../context/ContextProvider";
+
+// Helper: Convert numeric month to abbreviated name (e.g., 1 -> "Jan")
+function getMonthName(monthNumber) {
+  const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  const index = Math.max(1, Math.min(12, Number(monthNumber))) - 1;
+  return monthNames[index];
+}
+
+// Helper: Get the number of days in a month for a given year
+function getDaysInMonth(month, year) {
+  return new Date(year, month, 0).getDate();
+}
 
 const EditTimeslot = () => {
   const navigate = useNavigate();
@@ -30,7 +42,6 @@ const EditTimeslot = () => {
     year: { value: null, matchMode: FilterMatchMode.CONTAINS },
     project_name: { value: null, matchMode: FilterMatchMode.CONTAINS },
     task_name: { value: null, matchMode: FilterMatchMode.CONTAINS },
-    // New filter for Employee Name: We'll combine firstname and lastname in the filter function.
     employeeName: { value: null, matchMode: FilterMatchMode.CONTAINS },
   });
   const [globalFilterValue, setGlobalFilterValue] = useState("");
@@ -58,13 +69,10 @@ const EditTimeslot = () => {
   };
 
   const fetchTasks = async () => {
-    console.log("Fetching timesheet for Employee ID:", employeeId);
     try {
       const response = await fetch("http://localhost:3000/getTimesheet", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ employee_id: employeeId }),
       });
       if (!response.ok) {
@@ -84,32 +92,27 @@ const EditTimeslot = () => {
   }, [employeeId]);
 
   const handleDelete = async (taskId) => {
-    console.log("Task ID: " + taskId);
     try {
       const response = await fetch("http://localhost:3000/deleteTimesheet", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ assignment_id: taskId }),
       });
-
       if (!response.ok) {
         throw new Error("Failed to delete task");
       }
-
       fetchTasks();
     } catch (error) {
       console.error("Error deleting task:", error);
     }
   };
 
-  // Format duration to two decimals
-  const formatDuration = (duration) => (duration ? duration.toFixed(2) : "");
+  // Round worked hours to one decimal place
+  const formatDuration = (duration) => (duration ? Number(duration).toFixed(1) : "");
 
   // Action buttons: update and delete
   const actionButtonTemplate = (rowData) => (
-    <div className="flex gap-2">
+    <div className="flex gap-2" style={{ textAlign: "center" }}>
       <button
         onClick={() => navigate(`/update-timeslot/${rowData.assignment_id}`)}
         className="cursor-pointer rounded-md bg-teal-600 px-4 py-2 text-xs font-medium text-white hover:bg-teal-500"
@@ -125,107 +128,156 @@ const EditTimeslot = () => {
     </div>
   );
 
-  // Download function (unchanged from previous version)
   const exportToExcel = () => {
-    if (tasks.length === 0) {
-      alert("No timeslots to export!");
-      return;
-    }
+    // 1) Filter tasks based on current filters
     const filteredTasks = tasks.filter((task) => {
-      // Apply each filter (except global) on the respective fields.
-      const filterFields = [
-        "date",
-        "month",
-        "year",
-        "project_name",
-        "task_name",
-      ];
+      const filterFields = ["date", "month", "year", "project_name", "task_name"];
       const employeeFilter = filters.employeeName?.value;
       let matches = filterFields.every((col) => {
         const filterVal = filters[col]?.value;
         if (!filterVal) return true;
         const taskValue = task[col];
         if (taskValue === null || taskValue === undefined) return false;
-        return taskValue
-          .toString()
-          .toLowerCase()
-          .includes(filterVal.toString().toLowerCase());
+        return taskValue.toString().toLowerCase().includes(filterVal.toString().toLowerCase());
       });
-      // Additionally check employee name by combining firstname and lastname.
       if (employeeFilter) {
         const fullName = `${task.firstname} ${task.lastname}`.toLowerCase();
-        matches =
-          matches && fullName.includes(employeeFilter.toString().toLowerCase());
+        matches = matches && fullName.includes(employeeFilter.toLowerCase());
       }
       return matches;
     });
-
     if (filteredTasks.length === 0) {
       alert("No timeslots to export!");
       return;
     }
-    // Map tasks to only include desired columns
-    const exportData = filteredTasks.map((task) => ({
-      Date: task.date,
-      Month: task.month,
-      Year: task.year,
-      "Duration (hr)": task.duration ? task.duration.toFixed(2) : "",
-      "Project Name": task.project_name,
-      "Task Name": task.task_name,
-      "Employee Name": `${task.firstname} ${task.lastname}`,
-    }));
 
-    const worksheet = XLSX.utils.json_to_sheet(exportData);
-    const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, "Timeslots");
+    // 2) Determine chosen month and year from filters; fallback to first record if not set.
+    let chosenMonth = filters.month?.value || filteredTasks[0].month;
+    let chosenYear = filters.year?.value || filteredTasks[0].year;
+    const monthName = getMonthName(chosenMonth);
+    const yearNum = Number(chosenYear);
+    const monthNum = Number(chosenMonth);
+    const lastDay = getDaysInMonth(monthNum, yearNum);
 
-    const excelBuffer = XLSX.write(workbook, {
-      bookType: "xlsx",
-      type: "array",
-    });
-    // Use first task's employee name for file naming; fallback to "Employee" if no tasks
-    const employeeName =
-      tasks.length > 0
-        ? `${tasks[0].firstname} ${tasks[0].lastname}`
-        : "Employee";
-
-    // Build file name suffix from active filters
-    const filterColumns = [
-      "date",
-      "month",
-      "year",
-      "project_name",
-      "task_name",
-      "employeeName",
-    ];
-    const filterParts = [];
-    filterColumns.forEach((col) => {
-      const filterVal = filters[col]?.value;
-      if (filterVal) {
-        const colLabel =
-          col === "employeeName"
-            ? "Employee"
-            : col.charAt(0).toUpperCase() + col.slice(1);
-        filterParts.push(`${colLabel} ${filterVal}`);
+    // 3) Build summary maps: sum hours and collect remarks per day.
+    const dayHoursMap = {};
+    const dayRemarksMap = {};
+    filteredTasks.forEach((task) => {
+      const day = Number(task.date);
+      const hours = Number(task.duration || 0);
+      if (!dayHoursMap[day]) {
+        dayHoursMap[day] = 0;
+        dayRemarksMap[day] = [];
+      }
+      dayHoursMap[day] += hours;
+      if (task.task_name) {
+        dayRemarksMap[day].push(task.task_name);
       }
     });
-    const filterSuffix = filterParts.join(" ");
-    const fileName = filterSuffix
-      ? `Timesheet ${employeeName} ${filterSuffix}.xlsx`
-      : `Timesheet ${employeeName}.xlsx`;
-    const dataBlob = new Blob([excelBuffer], {
-      type: "application/octet-stream",
+
+    // 4) Split days into two side-by-side tables.
+    const leftCount = Math.ceil(lastDay / 2);
+    const rightCount = lastDay - leftCount;
+    const maxRows = Math.max(leftCount, rightCount);
+
+    // 5) Get employee info (assume same employee for all tasks).
+    const firstTask = filteredTasks[0];
+    const employeeFullName = `${firstTask.firstname} ${firstTask.lastname}`;
+
+    // 6) Build the array-of-arrays (AOA) layout.
+    // Left table will be columns A-C, spacer in D, right table in columns E-G.
+    const aoa = [];
+    // Row 0: Title row (merged across A-G)
+    aoa.push([`Billing Time Sheet for the month: ${monthName}`]);
+    // Row 1: Employee info on left, Work site on right
+    aoa.push([`Employee name: ${employeeFullName}`, "", "", "", `Work site: Remote`]);
+    // Blank row for spacing
+    aoa.push([]);
+    // Row 3: Headers for both tables (Left: Date, Hours worked, Remarks; Right: Date, Hours worked, Remarks)
+    aoa.push(["Date", "Hours worked", "Remarks", "", "Date", "Hours worked", "Remarks"]);
+
+    // Data rows: one row per each side of the table.
+    for (let i = 0; i < maxRows; i++) {
+      const leftDay = i < leftCount ? i + 1 : "";
+      const leftHours = leftDay !== "" ? (dayHoursMap[leftDay] || 0) : "";
+      const leftHoursRounded = leftDay !== "" ? Number(leftHours).toFixed(1) : "";
+      const leftRemarks = leftDay !== "" ? (dayRemarksMap[leftDay] ? dayRemarksMap[leftDay].join(", ") : "") : "";
+      const rightDay = i < rightCount ? i + leftCount + 1 : "";
+      const rightHours = rightDay !== "" ? (dayHoursMap[rightDay] || 0) : "";
+      const rightHoursRounded = rightDay !== "" ? Number(rightHours).toFixed(1) : "";
+      const rightRemarks = rightDay !== "" ? (dayRemarksMap[rightDay] ? dayRemarksMap[rightDay].join(", ") : "") : "";
+      aoa.push([leftDay, leftHoursRounded, leftRemarks, "", rightDay, rightHoursRounded, rightRemarks]);
+    }
+    // No confirmation row is added per new requirements.
+
+    // 7) Convert AOA to worksheet
+    const ws = XLSX.utils.aoa_to_sheet(aoa);
+
+    // 8) Define merges: merge title row across A-G, merge employee info cells.
+    ws["!merges"] = [
+      { s: { r: 0, c: 0 }, e: { r: 0, c: 6 } },
+      { s: { r: 1, c: 0 }, e: { r: 1, c: 2 } },
+      { s: { r: 1, c: 4 }, e: { r: 1, c: 6 } },
+    ];
+
+    // 9) Set column widths so that each column in the left table (A-C) and right table (E-G) are equal.
+    ws["!cols"] = [
+      { wch: 12 }, { wch: 12 }, { wch: 12 }, // Left table (A, B, C)
+      { wch: 2 },                           // Spacer (D)
+      { wch: 12 }, { wch: 12 }, { wch: 12 }   // Right table (E, F, G)
+    ];
+
+    // 10) Apply cell styling:
+    // Header row (row index 3) should be blue with white bold text.
+    const headerRow = 3;
+    [0, 1, 2, 4, 5, 6].forEach((col) => {
+      const cellAddr = XLSX.utils.encode_cell({ r: headerRow, c: col });
+      if (ws[cellAddr]) {
+        ws[cellAddr].s = {
+          fill: { fgColor: { rgb: "0000FF" } },
+          font: { color: { rgb: "FFFFFF" }, bold: true },
+          alignment: { horizontal: "center", vertical: "center" }
+        };
+      }
     });
+    // For date cells (columns A and E in data rows), if hours worked equals 0, set background to gray.
+    for (let i = 4; i < 4 + maxRows; i++) {
+      // Left table: column 0
+      const leftCellAddr = XLSX.utils.encode_cell({ r: i, c: 0 });
+      const leftHoursAddr = XLSX.utils.encode_cell({ r: i, c: 1 });
+      if (ws[leftCellAddr] && ws[leftHoursAddr] && Number(ws[leftHoursAddr].v) === 0) {
+        ws[leftCellAddr].s = {
+          fill: { fgColor: { rgb: "D3D3D3" } },
+          alignment: { horizontal: "center", vertical: "center" }
+        };
+      }
+      // Right table: column 4
+      const rightCellAddr = XLSX.utils.encode_cell({ r: i, c: 4 });
+      const rightHoursAddr = XLSX.utils.encode_cell({ r: i, c: 5 });
+      if (ws[rightCellAddr] && ws[rightHoursAddr] && Number(ws[rightHoursAddr].v) === 0) {
+        ws[rightCellAddr].s = {
+          fill: { fgColor: { rgb: "D3D3D3" } },
+          alignment: { horizontal: "center", vertical: "center" }
+        };
+      }
+    }
+
+    // 11) Create workbook and append worksheet, then write file
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Timesheet");
+    const excelBuffer = XLSX.write(wb, { bookType: "xlsx", type: "array" });
+    const dataBlob = new Blob([excelBuffer], { type: "application/octet-stream" });
+    const fileName = `Timesheet ${employeeFullName} ${monthName}.xlsx`;
     saveAs(dataBlob, fileName);
   };
 
   return (
     <div className="mx-auto max-w-screen-xl py-10 sm:px-6 lg:px-8">
-      {/* Header with title, filter bar, and download button */}
+      {/* Header */}
       <div className="flex items-center justify-between mb-5">
         <h1 className="text-4xl font-bold text-gray-900">Edit Time Schedule</h1>
       </div>
-
+      {/* Filter & Download */}
       <div className="flex justify-between">
         <Button
           type="button"
@@ -246,8 +298,7 @@ const EditTimeslot = () => {
           </button>
         </div>
       </div>
-
-      {/* DataTable with new columns, filters, sortable enabled and onFilter handler */}
+      {/* DataTable */}
       <DataTable
         value={tasks}
         paginator
@@ -265,12 +316,11 @@ const EditTimeslot = () => {
           "year",
           "project_name",
           "task_name",
-          "firstname", // for global search on employee name
+          "firstname",
           "lastname",
         ]}
         filterDisplay="menu"
       >
-        {/* <Column field="assignment_id" header="ID" style={{ minWidth: "5rem" }} sortable /> */}
         <Column
           field="date"
           header="Date"
@@ -306,6 +356,7 @@ const EditTimeslot = () => {
           header="Hours worked"
           body={(rowData) => formatDuration(rowData.duration)}
           style={{ minWidth: "7rem" }}
+          sortable
           headerStyle={{ textAlign: "center" }}
           bodyStyle={{ textAlign: "center" }}
         />
@@ -315,6 +366,7 @@ const EditTimeslot = () => {
           style={{ minWidth: "10rem" }}
           filter
           filterPlaceholder="Search Project"
+          sortable
         />
         <Column
           field="task_name"
@@ -322,6 +374,7 @@ const EditTimeslot = () => {
           style={{ minWidth: "12rem" }}
           filter
           filterPlaceholder="Search Task"
+          sortable
         />
         <Column
           header="Employee Name"
@@ -329,6 +382,7 @@ const EditTimeslot = () => {
           style={{ minWidth: "12rem" }}
           filter
           filterPlaceholder="Search Employee"
+          sortable
         />
         <Column
           header="Action"
