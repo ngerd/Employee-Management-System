@@ -5,38 +5,43 @@ import Alert from "../component/Alert";
 
 const CreateTimeslot = () => {
   const { employeeId } = useContext(Employee);
+  const navigate = useNavigate();
+
+  // Form state for creating a timeslot
   const [formValues, setFormValues] = useState({
     employee_ids: [employeeId],
     task_id: null,
     startdate: "",
     enddate: "",
   });
+
+  // For the task dropdown
   const [isOpen, setIsOpen] = useState(false);
   const [selectedTask, setSelectedTask] = useState("Choose Task");
   const [tasks, setTasks] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [alert, setAlert] = useState({ show: false, message: "", type: "" });
-  const navigate = useNavigate();
 
+  // Alert for success/error messages
+  const [alert, setAlert] = useState({ show: false, message: "", type: "" });
+
+  // This state holds the selected task’s official date range from the DB
+  const [taskTime, setTaskTime] = useState(null);
+
+  // 1) Fetch tasks (ensure your backend returns start_date and due_date)
   useEffect(() => {
     const fetchTasks = async () => {
-      console.log("Employee ID: " + employeeId);
       try {
         const response = await fetch("http://localhost:3000/task/getEmployeeTask", {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ employee_id: employeeId }),
         });
         const data = await response.json();
-
         if (Array.isArray(data)) {
           setTasks(data);
         } else {
           setTasks([]);
         }
-        console.log("Fetched tasks:", data);
       } catch (error) {
         console.error("Error fetching tasks:", error);
       } finally {
@@ -44,33 +49,53 @@ const CreateTimeslot = () => {
       }
     };
 
-    fetchTasks();
+    if (employeeId) {
+      fetchTasks();
+    }
   }, [employeeId]);
 
+  // 2) When user selects a task, set taskTime with official range
   const handleSelect = (task) => {
     setSelectedTask(task.task_name);
-    setFormValues({ ...formValues, task_id: task.task_id });
-    console.log(task.task_name, task.task_id);
+    setFormValues((prev) => ({
+      ...prev,
+      task_id: task.task_id,
+      // Optionally, auto-fill the start/end inputs:
+      // startdate: task.start_date,
+      // enddate: task.due_date,
+    }));
+    setTaskTime({ start: task.start_date, end: task.due_date });
     setIsOpen(false);
   };
 
-  const fetchCreateTimeSlot = async () => {
-    console.log("requestData:", formValues);
+  // 3) Helper to format date and time (date next to time)
+  const formatDateTime = (dateString) => {
+    if (!dateString) return "";
+    const dt = new Date(dateString);
+    return dt.toLocaleString("en-GB", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  };
+
+  // 4) Submit form => create timeslot
+  const handleSubmit = async (e) => {
+    e.preventDefault();
     try {
       const response = await fetch("http://localhost:3000/createTimesheet", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formValues),
       });
       const data = await response.json();
-
       if (response.ok) {
         setAlert({ show: true, message: "Timeslot created successfully!", type: "success" });
         setTimeout(() => {
           navigate("/timesheet");
-        }, 3000); // Delay the navigation by 3 seconds to show the alert
+        }, 3000);
       } else {
         setAlert({ show: true, message: "Failed to create timeslot: " + data.error, type: "error" });
       }
@@ -80,37 +105,32 @@ const CreateTimeslot = () => {
     }
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    fetchCreateTimeSlot();
-  };
-
+  // 5) Input change handler
   const handleChange = (e) => {
     const { name, value } = e.target;
-    console.log(name, value);
-    setFormValues({ ...formValues, [name]: value });
+    setFormValues((prev) => ({ ...prev, [name]: value }));
   };
 
   return (
     <section className="bg-gray-100">
       <div className="mx-auto max-w-2xl px-6 py-12 sm:px-8 lg:px-10">
-        {alert.show && <Alert message={alert.message} type={alert.type} onClose={() => setAlert({ show: false, message: "", type: "" })} />}
+        {alert.show && (
+          <Alert
+            message={alert.message}
+            type={alert.type}
+            onClose={() => setAlert({ show: false, message: "", type: "" })}
+          />
+        )}
         <div className="rounded-lg bg-white p-8 shadow-lg">
-          <h2 className="text-2xl pb-8 font-extrabold text-gray-900">
-            Create Time Slot
-          </h2>
+          <h2 className="text-2xl pb-8 font-extrabold text-gray-900">Create Time Slot</h2>
           <form className="space-y-4" onSubmit={handleSubmit}>
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div>
-                <label
-                  htmlFor="startDateTime"
-                  className="block text-sm font-medium text-gray-700"
-                >
+                <label className="block text-sm font-medium text-gray-700">
                   Start Date & Time
                 </label>
                 <input
                   type="datetime-local"
-                  id="startdate"
                   name="startdate"
                   className="w-full rounded-lg border-gray-300 p-3 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   onChange={handleChange}
@@ -118,22 +138,32 @@ const CreateTimeslot = () => {
                 />
               </div>
               <div>
-                <label
-                  htmlFor="endDateTime"
-                  className="block text-sm font-medium text-gray-700"
-                >
+                <label className="block text-sm font-medium text-gray-700">
                   End Date & Time
                 </label>
                 <input
                   type="datetime-local"
-                  id="enddate"
                   name="enddate"
+                  className="w-full rounded-lg border-gray-300 p-3 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   onChange={handleChange}
                   value={formValues.enddate}
-                  className="w-full rounded-lg border-gray-300 p-3 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 />
               </div>
             </div>
+
+            {/* Display official task range with date and time */}
+            {taskTime && (
+              <div className="mt-4 p-3 bg-gray-50 border border-gray-200 rounded">
+                <p className="text-sm text-gray-700">
+                  <strong>Task Start:</strong> {formatDateTime(taskTime.start)}
+                </p>
+                <p className="text-sm text-gray-700">
+                  <strong>Task End:</strong> {formatDateTime(taskTime.end)}
+                </p>
+              </div>
+            )}
+
+            {/* Task dropdown */}
             <div className="relative mt-7">
               <button
                 type="button"
@@ -167,7 +197,7 @@ const CreateTimeslot = () => {
                       </li>
                     ) : (
                       tasks.map((task) => (
-                        <li key={task.assignment_id}>
+                        <li key={task.task_id}>
                           <button
                             type="button"
                             onClick={() => handleSelect(task)}
@@ -182,6 +212,7 @@ const CreateTimeslot = () => {
                 </div>
               )}
             </div>
+
             <div className="mt-6 flex justify-between">
               <button
                 type="button"

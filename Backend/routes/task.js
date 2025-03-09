@@ -400,6 +400,8 @@ router.post("/getEmployeeTask", async (req, res) => {
         p.project_name,
         t.task_name,
         t.task_id,
+        t.start_date,        -- NEW: include start_date
+        t.due_date,          -- NEW: include due_date
         ta.assignment_id
       FROM public."task_assignment" ta
       JOIN public."task" t ON ta.task_id = t.task_id
