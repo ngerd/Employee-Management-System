@@ -126,9 +126,7 @@ const CreateTimeslot = () => {
           <form className="space-y-4" onSubmit={handleSubmit}>
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  Start Date & Time
-                </label>
+                <label className="block text-sm font-medium text-gray-700">Start Date & Time</label>
                 <input
                   type="datetime-local"
                   name="startdate"
@@ -138,9 +136,7 @@ const CreateTimeslot = () => {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  End Date & Time
-                </label>
+                <label className="block text-sm font-medium text-gray-700">End Date & Time</label>
                 <input
                   type="datetime-local"
                   name="enddate"
@@ -151,15 +147,16 @@ const CreateTimeslot = () => {
               </div>
             </div>
 
-            {/* Display official task range with date and time */}
+            {/* New: Display official task deadlines in a read-only text field */}
             {taskTime && (
-              <div className="mt-4 p-3 bg-gray-50 border border-gray-200 rounded">
-                <p className="text-sm text-gray-700">
-                  <strong>Task Start:</strong> {formatDateTime(taskTime.start)}
-                </p>
-                <p className="text-sm text-gray-700">
-                  <strong>Task End:</strong> {formatDateTime(taskTime.end)}
-                </p>
+              <div className="mt-4">
+                <label className="block text-sm font-medium text-gray-700">Deadlines</label>
+                <input
+                  type="text"
+                  readOnly
+                  className="w-full rounded-lg border-gray-300 p-3 text-sm shadow-sm focus:outline-none"
+                  value={`${formatDateTime(taskTime.start)} - ${formatDateTime(taskTime.end)}`}
+                />
               </div>
             )}
 
@@ -171,12 +168,7 @@ const CreateTimeslot = () => {
                 className="flex items-center justify-between w-full px-4 py-2 text-sm font-medium text-gray-700 bg-white border rounded-md shadow-sm hover:bg-gray-50"
               >
                 {selectedTask}
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="w-4 h-4 ml-2"
-                  viewBox="0 0 20 20"
-                  fill="currentColor"
-                >
+                <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 ml-2" viewBox="0 0 20 20" fill="currentColor">
                   <path
                     fillRule="evenodd"
                     d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
@@ -188,13 +180,9 @@ const CreateTimeslot = () => {
                 <div className="absolute mt-2 w-full bg-white border border-gray-200 rounded-md shadow-lg z-10">
                   <ul className="py-1">
                     {loading ? (
-                      <li className="text-center py-2 text-sm text-gray-500">
-                        Loading tasks...
-                      </li>
+                      <li className="text-center py-2 text-sm text-gray-500">Loading tasks...</li>
                     ) : tasks.length === 0 ? (
-                      <li className="text-center py-2 text-sm text-gray-500">
-                        No tasks found
-                      </li>
+                      <li className="text-center py-2 text-sm text-gray-500">No tasks found</li>
                     ) : (
                       tasks.map((task) => (
                         <li key={task.task_id}>
