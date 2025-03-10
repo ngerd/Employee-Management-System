@@ -1,8 +1,7 @@
 import React, { useContext, useEffect, useState } from "react";
-import TextInput from "../component/TextInput";
-import PasswordInput from "../component/PasswordInput";
 import { useNavigate } from "react-router-dom";
 import { Employee } from "../context/ContextProvider";
+import Alert from "../component/Alert"; // Import Alert component
 
 function Login() {
   const initialValues = {
@@ -12,8 +11,7 @@ function Login() {
   const [formValues, setFormValues] = useState(initialValues);
   const navigate = useNavigate();
   const { employeeId, setEmployeeId, setisadmin } = useContext(Employee);
-  // Alert state: message and type ('success' or 'error')
-  const [alert, setAlert] = useState({ message: "", type: "" });
+  const [alert, setAlert] = useState({ message: "", type: "" }); // Alert state
 
   const fetchMockData = async () => {
     try {
@@ -27,11 +25,9 @@ function Login() {
       });
       const data = await response.json();
       if (data.error) {
-        // If error is returned, set alert to error message.
         setAlert({ message: "wrong Email or Password", type: "error" });
         return null;
       } else {
-        // Successful login
         setEmployeeId(data.employee_id);
         setAlert({ message: "Login Successfully", type: "success" });
         return data;
@@ -84,7 +80,6 @@ function Login() {
       console.log("Updated Employee ID:", employeeId);
       const init = async () => {
         const data = await fetchEmployeeInfo();
-        // Navigate to home after a short delay so user can see the success alert
         if (data && !data.error) {
           setTimeout(() => {
             navigate("/home");
@@ -114,16 +109,7 @@ function Login() {
       </section>
       <div className="flex items-center justify-center place-items-center px-12 py-12 sm:px-16 lg:col-span-7 lg:px-32 lg:py-32 xl:col-span-6">
         <div className="rounded-lg bg-white p-16 shadow-xl max-w-2xl w-full">
-          {/* Alert message */}
-          {alert.message && (
-            <div
-              className={`mb-4 p-3 text-center text-white rounded ${
-                alert.type === "success" ? "bg-green-500" : "bg-red-500"
-              }`}
-            >
-              {alert.message}
-            </div>
-          )}
+          {alert.message && <Alert message={alert.message} type={alert.type} onClose={() => setAlert({ message: "", type: "" })} />} {/* Render Alert */}
           <h2 className="text-2xl pb-10 font-extrabold text-gray-900">Login</h2>
           <form className="space-y-6" onSubmit={handleSubmit}>
             <input

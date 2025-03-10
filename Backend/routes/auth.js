@@ -255,3 +255,42 @@ router.get("/getEmployee2", async (req, res) => {
 });
 
 export default router;
+
+// Update Employee (without changing the password)
+router.post("/updateEmployee2", async (req, res) => {
+  const { employee_id, firstname, lastname, email, role_id } = req.body;
+
+  // Validate input
+  if (!employee_id || !firstname || !lastname || !email || !role_id) {
+    return res.status(400).json({ error: "Missing required fields" });
+  }
+
+  try {
+    // Ensure the employee exists before updating
+    const checkEmployee = await pool.query(
+      `SELECT employee_id FROM employee WHERE employee_id = $1`,
+      [employee_id]
+    );
+
+    if (checkEmployee.rowCount === 0) {
+      return res.status(404).json({ error: "Employee not found" });
+    }
+
+    // Update employee details (excluding password)
+    const result = await pool.query(
+      `UPDATE employee 
+       SET firstname = $1, lastname = $2, email = $3, role_id = $4
+       WHERE employee_id = $5 
+       RETURNING employee_id, firstname, lastname, email, role_id, isAdmin`,
+      [firstname, lastname, email, role_id, employee_id]
+    );
+
+    return res.json({
+      status: "Update successful",
+      employee: result.rows[0]
+    });
+  } catch (err) {
+    console.error("Update employee error:", err);
+    return res.status(500).json({ error: "Internal server error" });
+  }
+});
