@@ -128,6 +128,17 @@ const EditTimeslot = () => {
     </div>
   );
 
+  /**
+   * Custom Excel export:
+   * - Splits the days of the chosen month into two side-by-side tables.
+   * - Rows 0-2: Title, Employee name, and Project name.
+   * - Row 3: Blank.
+   * - Row 4: Headers for both tables (Left: Date, Hours worked, Remarks; Right: Date, Hours worked, Remarks).
+   * - Data rows for the tables.
+   * - Final row (only for table 2): Under table 2, merge columns E and F to show the label "Total days worked:" and put the computed value in column G.
+   * - Header cells styled blue with white bold text; date cells with 0 worked hours are shaded gray.
+   * - All columns in each table have fixed equal widths.
+   */
   const exportToExcel = () => {
     // 1) Filter tasks based on current filters
     const filteredTasks = tasks.filter((task) => {
@@ -180,23 +191,24 @@ const EditTimeslot = () => {
     const rightCount = lastDay - leftCount;
     const maxRows = Math.max(leftCount, rightCount);
 
-    // 5) Get employee info (assume same employee for all tasks).
+    // 5) Get employee info and project name (assuming all tasks are from the same project)
     const firstTask = filteredTasks[0];
     const employeeFullName = `${firstTask.firstname} ${firstTask.lastname}`;
+    const projectName = firstTask.project_name;
 
     // 6) Build the array-of-arrays (AOA) layout.
-    // Left table will be columns A-C, spacer in D, right table in columns E-G.
     const aoa = [];
-    // Row 0: Title row (merged across A-G)
+    // Row 0: Title (merged across A–G)
     aoa.push([`Billing Time Sheet for the month: ${monthName}`]);
-    // Row 1: Employee info on left, Work site on right
-    aoa.push([`Employee name: ${employeeFullName}`, "", "", "", `Work site: Remote`]);
-    // Blank row for spacing
+    // Row 1: Employee name (to be merged across A–C)
+    aoa.push([`Employee name: ${employeeFullName}`]);
+    // Row 2: Project name (to be merged across A–C)
+    aoa.push([`Project name: ${projectName}`]);
+    // Row 3: Blank row for spacing
     aoa.push([]);
-    // Row 3: Headers for both tables (Left: Date, Hours worked, Remarks; Right: Date, Hours worked, Remarks)
+    // Row 4: Headers for both tables (Left: Date, Hours worked, Remarks; Right: Date, Hours worked, Remarks)
     aoa.push(["Date", "Hours worked", "Remarks", "", "Date", "Hours worked", "Remarks"]);
-
-    // Data rows: one row per each side of the table.
+    // Data rows for each table
     for (let i = 0; i < maxRows; i++) {
       const leftDay = i < leftCount ? i + 1 : "";
       const leftHours = leftDay !== "" ? (dayHoursMap[leftDay] || 0) : "";
@@ -208,47 +220,60 @@ const EditTimeslot = () => {
       const rightRemarks = rightDay !== "" ? (dayRemarksMap[rightDay] ? dayRemarksMap[rightDay].join(", ") : "") : "";
       aoa.push([leftDay, leftHoursRounded, leftRemarks, "", rightDay, rightHoursRounded, rightRemarks]);
     }
-    // No confirmation row is added per new requirements.
+    // 7) Final row: Only for table 2 (right table)
+    // For columns A-D, we insert blank cells.
+    // For table 2, merge columns E and F to display the label, and column G will have the computed value.
+    let totalHours = 0;
+    for (let d = 1; d <= lastDay; d++) {
+      totalHours += dayHoursMap[d] || 0;
+    }
+    const totalDaysWorked = (totalHours / 8).toFixed(1);
+    aoa.push(["", "", "", "", "Total days worked:", "", totalDaysWorked]);
 
-    // 7) Convert AOA to worksheet
+    // 8) Convert the AOA to a worksheet
     const ws = XLSX.utils.aoa_to_sheet(aoa);
 
-    // 8) Define merges: merge title row across A-G, merge employee info cells.
+    // 9) Define merges:
     ws["!merges"] = [
+      // Merge title row (Row 0: columns A–G)
       { s: { r: 0, c: 0 }, e: { r: 0, c: 6 } },
+      // Merge Employee name row (Row 1: columns A–C)
       { s: { r: 1, c: 0 }, e: { r: 1, c: 2 } },
-      { s: { r: 1, c: 4 }, e: { r: 1, c: 6 } },
+      // Merge Project name row (Row 2: columns A–C)
+      { s: { r: 2, c: 0 }, e: { r: 2, c: 2 } },
+      // Merge final row for table 2: merge columns E and F in the last row
+      { s: { r: aoa.length - 1, c: 4 }, e: { r: aoa.length - 1, c: 5 } },
     ];
 
-    // 9) Set column widths so that each column in the left table (A-C) and right table (E-G) are equal.
+    // 10) Set fixed column widths: left table (columns A–C), spacer (D), right table (columns E–G)
     ws["!cols"] = [
-      { wch: 12 }, { wch: 12 }, { wch: 12 }, // Left table (A, B, C)
-      { wch: 2 },                           // Spacer (D)
-      { wch: 12 }, { wch: 12 }, { wch: 12 }   // Right table (E, F, G)
+      { wch: 12 }, { wch: 12 }, { wch: 12 },
+      { wch: 2 },
+      { wch: 12 }, { wch: 12 }, { wch: 12 },
     ];
 
-    // 10) Apply cell styling:
-    // Header row (row index 3) should be blue with white bold text.
-    const headerRow = 3;
+    // 11) Apply cell styling:
+    // Header row (Row 4) should be blue with white bold text.
+    const headerRow = 4;
     [0, 1, 2, 4, 5, 6].forEach((col) => {
       const cellAddr = XLSX.utils.encode_cell({ r: headerRow, c: col });
       if (ws[cellAddr]) {
         ws[cellAddr].s = {
           fill: { fgColor: { rgb: "0000FF" } },
           font: { color: { rgb: "FFFFFF" }, bold: true },
-          alignment: { horizontal: "center", vertical: "center" }
+          alignment: { horizontal: "center", vertical: "center" },
         };
       }
     });
-    // For date cells (columns A and E in data rows), if hours worked equals 0, set background to gray.
-    for (let i = 4; i < 4 + maxRows; i++) {
+    // For date cells (columns A and E in data rows), if corresponding worked hours equals 0, set background to gray.
+    for (let i = headerRow + 1; i < headerRow + 1 + maxRows; i++) {
       // Left table: column 0
       const leftCellAddr = XLSX.utils.encode_cell({ r: i, c: 0 });
       const leftHoursAddr = XLSX.utils.encode_cell({ r: i, c: 1 });
       if (ws[leftCellAddr] && ws[leftHoursAddr] && Number(ws[leftHoursAddr].v) === 0) {
         ws[leftCellAddr].s = {
           fill: { fgColor: { rgb: "D3D3D3" } },
-          alignment: { horizontal: "center", vertical: "center" }
+          alignment: { horizontal: "center", vertical: "center" },
         };
       }
       // Right table: column 4
@@ -257,12 +282,12 @@ const EditTimeslot = () => {
       if (ws[rightCellAddr] && ws[rightHoursAddr] && Number(ws[rightHoursAddr].v) === 0) {
         ws[rightCellAddr].s = {
           fill: { fgColor: { rgb: "D3D3D3" } },
-          alignment: { horizontal: "center", vertical: "center" }
+          alignment: { horizontal: "center", vertical: "center" },
         };
       }
     }
 
-    // 11) Create workbook and append worksheet, then write file
+    // 12) Create workbook and save file
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, "Timesheet");
     const excelBuffer = XLSX.write(wb, { bookType: "xlsx", type: "array" });
