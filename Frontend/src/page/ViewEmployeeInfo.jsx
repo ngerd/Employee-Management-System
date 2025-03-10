@@ -94,7 +94,7 @@ const ViewEmployeeInfo = () => {
         throw new Error("Failed to update account");
       }
       alert("Account updated successfully!");
-      navigate("/staff");
+      navigate("/home");
     } catch (error) {
       console.error("There was a problem updating the account:", error);
     }
