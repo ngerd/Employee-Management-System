@@ -131,6 +131,27 @@ const ProjectInformation = () => {
           </div>
 
           <div className="grid grid-cols-1 gap-1 p-3 sm:grid-cols-3 sm:gap-4">
+            <dt className="font-medium text-gray-900">Customer</dt>
+            <dd className="text-gray-700 sm:col-span-2">
+              {project ? project.customername : "N/A"}
+            </dd>
+          </div>
+
+          <div className="grid grid-cols-1 gap-1 p-3 sm:grid-cols-3 sm:gap-4">
+            <dt className="font-medium text-gray-900">Nation</dt>
+            <dd className="text-gray-700 sm:col-span-2">
+              {project ? project.nation : "N/A"}
+            </dd>
+          </div>
+
+          <div className="grid grid-cols-1 gap-1 p-3 sm:grid-cols-3 sm:gap-4">
+            <dt className="font-medium text-gray-900">Cost</dt>
+            <dd className="text-gray-700 sm:col-span-2">
+              {project ? project.cost : "N/A"}
+            </dd>
+          </div>
+          
+          {/* <div className="grid grid-cols-1 gap-1 p-3 sm:grid-cols-3 sm:gap-4">
             <dt className="font-medium text-gray-900">Employees</dt>
             <dd className="text-gray-700 sm:col-span-2">
               {employees.length > 0 ? (
@@ -145,7 +166,7 @@ const ProjectInformation = () => {
                 "No employees assigned"
               )}
             </dd>
-          </div>
+          </div> */}
         </dl>
       </div>
     </div>
