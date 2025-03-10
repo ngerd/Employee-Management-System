@@ -216,6 +216,73 @@ router.post("/update", async (req, res) => {
 });
 
 // Add multiple employees to a project
+// router.post("/add-employee", async (req, res) => {
+//   const { employee_ids, project_id, ismanager } = req.body;
+
+//   if (!employee_ids || !Array.isArray(employee_ids) || employee_ids.length === 0 || !project_id) {
+//     return res.status(400).json({ error: "Missing or invalid required fields" });
+//   }
+
+//   const client = await pool.connect();
+//   try {
+//     await client.query("BEGIN");
+
+//     let addedEmployees = [];
+
+//     for (const employee_id of employee_ids) {
+//       const manager = ismanager?.includes(employee_id) ? true : false; // Allow multiple managers if needed
+
+//       // Insert each employee into the project_employee table
+//       const addEmployeeQuery = `
+//         INSERT INTO public."project_employee" (ismanager, project_id, employee_id)
+//         VALUES ($1, $2, $3) RETURNING *`;
+//       const employeeResult = await client.query(addEmployeeQuery, [
+//         manager,
+//         project_id,
+//         employee_id,
+//       ]);
+
+//       addedEmployees.push(employeeResult.rows[0]);
+//     }
+
+//     // Calculate the total cost for the project by summing pay rates of all employees in the project.
+//     const sumQuery = `
+//       SELECT SUM(
+//         CASE 
+//           WHEN p.nation = 'Singapore' THEN r.pay_rate_sg 
+//           ELSE r.pay_rate_vn 
+//         END
+//       ) AS total_cost
+//       FROM public."project_employee" pm
+//       JOIN public."employee" e ON pm.employee_id = e.employee_id
+//       JOIN public."role" r ON e.role_id = r.role_id
+//       JOIN public."project" p ON p.project_id = pm.project_id
+//       WHERE pm.project_id = $1
+//     `;
+//     const sumResult = await client.query(sumQuery, [project_id]);
+//     const totalCost = sumResult.rows[0].total_cost;
+
+//     // Update the project cost
+//     await client.query(
+//       `UPDATE public."project" SET cost = $1 WHERE project_id = $2`,
+//       [totalCost, project_id]
+//     );
+
+//     await client.query("COMMIT");
+
+//     return res.status(201).json({
+//       message: "Employees added successfully",
+//       addedEmployees,
+//       updated_cost: totalCost,
+//     });
+//   } catch (error) {
+//     await client.query("ROLLBACK");
+//     console.error("Error adding employees:", error);
+//     res.status(500).json({ error: "Internal Server Error" });
+//   } finally {
+//     client.release();
+//   }
+// });
 router.post("/add-employee", async (req, res) => {
   const { employee_ids, project_id, ismanager } = req.body;
 
@@ -230,7 +297,8 @@ router.post("/add-employee", async (req, res) => {
     let addedEmployees = [];
 
     for (const employee_id of employee_ids) {
-      const manager = ismanager?.includes(employee_id) ? true : false; // Allow multiple managers if needed
+      // Ensure ismanager is always explicitly set
+      const manager = ismanager && ismanager.includes(employee_id) ? true : false;
 
       // Insert each employee into the project_employee table
       const addEmployeeQuery = `
@@ -260,7 +328,7 @@ router.post("/add-employee", async (req, res) => {
       WHERE pm.project_id = $1
     `;
     const sumResult = await client.query(sumQuery, [project_id]);
-    const totalCost = sumResult.rows[0].total_cost;
+    const totalCost = sumResult.rows[0].total_cost || 0;
 
     // Update the project cost
     await client.query(
@@ -275,15 +343,15 @@ router.post("/add-employee", async (req, res) => {
       addedEmployees,
       updated_cost: totalCost,
     });
+
   } catch (error) {
     await client.query("ROLLBACK");
     console.error("Error adding employees:", error);
-    res.status(500).json({ error: "Internal Server Error" });
+    res.status(500).json({ error: "Internal Server Error", details: error.message });
   } finally {
     client.release();
   }
 });
-
 
 //Delete employee from project
 router.post("/delete-employee", async (req, res) => {

@@ -6,7 +6,6 @@ import { Info, ClipboardList, Users, CirclePlus, Download } from "lucide-react";
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
 
-
 import "primereact/resources/themes/lara-light-blue/theme.css";
 import "primereact/resources/primereact.min.css";
 import "primeicons/primeicons.css";
@@ -20,17 +19,17 @@ const ProjectTask = () => {
   const { employeeId } = useContext(Employee);
 
   const [employees, setEmployees] = useState([]);
-  const [isUserManager, setIsUserManager] = useState();
+  const [isUserManager, setIsUserManager] = useState(false);
   const [tasks, setTasks] = useState([]);
   const [loading, setLoading] = useState(true);
 
-
+  // Check if the current user is the manager for this project
   useEffect(() => {
     const checkIfManager = async () => {
       if (!projectId || !employeeId) return;
 
       const result = await isManager(projectId, employeeId);
-      console.log("result" + result)
+      console.log("Manager check result:", result);
       setIsUserManager(result);
     };
 
@@ -58,7 +57,6 @@ const ProjectTask = () => {
 
       console.log("Comparison result:", Number(data1.manager) === Number(employeeId));
       return Number(data1.manager) === Number(employeeId);
-
     } catch (error) {
       console.error("Error checking manager:", error);
       return false;
@@ -66,7 +64,7 @@ const ProjectTask = () => {
   };
 
   const fetchTasks = async () => {
-    console.log("Pj task:" + projectId);
+    console.log("Project ID for tasks:", projectId);
     if (!projectId) return;
     try {
       const response = await fetch("http://localhost:3000/task/get", {
@@ -107,7 +105,6 @@ const ProjectTask = () => {
         throw new Error("Failed to delete task");
       }
 
-
       fetchTasks();
     } catch (error) {
       console.error("Error deleting task:", error);
@@ -117,10 +114,10 @@ const ProjectTask = () => {
   const formatDate = (dateString) => {
     if (!dateString) return '';
     const date = new Date(dateString);
-    return new Intl.DateTimeFormat('en-GB', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric',
+    return new Intl.DateTimeFormat("en-GB", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
     }).format(date);
   };
 
@@ -129,7 +126,7 @@ const ProjectTask = () => {
       <button
         onClick={() => {
           setCurrentTaskId(rowData.task_id);
-          console.log("Task ID:" + currentTaskId);
+          console.log("Task ID:" + rowData.task_id);
           navigate("/update-task");
         }}
         className="cursor-pointer rounded-md bg-teal-600 px-4 py-2 text-xs font-medium text-white hover:bg-teal-500"
@@ -146,7 +143,7 @@ const ProjectTask = () => {
     </div>
   );
 
-  // Download task list
+  // Download task list to Excel
   const exportToExcel = () => {
     if (tasks.length === 0) {
       alert("No tasks to export!");
@@ -160,10 +157,8 @@ const ProjectTask = () => {
     // Export and save
     const excelBuffer = XLSX.write(workbook, { bookType: "xlsx", type: "array" });
     const data = new Blob([excelBuffer], { type: "application/octet-stream" });
-
     saveAs(data, "Project_Tasks.xlsx");
   };
-
 
   return (
     <div className="mx-auto max-w-screen-xl py-10 sm:px-6 lg:px-8">
@@ -231,10 +226,26 @@ const ProjectTask = () => {
       >
         <Column field="task_id" header="ID" style={{ minWidth: "5rem" }} />
         <Column field="task_name" header="Task Name" style={{ minWidth: "12rem" }} />
-        <Column field="start_date" header="Start Date" body={(rowData) => formatDate(rowData.start_date)} style={{ minWidth: "10rem" }} />
-        <Column field="due_date" header="Due Date" body={(rowData) => formatDate(rowData.due_date)} style={{ minWidth: "10rem" }} />
+        <Column
+          field="start_date"
+          header="Start Date"
+          body={(rowData) => formatDate(rowData.start_date)}
+          style={{ minWidth: "10rem" }}
+        />
+        <Column
+          field="due_date"
+          header="Due Date"
+          body={(rowData) => formatDate(rowData.due_date)}
+          style={{ minWidth: "10rem" }}
+        />
         <Column field="task_status" header="Status" style={{ minWidth: "10rem" }} />
-        <Column header="Action" body={actionButtonTemplate} style={{ minWidth: "12rem" }} />
+        {isUserManager && (
+          <Column
+            header="Action"
+            body={actionButtonTemplate}
+            style={{ minWidth: "12rem" }}
+          />
+        )}
       </DataTable>
     </div>
   );

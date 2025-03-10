@@ -4,6 +4,7 @@ import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import { Info, ClipboardList, Users, CirclePlus } from "lucide-react";
 import { ProjectContext, Employee } from "../context/ContextProvider";
+import Alert from "../component/Alert";
 
 const ProjectTeam = () => {
   const navigate = useNavigate();
@@ -17,26 +18,19 @@ const ProjectTeam = () => {
   const [assignedTaskIds, setAssignedTaskIds] = useState(new Set()); // Store assigned tasks
   const [selectedEmployeeId, setSelectedEmployeeId] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [isUserManager, setIsUserManager] = useState();
+  const [isUserManager, setIsUserManager] = useState(false);
+  const [alert, setAlert] = useState({ show: false, message: "", type: "" });
 
+  // Check if current user is manager
   useEffect(() => {
     const checkIfManager = async () => {
       if (!projectId || !employeeId) return;
-
       const result = await isManager(projectId, employeeId);
-      console.log("result" + result)
+      console.log("Manager check result:", result);
       setIsUserManager(result);
     };
-
     checkIfManager();
   }, [projectId, employeeId]);
-
-
-  useEffect(() => {
-    if (!projectId) return;
-    fetchTeam();
-  }, [projectId]);
-
 
   const isManager = async (projectId, employeeId) => {
     try {
@@ -45,31 +39,23 @@ const ProjectTeam = () => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ projectId }),
       });
-
       if (!response.ok) throw new Error("Failed to fetch manager");
-
       const data1 = await response.json();
       console.log("Data received:", JSON.stringify(data1, null, 2));
       console.log("Employee ID:", employeeId);
-
       if (!data1.manager) {
         console.log("No manager assigned to this project.");
         return false;
       }
-
       console.log("Comparison result:", Number(data1.manager) === Number(employeeId));
       return Number(data1.manager) === Number(employeeId);
-
     } catch (error) {
       console.error("Error checking manager:", error);
       return false;
     }
   };
 
-
-
-
-  // Fetch employees
+  // Fetch team data
   const fetchTeam = async () => {
     try {
       const response = await fetch("http://localhost:3000/projects/info", {
@@ -87,111 +73,105 @@ const ProjectTeam = () => {
     }
   };
 
-  // Open modal and fetch tasks + assigned tasks
-  const openAssignModal = async (employeeId) => {
-    setSelectedEmployeeId(employeeId); // Store selected employee ID
+  useEffect(() => {
+    if (!projectId) return;
+    fetchTeam();
+  }, [projectId]);
 
-    if (!projectId || !employeeId) return;
-
+  // Open modal: fetch tasks and assigned tasks for employee
+  const openAssignModal = async (empId) => {
+    setSelectedEmployeeId(empId); // Store selected employee ID
+    if (!projectId || !empId) return;
     try {
-      // Get all available tasks
+      // Fetch available tasks for project
       const taskResponse = await fetch("http://localhost:3000/task/get", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ projectId }),
       });
-
       if (!taskResponse.ok) throw new Error("Failed to fetch tasks");
       const taskData = await taskResponse.json();
       setTasks(taskData || []);
-
-
-      console.log("Fetching:", "http://localhost:3000/task/getEmployeeTask");
-      console.log("Payload:", { employee_id: employeeId });
-
-
-      // Get assigned tasks for the employee
+      // Fetch tasks assigned to this employee
       const assignedResponse = await fetch("http://localhost:3000/task/getEmployeeTask", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ employee_id: employeeId }),
+        body: JSON.stringify({ employee_id: empId }),
       });
-
       if (!assignedResponse.ok) throw new Error("Failed to fetch assigned tasks");
       const assignedData = await assignedResponse.json();
-
-      // Extract assigned task IDs and store in Set for fast lookup
       const assignedIds = new Set(assignedData.map((task) => task.task_id));
       setAssignedTaskIds(assignedIds);
     } catch (error) {
       console.error("Error fetching tasks:", error);
+      setAlert({ show: true, message: error.message, type: "error" });
+      setTimeout(() => setAlert({ show: false, message: "", type: "" }), 3000);
     }
-
     setIsModalOpen(true);
   };
 
-  // Close modal
-  // const closeAssignModal = () => setIsModalOpen(false);
-
+  // Close modal and re-fetch team data
   const closeAssignModal = () => {
     setIsModalOpen(false);
-    fetchTeam(); // Re-fetch team data
+    fetchTeam();
   };
-
 
   // API call to assign or unassign task
   const toggleTaskAssignment = async (taskId) => {
     if (!selectedEmployeeId || !taskId) return;
-
     const isAssigned = assignedTaskIds.has(taskId);
-    const endpoint = isAssigned ? "/unassign" : "/assign"; // Change API based on current state
-
+    const endpoint = isAssigned ? "/unassign" : "/assign"; // Change API based on state
     try {
       const response = await fetch(`http://localhost:3000/task${endpoint}`, {
         method: isAssigned ? "DELETE" : "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ employeeId: selectedEmployeeId, taskId }),
       });
-
       const text = await response.text();
       console.log("Raw Response:", text);
-
       const data = JSON.parse(text);
       if (!response.ok) {
         throw new Error(data.error || `Failed to ${isAssigned ? "unassign" : "assign"} task`);
       }
-
-      alert(`Task ${isAssigned ? "unassigned" : "assigned"} successfully!`);
-
-      // Update the assigned tasks list
+      setAlert({
+        show: true,
+        message: `Task ${isAssigned ? "unassigned" : "assigned"} successfully!`,
+        type: "success",
+      });
+      setTimeout(() => setAlert({ show: false, message: "", type: "" }), 3000);
+      // Update assigned tasks
       setAssignedTaskIds((prev) => {
         const newSet = new Set(prev);
         if (isAssigned) {
-          newSet.delete(taskId); // Remove from assigned list
+          newSet.delete(taskId);
         } else {
-          newSet.add(taskId); // Add to assigned list
+          newSet.add(taskId);
         }
         return newSet;
       });
     } catch (error) {
       console.error("Error:", error);
-      alert(error.message);
+      setAlert({ show: true, message: error.message, type: "error" });
+      setTimeout(() => setAlert({ show: false, message: "", type: "" }), 3000);
     }
   };
 
-  // Delete employee
-  const handleDelete = async (employeeId) => {
+  // Delete employee from project
+  const handleDelete = async (empId) => {
     try {
       const response = await fetch("http://localhost:3000/projects/delete-employee", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ employee_id: employeeId, project_id: projectId }),
+        body: JSON.stringify({ employee_id: empId, project_id: projectId }),
       });
       if (!response.ok) throw new Error("Failed to delete employee");
-      alert("Deleted successfully!");
-      fetchTeam(); // Refresh employee list
+      setAlert({ show: true, message: "Deleted successfully!", type: "success" });
+      setTimeout(() => setAlert({ show: false, message: "", type: "" }), 3000);
+      fetchTeam(); // Refresh team data
     } catch (error) {
       console.error("Error deleting employee:", error);
+      setAlert({ show: true, message: error.message, type: "error" });
+      setTimeout(() => setAlert({ show: false, message: "", type: "" }), 3000);
     }
   };
 
@@ -213,14 +193,15 @@ const ProjectTeam = () => {
     </div>
   );
 
-  // Assign/Unassign task button inside modal
+  // Button inside modal to assign/unassign task
   const assignTaskButton = (rowData) => {
     const isAssigned = assignedTaskIds.has(rowData.task_id);
     return (
       <button
         onClick={() => toggleTaskAssignment(rowData.task_id)}
-        className={`cursor-pointer rounded-md px-4 py-2 text-xs font-medium text-white ${isAssigned ? "bg-red-600 hover:bg-red-500" : "bg-teal-600 hover:bg-teal-500"
-          }`}
+        className={`cursor-pointer rounded-md px-4 py-2 text-xs font-medium text-white ${
+          isAssigned ? "bg-red-600 hover:bg-red-500" : "bg-teal-600 hover:bg-teal-500"
+        }`}
       >
         {isAssigned ? "Unselect" : "Select"}
       </button>
@@ -229,6 +210,14 @@ const ProjectTeam = () => {
 
   return (
     <div className="mx-auto max-w-screen-xl py-10 sm:px-6 lg:px-8">
+      {/* Alert */}
+      {alert.show && (
+        <Alert
+          message={alert.message}
+          type={alert.type}
+          onClose={() => setAlert({ show: false, message: "", type: "" })}
+        />
+      )}
       {/* Header */}
       <div className="flex items-center justify-between">
         <h1 className="text-4xl font-bold text-gray-900 flex items-center gap-2">
@@ -243,12 +232,10 @@ const ProjectTeam = () => {
               <CirclePlus className="w-5 h-5" /> Add Member
             </button>
           )}
-
         </div>
       </div>
-
+      {/* Tabs */}
       <div className="mt-4">
-        {/* Desktop Tabs */}
         <div className="hidden sm:block">
           <div className="border-b border-gray-200">
             <nav className="-mb-px flex space-x-1">
@@ -274,17 +261,22 @@ const ProjectTeam = () => {
           </div>
         </div>
       </div>
-      {/* DataTable for Employees */}
-      <DataTable value={employees} paginator rows={10} loading={loading} dataKey="employee_id" emptyMessage="No employees found.">
+      {/* Employee DataTable */}
+      <DataTable
+        value={employees}
+        paginator
+        rows={10}
+        loading={loading}
+        dataKey="employee_id"
+        emptyMessage="No employees found."
+      >
         <Column field="employee_id" header="ID" />
         <Column field="firstname" header="First Name" />
         <Column field="lastname" header="Last Name" />
         <Column field="email" header="Email" />
         <Column field="role_name" header="Role" />
         {isUserManager && <Column header="Action" body={actionButtonTemplate} />}
-
       </DataTable>
-
       {/* Assign Task Modal */}
       {isModalOpen && (
         <div className="fixed inset-0 flex items-center justify-center bg-gray-900/10 backdrop-blur-sm">
@@ -295,7 +287,10 @@ const ProjectTeam = () => {
               <Column field="task_name" header="Task Name" />
               <Column header="Action" body={assignTaskButton} />
             </DataTable>
-            <button className="mt-4 px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-700" onClick={closeAssignModal}>
+            <button
+              className="mt-4 px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-700"
+              onClick={closeAssignModal}
+            >
               Close
             </button>
           </div>

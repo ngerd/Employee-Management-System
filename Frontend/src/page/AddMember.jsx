@@ -22,9 +22,6 @@ const AddMember = () => {
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormValues({ ...formValues, [name]: value });
-    if (name === "projectId") {
-      setProjectId(value);
-    }
   };
 
   // Fetch all employees
@@ -62,36 +59,62 @@ const AddMember = () => {
     fetchProjectMembers();
   }, [projectId]);
 
-  // Filter available employees (exclude those already in project)
+  // Filter available employees (exclude those already in project or selected)
   const availableEmployees = employees.filter(
     (emp) =>
       !projectMembers.some((member) => member.employee_id === emp.employee_id) &&
       !selectedEmployees.some((selected) => selected.employee_id === emp.employee_id) &&
-      `${emp.firstname} ${emp.lastname} - ${emp.role_name}`.toLowerCase().includes(searchTerm.toLowerCase())
+      `${emp.firstname} ${emp.lastname} - ${emp.role_name}`
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase())
   );
 
-  // Add selected employees to the project
+  // Add selected employees to the project using the new batch API
   const handleAddEmployee = async () => {
     if (!projectId) {
-      setAlert({ show: true, message: "Please select a project before adding employees.", type: "error" });
+      setAlert({
+        show: true,
+        message: "Please select a project before adding employees.",
+        type: "error",
+      });
+      return;
+    }
+    if (selectedEmployees.length === 0) {
+      setAlert({
+        show: true,
+        message: "Please select at least one employee.",
+        type: "error",
+      });
       return;
     }
     try {
-      const promises = selectedEmployees.map((employee) =>
-        fetch("http://localhost:3000/projects/add-employee", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ employee_id: employee.employee_id, project_id: projectId }),
-        })
-      );
-      await Promise.all(promises);
-      setProjectMembers([...projectMembers, ...selectedEmployees]); // Update local state
-      setSelectedEmployees([]);
-      setSearchTerm("");
-      setAlert({ show: true, message: "Employees added successfully!", type: "success" });
-      setTimeout(() => {
-        navigate("/project-team");
-      }, 3000); // Delay the navigation by 3 seconds to show the alert
+      // Create the payload for batch insertion
+      const employee_ids = selectedEmployees.map((employee) => employee.employee_id);
+      // New employees are added as non-managers
+      const ismanager = [];
+
+      const response = await fetch("http://localhost:3000/projects/add-employee", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          employee_ids, // Array of selected employee IDs
+          project_id: projectId,
+          ismanager, // Empty array means no additional managers
+        }),
+      });
+      const data = await response.json();
+      if (response.ok) {
+        // Update local project members list
+        setProjectMembers([...projectMembers, ...selectedEmployees]);
+        setSelectedEmployees([]);
+        setSearchTerm("");
+        setAlert({ show: true, message: "Employees added successfully!", type: "success" });
+        setTimeout(() => {
+          navigate("/project-team");
+        }, 3000);
+      } else {
+        throw new Error(data.error || "Failed to add employees.");
+      }
     } catch (error) {
       console.error("Error adding employees:", error);
       setAlert({ show: true, message: "There was a problem adding the employees.", type: "error" });
@@ -114,7 +137,13 @@ const AddMember = () => {
 
   return (
     <div className="mx-auto max-w-xl py-10 sm:px-6 lg:px-8">
-      {alert.show && <Alert message={alert.message} type={alert.type} onClose={() => setAlert({ show: false, message: "", type: "" })} />}
+      {alert.show && (
+        <Alert
+          message={alert.message}
+          type={alert.type}
+          onClose={() => setAlert({ show: false, message: "", type: "" })}
+        />
+      )}
       <div className="mt-4 grid grid-cols-1 gap-x-16 gap-y-8">
         {/* Add employee section */}
         <div className="rounded-lg bg-white p-8 shadow-lg">
@@ -136,6 +165,7 @@ const AddMember = () => {
                     className="p-2 hover:bg-gray-100 cursor-pointer"
                     onClick={() => {
                       setSelectedEmployees([...selectedEmployees, emp]);
+                      setIsDropdownOpen(false);
                     }}
                   >
                     {`${emp.firstname} ${emp.lastname} - ${emp.role_name}`}
@@ -159,12 +189,20 @@ const AddMember = () => {
                 <tbody>
                   {selectedEmployees.map((emp) => (
                     <tr key={emp.employee_id}>
-                      <td className="border p-2">{emp.firstname} {emp.lastname}</td>
+                      <td className="border p-2">
+                        {emp.firstname} {emp.lastname}
+                      </td>
                       <td className="border p-2">{emp.role_name}</td>
                       <td className="border p-2 text-center">
                         <button
                           className="text-red-500"
-                          onClick={() => setSelectedEmployees(selectedEmployees.filter((e) => e.employee_id !== emp.employee_id))}
+                          onClick={() =>
+                            setSelectedEmployees(
+                              selectedEmployees.filter(
+                                (e) => e.employee_id !== emp.employee_id
+                              )
+                            )
+                          }
                           type="button"
                         >
                           Remove
@@ -187,12 +225,11 @@ const AddMember = () => {
             </button>
             <button
               type="button"
-              onClick={() => {
-                handleAddEmployee();
-              }}
+              onClick={handleAddEmployee}
               disabled={!projectId}
-              className={`cursor-pointer rounded-lg px-5 py-3 font-medium text-white ${!projectId ? "bg-gray-400 cursor-not-allowed" : "bg-black hover:bg-gray-700"
-                }`}
+              className={`cursor-pointer rounded-lg px-5 py-3 font-medium text-white ${
+                !projectId ? "bg-gray-400 cursor-not-allowed" : "bg-black hover:bg-gray-700"
+              }`}
             >
               Add Employee
             </button>

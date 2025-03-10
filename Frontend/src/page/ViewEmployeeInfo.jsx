@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { Employee } from "../context/ContextProvider";
+import Alert from "../component/Alert";
 
 const ViewEmployeeInfo = () => {
   const navigate = useNavigate();
@@ -16,10 +17,11 @@ const ViewEmployeeInfo = () => {
   const [roles, setRoles] = useState([]);
   const [selectedRole, setSelectedRole] = useState("Choose Role");
   const [isOpen, setIsOpen] = useState(false);
+  // Alert state similar to CreateProject2 page
+  const [alert, setAlert] = useState({ show: false, message: "", type: "" });
 
   useEffect(() => {
     const fetchEmployeeInfo = async () => {
-      console.log("Meow " + employeeId);
       try {
         const response = await fetch("http://localhost:3000/getEmployeeById", {
           method: "POST",
@@ -79,7 +81,11 @@ const ViewEmployeeInfo = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (formValues.password !== formValues.confirmPassword) {
-      alert("Passwords do not match");
+      setAlert({
+        show: true,
+        message: "Passwords do not match",
+        type: "error",
+      });
       return;
     }
     try {
@@ -93,17 +99,37 @@ const ViewEmployeeInfo = () => {
       if (!response.ok) {
         throw new Error("Failed to update account");
       }
-      alert("Account updated successfully!");
-      navigate("/home");
+      setAlert({
+        show: true,
+        message: "Account updated successfully!",
+        type: "success",
+      });
+      setTimeout(() => {
+        navigate("/home");
+      }, 3000);
     } catch (error) {
       console.error("There was a problem updating the account:", error);
+      setAlert({
+        show: true,
+        message: "There was a problem updating the account.",
+        type: "error",
+      });
     }
   };
 
   return (
     <div className="mx-auto max-w-xl px-6 py-12 sm:px-8 lg:px-10 grid grid-cols-1 gap-6">
+      {alert.show && (
+        <Alert
+          message={alert.message}
+          type={alert.type}
+          onClose={() => setAlert({ show: false, message: "", type: "" })}
+        />
+      )}
       <div className="rounded-lg bg-white p-8 shadow-lg">
-        <h2 className="text-2xl pb-8 font-extrabold text-gray-900">View and Update Account</h2>
+        <h2 className="text-2xl pb-8 font-extrabold text-gray-900">
+          View and Update Account
+        </h2>
         <form className="space-y-4" onSubmit={handleSubmit}>
           <div className="flex gap-4">
             <input
@@ -157,7 +183,12 @@ const ViewEmployeeInfo = () => {
                 className="flex items-center justify-between w-full px-4 py-2 text-sm font-medium text-gray-700 bg-white border rounded-md shadow-sm hover:bg-gray-50"
               >
                 {selectedRole}
-                <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 ml-2" viewBox="0 0 20 20" fill="currentColor">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="w-4 h-4 ml-2"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                >
                   <path
                     fillRule="evenodd"
                     d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
