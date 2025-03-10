@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { Employee } from "../context/ContextProvider";
+import Alert from "../component/Alert";
 
 const ViewAccountForStaff = () => {
   const navigate = useNavigate();
@@ -9,13 +10,12 @@ const ViewAccountForStaff = () => {
     firstname: "",
     lastname: "",
     email: "",
-    password: "",
-    confirmPassword: "",
     role_id: "",
   });
   const [roles, setRoles] = useState([]);
   const [selectedRole, setSelectedRole] = useState("Choose Role");
   const [isOpen, setIsOpen] = useState(false);
+  const [alert, setAlert] = useState({ message: "", type: "" }); // State for alert
 
   useEffect(() => {
     const fetchEmployeeInfo = async () => {
@@ -37,8 +37,6 @@ const ViewAccountForStaff = () => {
           lastname: data.employee.lastname,
           email: data.employee.email,
           role_id: data.employee.role_id,
-          password: "",
-          confirmPassword: "",
         });
         setSelectedRole(data.employee.role_name);
       } catch (error) {
@@ -78,12 +76,8 @@ const ViewAccountForStaff = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (formValues.password !== formValues.confirmPassword) {
-      alert("Passwords do not match");
-      return;
-    }
     try {
-      const response = await fetch("http://localhost:3000/updateEmployee", {
+      const response = await fetch("http://localhost:3000/updateEmployee2", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -93,15 +87,19 @@ const ViewAccountForStaff = () => {
       if (!response.ok) {
         throw new Error("Failed to update account");
       }
-      alert("Account updated successfully!");
-      navigate("/staff");
+      setAlert({ message: "Account updated successfully!", type: "success" }); // Show success alert
+      setTimeout(() => {
+        navigate("/staff");
+      }, 3000); // Delay the navigation by 3 seconds to show the alert
     } catch (error) {
       console.error("There was a problem updating the account:", error);
+      setAlert({ message: "Failed to update account", type: "error" }); // Show error alert
     }
   };
 
   return (
     <div className="mx-auto max-w-xl px-6 py-12 sm:px-8 lg:px-10 grid grid-cols-1 gap-6">
+      {alert.message && <Alert message={alert.message} type={alert.type} onClose={() => setAlert({ message: "", type: "" })} />} {/* Render Alert */}
       <div className="rounded-lg bg-white p-8 shadow-lg">
         <h2 className="text-2xl pb-8 font-extrabold text-gray-900">View and Update Account</h2>
         <form className="space-y-4" onSubmit={handleSubmit}>
@@ -130,24 +128,6 @@ const ViewAccountForStaff = () => {
             onChange={handleChange}
             className="mt-1 p-2 h-10 w-full rounded-md border-gray-300 bg-white text-sm text-gray-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 pr-10"
             placeholder="Email"
-          />
-          <input
-            type="password"
-            id="password"
-            name="password"
-            value={formValues.password}
-            onChange={handleChange}
-            className="mt-1 p-2 h-10 w-full rounded-md border-gray-300 bg-white text-sm text-gray-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 pr-10"
-            placeholder="Password"
-          />
-          <input
-            type="password"
-            id="confirmPassword"
-            name="confirmPassword"
-            value={formValues.confirmPassword}
-            onChange={handleChange}
-            className="mt-1 p-2 h-10 w-full rounded-md border-gray-300 bg-white text-sm text-gray-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 pr-10"
-            placeholder="Confirm Password"
           />
           <div className="relative mt-1">
             <button

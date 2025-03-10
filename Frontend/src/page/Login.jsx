@@ -1,7 +1,7 @@
-import React, { useContext, useEffect, useState } from "react"; 
+import React, { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Employee } from "../context/ContextProvider";
-import Alert from "../component/Alert";
+import Alert from "../component/Alert"; // Import Alert component
 
 function Login() {
   const initialValues = {
