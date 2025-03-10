@@ -26,7 +26,11 @@ function Login() {
       });
       const data = await response.json();
       if (data.error) {
-        setAlert({ show: true, message: "Wrong email or password", type: "error" });
+        setAlert({
+          show: true,
+          message: "Wrong email or password",
+          type: "error",
+        });
         return null;
       } else {
         setEmployeeId(data.employee_id);
@@ -35,7 +39,11 @@ function Login() {
       }
     } catch (error) {
       console.error("There was a problem fetching the login data:", error);
-      setAlert({ show: true, message: "Wrong email or password", type: "error" });
+      setAlert({
+        show: true,
+        message: "Wrong email or password",
+        type: "error",
+      });
       return null;
     }
   };
@@ -115,13 +123,17 @@ function Login() {
               Welcome to Icon Consulting Group
             </h2>
             <p className="mt-4 leading-relaxed text-white/90">
-              Icon Consulting Group is your trusted partner in professional consulting and business management. Our website provides a unified platform for managing projects, collaborating with teams, and driving success.
+              Icon Consulting Group Internal Portal is an exclusively designed
+              platform to help our team manage projects, track tasks, and
+              collaborate seamlessly in one place.
             </p>
           </div>
         </section>
         <div className="flex items-center justify-center place-items-center px-12 py-12 sm:px-16 lg:col-span-7 lg:px-32 lg:py-32 xl:col-span-6">
           <div className="rounded-lg bg-white p-16 shadow-xl max-w-2xl w-full">
-            <h2 className="text-2xl pb-10 font-extrabold text-gray-900">Login</h2>
+            <h2 className="text-2xl pb-10 font-extrabold text-gray-900">
+              Login
+            </h2>
             <form className="space-y-6" onSubmit={handleSubmit}>
               <input
                 id="email"

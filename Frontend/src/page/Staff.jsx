@@ -139,7 +139,7 @@ const Staff = () => {
         globalFilterFields={['firstname', 'lastname', 'email', 'isadmin', 'role_name']}
         filterDisplay="menu"
       >
-        <Column field="employee_id" header="ID" style={{ minWidth: '5rem' }} />
+        {/* <Column field="employee_id" header="ID" style={{ minWidth: '5rem' }} /> */}
         <Column field="firstname" header="First Name" filter filterMenuStyle={{ width: '14rem' }} style={{ minWidth: '12rem' }} />
         <Column field="lastname" header="Last Name" filter filterMenuStyle={{ width: '14rem' }} style={{ minWidth: '12rem' }} />
         <Column field="email" header="Email" filter filterMenuStyle={{ width: '14rem' }} style={{ minWidth: '16rem' }} />

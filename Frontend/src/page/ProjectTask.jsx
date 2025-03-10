@@ -224,7 +224,7 @@ const ProjectTask = () => {
         showGridlines
         className="border border-gray-300 bg-white"
       >
-        <Column field="task_id" header="ID" style={{ minWidth: "5rem" }} />
+        {/* <Column field="task_id" header="ID" style={{ minWidth: "5rem" }} /> */}
         <Column field="task_name" header="Task Name" style={{ minWidth: "12rem" }} />
         <Column
           field="start_date"

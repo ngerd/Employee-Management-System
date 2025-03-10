@@ -144,7 +144,7 @@ const Project = () => {
         filterDisplay="menu"
         rowClassName={(rowData) => rowData.ismanager ? 'font-bold' : ''}
       >
-        <Column field="project_id" header="ID" style={{ minWidth: '5rem' }} />
+        {/* <Column field="project_id" header="ID" style={{ minWidth: '5rem' }} /> */}
         <Column
           field="project_name"
           header="Project Name"

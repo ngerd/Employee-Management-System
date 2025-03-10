@@ -270,7 +270,7 @@ const ProjectTeam = () => {
         dataKey="employee_id"
         emptyMessage="No employees found."
       >
-        <Column field="employee_id" header="ID" />
+        {/* <Column field="employee_id" header="ID" /> */}
         <Column field="firstname" header="First Name" />
         <Column field="lastname" header="Last Name" />
         <Column field="email" header="Email" />
@@ -283,7 +283,7 @@ const ProjectTeam = () => {
           <div className="bg-white p-6 rounded-lg shadow-xl">
             <h2 className="text-xl font-bold mb-4">Assign Task</h2>
             <DataTable value={tasks} paginator rows={5} emptyMessage="No tasks found.">
-              <Column field="task_id" header="Task ID" />
+              {/* <Column field="task_id" header="Task ID" /> */}
               <Column field="task_name" header="Task Name" />
               <Column header="Action" body={assignTaskButton} />
             </DataTable>
