@@ -45,7 +45,7 @@ CREATE TABLE Employee
     ON DELETE CASCADE ON UPDATE CASCADE
 );
 
-CREATE TABLE Project_Member
+CREATE TABLE Project_employee
 (
   ismanager BOOLEAN NOT NULL,
   project_id INT NOT NULL,
@@ -59,11 +59,11 @@ CREATE TABLE Project_Member
 
 CREATE TABLE Task_Assignment
 (
-  emp_startdate DATE,
-  emp_enddate DATE,
+  assignment_id SERIAL PRIMARY KEY,
+  emp_startdate TIMESTAMP,
+  emp_enddate TIMESTAMP,
   employee_id INT NOT NULL,
   task_id INT NOT NULL,
-  PRIMARY KEY (employee_id, task_id),
   FOREIGN KEY (employee_id) REFERENCES Employee(employee_id) 
     ON DELETE CASCADE ON UPDATE CASCADE,
   FOREIGN KEY (task_id) REFERENCES Task(task_id) 
