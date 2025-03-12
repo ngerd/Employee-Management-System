@@ -4,6 +4,7 @@ import projectRoutes from "./routes/project.js";
 import authRoutes from "./routes/auth.js";
 import infoRoutes from "./routes/information.js";
 import timesheetRoutes from "./routes/timesheet.js";
+import customerRoutes from "./routes/customer.js";
 import cors from "cors";
 
 const app = express();
@@ -19,6 +20,7 @@ app.use(
 app.use(express.json());
 
 // Mount routes
+app.use("/customer", customerRoutes);
 app.use("/projects", projectRoutes);
 app.use("/task", taskRoutes);
 app.use("/", authRoutes);

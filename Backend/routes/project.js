@@ -98,7 +98,6 @@ router.post("/checkmanager", async (req, res) => {
   }
 });
 
-
 //Get Project info
 router.post("/info", async (req, res) => {
   const { projectId } = req.body;
