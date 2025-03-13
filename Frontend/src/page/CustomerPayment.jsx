@@ -2,6 +2,7 @@ import React, { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Info, ClipboardList } from "lucide-react";
 import { CustomerContext } from "../context/ContextProvider";
+import DownloadButton from "../component/DownloadButton"; // Import component
 
 const CustomerPayment = () => {
     // const navigate = useNavigate();
@@ -36,6 +37,7 @@ const CustomerPayment = () => {
                 <h1 className="text-4xl font-bold text-gray-900 flex items-center gap-2">
                     General Information
                 </h1>
+                <DownloadButton customer={customer} />
             </div>
 
             <div className="mt-4">
