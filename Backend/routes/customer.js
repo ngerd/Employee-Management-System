@@ -259,4 +259,15 @@ router.delete("/delete-customer", async (req, res) => {
   }
 });
 
+router.get("/get-customer-codeandname", async (req, res) => { 
+  try {
+    const result = await pool.query(`SELECT company_code, legal_name FROM customer`);
+    return res.json({ customers: result.rows }); // Changed key from 'Role' to 'customers'
+  } catch (error) {
+    console.error("Error retrieving customers: ", error);
+    return res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+
 export default router;
