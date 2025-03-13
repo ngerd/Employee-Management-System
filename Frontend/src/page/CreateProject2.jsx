@@ -9,9 +9,10 @@ const CreateProject2 = () => {
     project_description: "",
     start_date: "",
     due_date: "",
-    customername: "",
+    customer_id: "",
     nation: "",
     cost: "",
+    billable: false, // New attribute for toggling billable
   });
   const [projectId, setProjectId] = useState(null);
   const [employees, setEmployees] = useState([]);
@@ -97,7 +98,7 @@ const CreateProject2 = () => {
       console.log(data);
       setAlert({
         show: true,
-        message: "Update project successfully!",
+        message: "Project updated successfully!",
         type: "success",
       });
     } catch (error) {
@@ -259,12 +260,12 @@ const CreateProject2 = () => {
               />
             </div>
             <input
-              id="customername"
-              name="customername"
-              value={formValues.customername}
+              id="customer_id"
+              name="customer_id"
+              value={formValues.customer_id}
               onChange={handleChange}
               className="mt-1 p-2 h-10 w-full rounded-md border-gray-300 bg-white text-sm text-gray-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              placeholder="Customer Name"
+              placeholder="Customer ID"
             />
             <select
               id="nation"
@@ -288,6 +289,21 @@ const CreateProject2 = () => {
               className="mt-1 p-2 h-10 w-full rounded-md border-gray-300 bg-white text-sm text-gray-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               placeholder="Cost"
             />
+            <div className="flex items-center">
+              <input
+                type="checkbox"
+                id="billable"
+                name="billable"
+                checked={formValues.billable}
+                onChange={(e) =>
+                  setFormValues({ ...formValues, billable: e.target.checked })
+                }
+                className="mr-2"
+              />
+              <label htmlFor="billable" className="text-sm text-gray-700">
+                Billable
+              </label>
+            </div>
             <div className="mt-6 text-right">
               <button
                 type="submit"

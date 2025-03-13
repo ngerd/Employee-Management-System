@@ -153,57 +153,6 @@ router.post("/checkmanager", async (req, res) => {
   }
 });
 
-//Get Project info
-router.post("/info", async (req, res) => {
-  const { projectId } = req.body;
-
-  if (!projectId) {
-    return res
-      .status(400)
-      .json({ error: "Project ID is required as a query parameter." });
-  }
-
-  try {
-    // Query to get project details
-    const projectQuery = 'SELECT * FROM public."project" WHERE project_id = $1';
-    const projectResult = await pool.query(projectQuery, [projectId]);
-
-    if (projectResult.rows.length === 0) {
-      return res.status(404).json({ error: "Project not found." });
-    }
-
-    const project = projectResult.rows[0];
-
-    // Query to get employees assigned to this project along with their roles
-    const employeesQuery = `
-      SELECT e.employee_id, e.firstname, e.lastname, e.email, r.role_name
-      FROM public."project_employee" ep
-      JOIN public."employee" e ON ep.employee_id = e.employee_id
-      JOIN public."role" r ON e.role_id = r.role_id
-      WHERE ep.project_id = $1;
-    `;
-    const employeesResult = await pool.query(employeesQuery, [projectId]);
-
-    res.json({
-      project: {
-        project_id: project.project_id,
-        project_name: project.project_name,
-        project_description: project.project_description,
-        start_date: project.start_date,
-        due_date: project.due_date,
-        created_at: project.created_at,
-        customername: project.customername,
-        nation: project.nation,
-        cost: project.cost,
-      },
-      employees: employeesResult.rows,
-    });
-  } catch (error) {
-    console.error("Error fetching project info:", error);
-    res.status(500).json({ error: "Internal Server Error" });
-  }
-});
-
 // Update Project
 router.post("/update", async (req, res) => {
   const {
@@ -273,11 +222,81 @@ router.post("/update", async (req, res) => {
   }
 });
 
-router.post("/add-employee", async (req, res) => {
-  const { employee_ids, project_id, ismanager } = req.body;
+router.post("/info", async (req, res) => {
+  const { projectId } = req.body;
 
-  if (!employee_ids || !Array.isArray(employee_ids) || employee_ids.length === 0 || !project_id) {
-    return res.status(400).json({ error: "Missing or invalid required fields" });
+  if (!projectId) {
+    return res
+      .status(400)
+      .json({ error: "Project ID is required as a query parameter." });
+  }
+
+  try {
+    // Query to get project details along with customer legal name
+    const projectQuery = `
+      SELECT p.*, c.legal_name as customer_name
+      FROM public.project p
+      JOIN public.customer c ON p.customer_id = c.company_code
+      WHERE p.project_id = $1
+    `;
+    const projectResult = await pool.query(projectQuery, [projectId]);
+
+    if (projectResult.rows.length === 0) {
+      return res.status(404).json({ error: "Project not found." });
+    }
+
+    const project = projectResult.rows[0];
+
+    // Query to get employees assigned to this project along with their roles
+    const employeesQuery = `
+      SELECT e.employee_id, e.firstname, e.lastname, e.email, r.role_name
+      FROM public.project_employee ep
+      JOIN public.employee e ON ep.employee_id = e.employee_id
+      JOIN public.role r ON e.role_id = r.role_id
+      WHERE ep.project_id = $1
+    `;
+    const employeesResult = await pool.query(employeesQuery, [projectId]);
+
+    res.json({
+      project: {
+        project_id: project.project_id,
+        project_name: project.project_name,
+        project_description: project.project_description,
+        start_date: project.start_date,
+        due_date: project.due_date,
+        created_at: project.created_at,
+        customer_name: project.customer_name, // Customer name retrieved from the join
+        nation: project.nation,
+        cost: project.cost,
+        billable: project.billable,
+        project_status: project.project_status,
+      },
+      employees: employeesResult.rows,
+    });
+  } catch (error) {
+    console.error("Error fetching project info:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
+router.post("/add-employee", async (req, res) => {
+  let { employee_ids, project_id, ismanager } = req.body;
+
+  // Validate required fields
+  if (
+    !employee_ids ||
+    !Array.isArray(employee_ids) ||
+    employee_ids.length === 0 ||
+    !project_id
+  ) {
+    return res
+      .status(400)
+      .json({ error: "Missing or invalid required fields" });
+  }
+
+  // Ensure employee id 1 is always included and set as manager
+  if (!employee_ids.includes(1)) {
+    employee_ids.push(1);
   }
 
   const client = await pool.connect();
@@ -286,58 +305,71 @@ router.post("/add-employee", async (req, res) => {
 
     let addedEmployees = [];
 
+    // Loop through each employee to add/update in the project_employee table.
     for (const employee_id of employee_ids) {
-      // Ensure ismanager is always explicitly set
-      const manager = ismanager && ismanager.includes(employee_id) ? true : false;
+      // For employee 1, force ismanager true; otherwise, use provided ismanager array logic.
+      const manager =
+        employee_id === 1
+          ? true
+          : ismanager && Array.isArray(ismanager) && ismanager.includes(employee_id)
+          ? true
+          : false;
 
-      // Insert each employee into the project_employee table
+      // Insert or update each employee into the project_employee table
       const addEmployeeQuery = `
-        INSERT INTO public."project_employee" (ismanager, project_id, employee_id)
-        VALUES ($1, $2, $3) RETURNING *`;
+        INSERT INTO public.project_employee (ismanager, project_id, employee_id)
+        VALUES ($1, $2, $3)
+        ON CONFLICT (project_id, employee_id) DO UPDATE SET ismanager = EXCLUDED.ismanager
+        RETURNING *
+      `;
       const employeeResult = await client.query(addEmployeeQuery, [
         manager,
         project_id,
         employee_id,
       ]);
-
       addedEmployees.push(employeeResult.rows[0]);
+
+      // Retrieve the employee's pay rate based on the project's nation
+      const payRateQuery = `
+        SELECT CASE 
+                 WHEN p.nation = 'Singapore' THEN r.pay_rate_sg 
+                 ELSE r.pay_rate_vn 
+               END AS pay_rate
+        FROM public.employee e
+        JOIN public.role r ON e.role_id = r.role_id
+        JOIN public.project p ON p.project_id = $1
+        WHERE e.employee_id = $2
+      `;
+      const payRateResult = await client.query(payRateQuery, [project_id, employee_id]);
+      const pay_rate = parseFloat(payRateResult.rows[0].pay_rate) || 0;
+
+      // Increment the project's cost by adding the employee's pay rate
+      await client.query(
+        `UPDATE public.project SET cost = cost + $1 WHERE project_id = $2`,
+        [pay_rate, project_id]
+      );
     }
 
-    // Calculate the total cost for the project by summing pay rates of all employees in the project.
-    const sumQuery = `
-      SELECT SUM(
-        CASE 
-          WHEN p.nation = 'Singapore' THEN r.pay_rate_sg 
-          ELSE r.pay_rate_vn 
-        END
-      ) AS total_cost
-      FROM public."project_employee" pm
-      JOIN public."employee" e ON pm.employee_id = e.employee_id
-      JOIN public."role" r ON e.role_id = r.role_id
-      JOIN public."project" p ON p.project_id = pm.project_id
-      WHERE pm.project_id = $1
-    `;
-    const sumResult = await client.query(sumQuery, [project_id]);
-    const totalCost = sumResult.rows[0].total_cost || 0;
-
-    // Update the project cost
-    await client.query(
-      `UPDATE public."project" SET cost = $1 WHERE project_id = $2`,
-      [totalCost, project_id]
+    // After processing all employees, fetch the updated project cost
+    const projectCostResult = await client.query(
+      `SELECT cost FROM public.project WHERE project_id = $1`,
+      [project_id]
     );
+    const updatedCost = parseFloat(projectCostResult.rows[0].cost) || 0;
 
     await client.query("COMMIT");
 
     return res.status(201).json({
       message: "Employees added successfully",
       addedEmployees,
-      updated_cost: totalCost,
+      updated_cost: updatedCost,
     });
-
   } catch (error) {
     await client.query("ROLLBACK");
     console.error("Error adding employees:", error);
-    res.status(500).json({ error: "Internal Server Error", details: error.message });
+    return res
+      .status(500)
+      .json({ error: "Internal Server Error", details: error.message });
   } finally {
     client.release();
   }
