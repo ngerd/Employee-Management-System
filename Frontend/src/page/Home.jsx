@@ -14,6 +14,17 @@ function Home() {
           {isadmin && (
             <Card
               Icon={FileUser}
+              title="CustomerCustomer"
+              subtitle="Manage customer"
+              description="Oversee customer details"
+              linkText="See details"
+              href="customer"
+            />
+          )}
+
+          {isadmin && (
+            <Card
+              Icon={FileUser}
               title="Staff"
               subtitle="Manage team members and roles"
               description="Oversee staff details, assign responsibilities, and manage access levels to ensure smooth collaboration within the organization."
