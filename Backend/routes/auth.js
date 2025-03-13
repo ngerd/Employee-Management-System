@@ -3,7 +3,7 @@ import pool from "../DB.js";
 import generateTokenAndSetCookie from "../utils/generateToken.js";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
 
 dotenv.config();
 
