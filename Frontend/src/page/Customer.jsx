@@ -6,7 +6,8 @@ import { Button } from 'primereact/button';
 import { InputText } from 'primereact/inputtext';
 import { FilterMatchMode } from 'primereact/api';
 import { CirclePlus } from "lucide-react";
-import { Employee } from '../context/ContextProvider';
+import { CustomerContext } from '../context/ContextProvider';
+
 
 import "primereact/resources/themes/lara-light-blue/theme.css";
 import "primereact/resources/primereact.min.css";
@@ -14,11 +15,11 @@ import "primeicons/primeicons.css";
 
 const Customer = () => {
     const navigate = useNavigate();
-    const { setCurrentEmployeeId } = useContext(Employee);
     const [customers, setCustomers] = useState([]);
     const [loading, setLoading] = useState(true);
     const [filters, setFilters] = useState(null);
     const [globalFilterValue, setGlobalFilterValue] = useState('');
+    const { setcompany_code } = useContext(CustomerContext);
 
     useEffect(() => {
         fetchCustomers();
@@ -81,13 +82,15 @@ const Customer = () => {
         }
     };
 
+    const viewCustomer = (rowData) => {
+        setcompany_code(rowData.company_code);
+        navigate(`/customer-information`);
+    };
+
     const actionButtonTemplate = (rowData) => (
         <div className="flex gap-2">
             <button
-                onClick={() => {
-                    setCurrentEmployeeId(rowData.company_code);
-                    navigate("/view-account-for-staff");
-                }}
+                onClick={() => viewCustomer(rowData)}
                 className="cursor-pointer rounded-md bg-teal-600 px-4 py-2 text-xs font-medium text-white hover:bg-teal-500"
             >
                 View
@@ -100,6 +103,27 @@ const Customer = () => {
             </button>
         </div>
     );
+
+
+    // const actionButtonTemplate = (rowData) => (
+    //     <div className="flex gap-2">
+    //         <button
+    //             onClick={() => {
+    //                 setcompany_code(rowData.company_code);
+    //                 navigate("/customer-information");
+    //             }}
+    //             className="cursor-pointer rounded-md bg-teal-600 px-4 py-2 text-xs font-medium text-white hover:bg-teal-500"
+    //         >
+    //             View
+    //         </button>
+    //         <button
+    //             onClick={() => deleteCustomer(rowData.company_code)}
+    //             className="cursor-pointer rounded-md bg-red-700 px-4 py-2 text-xs font-medium text-white hover:bg-red-500"
+    //         >
+    //             Delete
+    //         </button>
+    //     </div>
+    // );
 
     return (
         <div className="mx-auto max-w-screen-xl py-10 sm:px-6 lg:px-8">

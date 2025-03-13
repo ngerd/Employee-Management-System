@@ -62,43 +62,215 @@ const CreateCustomer = () => {
     };
 
     return (
-        <div className="mx-auto max-w-2xl px-6 py-12 sm:px-8 lg:px-10">
+        <div className="mx-auto max-w-screen-xl px-6 py-12 sm:px-8 lg:px-10">
             {alert.show && <Alert message={alert.message} type={alert.type} onClose={() => setAlert({ show: false, message: "", type: "" })} />}
-
-            <div className="rounded-lg bg-white p-8 shadow-lg">
-                <h2 className="text-2xl pb-8 font-extrabold text-gray-900">Create Customer</h2>
-
-                <form className="space-y-4" onSubmit={handleSubmit}>
-                    {Object.keys(formValues).map((key) => (
+            <div className="mt-4 grid max-w-screen-xl grid-cols-1 gap-x-16 gap-y-8 lg:grid-cols-2" >
+                <div className="rounded-lg bg-white p-8 shadow-lg">
+                    <h2 className="text-2xl pb-8 font-extrabold text-gray-900">Create Customer</h2>
+                    <form className="space-y-4">
+                        {/* <div className="flex gap-4"> */}
                         <input
-                            key={key}
-                            id={key}
-                            name={key}
-                            value={formValues[key]}
+                            id="company_code"
+                            name="company_code"
+                            value={formValues.company_code}
                             onChange={handleChange}
                             className="mt-1 p-2 h-10 w-full rounded-md border-gray-300 bg-white text-sm text-gray-700 shadow-sm focus:ring-2 focus:ring-blue-500"
-                            placeholder={key.replace(/_/g, " ").replace(/\b\w/g, (char, index) => index === 0 ? char.toUpperCase() : char.toLowerCase())}
+                            placeholder="Company Code"
                         />
-                    ))}
+                        <input
+                            id="legal_name"
+                            name="legal_name"
+                            value={formValues.legal_name}
+                            onChange={handleChange}
+                            className="mt-1 p-2 h-10 w-full rounded-md border-gray-300 bg-white text-sm text-gray-700 shadow-sm focus:ring-2 focus:ring-blue-500"
+                            placeholder="Legal Name"
+                        />
+                        <input
+                            id="street_1"
+                            name="street_1"
+                            value={formValues.street_1}
+                            onChange={handleChange}
+                            className="mt-1 p-2 h-10 w-full rounded-md border-gray-300 bg-white text-sm text-gray-700 shadow-sm focus:ring-2 focus:ring-blue-500"
+                            placeholder="Street 1"
+                        />
+                        <input
+                            id="street_2"
+                            name="street_2"
+                            value={formValues.street_2}
+                            onChange={handleChange}
+                            className="mt-1 p-2 h-10 w-full rounded-md border-gray-300 bg-white text-sm text-gray-700 shadow-sm focus:ring-2 focus:ring-blue-500"
+                            placeholder="Street 2"
+                        />
+                        <input
+                            id="street_3"
+                            name="street_3"
+                            value={formValues.street_3}
+                            onChange={handleChange}
+                            className="mt-1 p-2 h-10 w-full rounded-md border-gray-300 bg-white text-sm text-gray-700 shadow-sm focus:ring-2 focus:ring-blue-500"
+                            placeholder="Street 3"
+                        />
+                        <input
+                            id="house_number"
+                            name="house_number"
+                            value={formValues.house_number}
+                            onChange={handleChange}
+                            className="mt-1 p-2 h-10 w-full rounded-md border-gray-300 bg-white text-sm text-gray-700 shadow-sm focus:ring-2 focus:ring-blue-500"
+                            placeholder="House Number"
+                        />
+                        <input
+                            id="postal_code"
+                            name="postal_code"
+                            value={formValues.postal_code}
+                            onChange={handleChange}
+                            className="mt-1 p-2 h-10 w-full rounded-md border-gray-300 bg-white text-sm text-gray-700 shadow-sm focus:ring-2 focus:ring-blue-500"
+                            placeholder="Postal Code"
+                        />
+                        <input
+                            id="city"
+                            name="city"
+                            value={formValues.city}
+                            onChange={handleChange}
+                            className="mt-1 p-2 h-10 w-full rounded-md border-gray-300 bg-white text-sm text-gray-700 shadow-sm focus:ring-2 focus:ring-blue-500"
+                            placeholder="City"
+                        />
+                        <input
+                            id="region"
+                            name="region"
+                            value={formValues.region}
+                            onChange={handleChange}
+                            className="mt-1 p-2 h-10 w-full rounded-md border-gray-300 bg-white text-sm text-gray-700 shadow-sm focus:ring-2 focus:ring-blue-500"
+                            placeholder="Region"
+                        />
+                        <input
+                            id="country"
+                            name="country"
+                            value={formValues.country}
+                            onChange={handleChange}
+                            className="mt-1 p-2 h-10 w-full rounded-md border-gray-300 bg-white text-sm text-gray-700 shadow-sm focus:ring-2 focus:ring-blue-500"
+                            placeholder="Country"
+                        />
+                    </form>
+                </div>
 
-                    <div className="mt-6 flex justify-between">
-                        <button
-                            type="button"
-                            onClick={() => navigate("/customer")}
-                            className="cursor-pointer rounded-lg bg-black px-5 py-3 font-medium text-white hover:bg-gray-700"
-                        >
-                            Back
-                        </button>
-                        <button
-                            type="submit"
-                            className="cursor-pointer rounded-lg bg-black px-5 py-3 font-medium text-white hover:bg-gray-700"
-                        >
-                            Submit
-                        </button>
-                    </div>
-                </form>
+
+                <div className="rounded-lg bg-white p-8 shadow-lg">
+                    <form className=" mt-16 space-y-4" onSubmit={handleSubmit}>
+                        <input
+                            id="tax_number"
+                            name="tax_number"
+                            value={formValues.tax_number}
+                            onChange={handleChange}
+                            className="mt-1 p-2 h-10 w-full rounded-md border-gray-300 bg-white text-sm text-gray-700 shadow-sm focus:ring-2 focus:ring-blue-500"
+                            placeholder="Tax number"
+                        />
+                        <input
+                            id="order_currency"
+                            name="order_currency"
+                            value={formValues.order_currency}
+                            onChange={handleChange}
+                            className="mt-1 p-2 h-10 w-full rounded-md border-gray-300 bg-white text-sm text-gray-700 shadow-sm focus:ring-2 focus:ring-blue-500"
+                            placeholder="Order currency"
+                        />
+                        <input
+                            id="payment_term"
+                            name="payment_term"
+                            value={formValues.payment_term}
+                            onChange={handleChange}
+                            className="mt-1 p-2 h-10 w-full rounded-md border-gray-300 bg-white text-sm text-gray-700 shadow-sm focus:ring-2 focus:ring-blue-500"
+                            placeholder="Payment term"
+                        />
+                        <input
+                            id="payment_method"
+                            name="payment_method"
+                            value={formValues.payment_method}
+                            onChange={handleChange}
+                            className="mt-1 p-2 h-10 w-full rounded-md border-gray-300 bg-white text-sm text-gray-700 shadow-sm focus:ring-2 focus:ring-blue-500"
+                            placeholder="Payment method"
+                        />
+                        <input
+                            id="account_code"
+                            name="account_code"
+                            value={formValues.account_code}
+                            onChange={handleChange}
+                            className="mt-1 p-2 h-10 w-full rounded-md border-gray-300 bg-white text-sm text-gray-700 shadow-sm focus:ring-2 focus:ring-blue-500"
+                            placeholder="Account code"
+                        />
+                        <input
+                            id="accountant"
+                            name="accountant"
+                            value={formValues.accountant}
+                            onChange={handleChange}
+                            className="mt-1 p-2 h-10 w-full rounded-md border-gray-300 bg-white text-sm text-gray-700 shadow-sm focus:ring-2 focus:ring-blue-500"
+                            placeholder="Accountant"
+                        />
+                        <input
+                            id="invoice_email"
+                            name="invoice_email"
+                            value={formValues.invoice_email}
+                            onChange={handleChange}
+                            className="mt-1 p-2 h-10 w-full rounded-md border-gray-300 bg-white text-sm text-gray-700 shadow-sm focus:ring-2 focus:ring-blue-500"
+                            placeholder="Invoice email"
+                        />
+                        <input
+                            id="notices_email"
+                            name="notices_email"
+                            value={formValues.notices_email}
+                            onChange={handleChange}
+                            className="mt-1 p-2 h-10 w-full rounded-md border-gray-300 bg-white text-sm text-gray-700 shadow-sm focus:ring-2 focus:ring-blue-500"
+                            placeholder="Notices email"
+                        />
+                        <input
+                            id="account_manager"
+                            name="account_manager"
+                            value={formValues.account_manager}
+                            onChange={handleChange}
+                            className="mt-1 p-2 h-10 w-full rounded-md border-gray-300 bg-white text-sm text-gray-700 shadow-sm focus:ring-2 focus:ring-blue-500"
+                            placeholder="Account manager"
+                        />
+                        <input
+                            id="account_partner"
+                            name="account_partner"
+                            value={formValues.account_partner}
+                            onChange={handleChange}
+                            className="mt-1 p-2 h-10 w-full rounded-md border-gray-300 bg-white text-sm text-gray-700 shadow-sm focus:ring-2 focus:ring-blue-500"
+                            placeholder="Account partner"
+                        />
+                        <input
+                            id="sales_manager"
+                            name="sales_manager"
+                            value={formValues.sales_manager}
+                            onChange={handleChange}
+                            className="mt-1 p-2 h-10 w-full rounded-md border-gray-300 bg-white text-sm text-gray-700 shadow-sm focus:ring-2 focus:ring-blue-500"
+                            placeholder="Sales manager"
+                        />
+
+
+
+                        {/* </div> */}
+
+                        <div className="mt-6 flex justify-between">
+                            <button
+                                type="button"
+                                onClick={() => navigate("/customer")}
+                                className="cursor-pointer rounded-lg bg-black px-5 py-3 font-medium text-white hover:bg-gray-700"
+                            >
+                                Back
+                            </button>
+                            <button
+                                type="submit"
+                                className="cursor-pointer rounded-lg bg-black px-5 py-3 font-medium text-white hover:bg-gray-700"
+                            >
+                                Submit
+                            </button>
+                        </div>
+
+                    </form>
+                </div>
+
+
+
             </div>
-        </div>
+        </div >
     );
 };
 

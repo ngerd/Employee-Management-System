@@ -1,22 +1,12 @@
 import React, { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Info, ClipboardList } from "lucide-react";
-import { ProjectContext } from "../context/ContextProvider";
+import { CustomerContext } from "../context/ContextProvider";
 
 const CustomerInformation = () => {
     const navigate = useNavigate();
-    const { projectId: companyCode } = useContext(ProjectContext);
+    const { company_code } = useContext(CustomerContext);
     const [customer, setCustomer] = useState(null);
-
-    const formatDate = (dateString) => {
-        if (!dateString) return "N/A";
-        const date = new Date(dateString);
-        return new Intl.DateTimeFormat("en-GB", {
-            day: "2-digit",
-            month: "2-digit",
-            year: "numeric",
-        }).format(date);
-    };
 
     useEffect(() => {
         const fetchData = async () => {
@@ -24,9 +14,9 @@ const CustomerInformation = () => {
                 const response = await fetch("http://localhost:3000/customer/customer-info", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ companyCode }),
+                    body: JSON.stringify({ companyCode: company_code }),
                 });
-
+                console.log("Customer infor:" + company_code)
                 if (!response.ok) throw new Error("Failed to fetch customer data");
                 const data = await response.json();
                 setCustomer(data.customer);
@@ -35,10 +25,10 @@ const CustomerInformation = () => {
             }
         };
 
-        if (companyCode) {
+        if (company_code) {
             fetchData();
         }
-    }, [companyCode]);
+    }, [company_code]);
 
     return (
         <div className="mx-auto max-w-screen-xl py-10 sm:px-6 lg:px-8">
