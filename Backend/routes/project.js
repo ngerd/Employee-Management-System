@@ -2,70 +2,125 @@ import express from "express";
 import pool from "../DB.js";
 const router = express.Router();
 
+// Create Project with project_id as: account_code + 3-digit sequential number
 router.post("/create-project", async (req, res) => {
   const {
     project_name,
     project_description,
     start_date,
     due_date,
-    customername,
+    customer_id, // now using customer_id (customer's company_code)
     nation,
     cost,
+    billable,   // new attribute
   } = req.body;
-  const project_status = `In Progress`;
-  // Validate input
-  if (!project_name) {
-    return res
-      .status(400)
-      .json({ error: "Missing required field: projectName" });
+
+  const project_status = "In Progress";
+
+  // Validate required fields
+  if (
+    !project_name ||
+    !project_description ||
+    !start_date ||
+    !due_date ||
+    !customer_id ||
+    !nation ||
+    cost === undefined ||
+    billable === undefined
+  ) {
+    return res.status(400).json({ error: "Missing required fields." });
   }
 
   try {
-    // Insert the new project into the Project table
+    // Step 1: Retrieve the customer's account_code from the customer table using customer_id (company_code)
+    const customerResult = await pool.query(
+      'SELECT account_code FROM public.customer WHERE company_code = $1',
+      [customer_id]
+    );
+    if (customerResult.rows.length === 0) {
+      return res.status(404).json({ error: "Customer not found." });
+    }
+    const account_code = customerResult.rows[0].account_code;
+
+    // Step 2: Determine the next sequential number for the project_id.
+    // Look for existing project_ids that start with the account_code.
+    const likePattern = account_code + '%';
+    const maxResult = await pool.query(
+      'SELECT MAX(project_id) as max_id FROM public.project WHERE project_id LIKE $1',
+      [likePattern]
+    );
+    const maxProjectId = maxResult.rows[0].max_id;
+    let newSequence = "001";
+    if (maxProjectId) {
+      // Extract the 3-digit sequence part (assuming it's immediately after the account_code)
+      const currentSeqStr = maxProjectId.substring(account_code.length, account_code.length + 3);
+      const currentSeq = parseInt(currentSeqStr, 10);
+      newSequence = (currentSeq + 1).toString().padStart(3, "0");
+    }
+    const final_project_id = account_code + newSequence;
+
+    // Step 3: Insert the new project into the Project table
     const result = await pool.query(
-      `INSERT INTO public.project ("project_name", "project_description", "start_date", "due_date","project_status","customername","nation","cost") 
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8 ) RETURNING *`,
+      `INSERT INTO public.project (
+          project_id,
+          project_name,
+          project_description,
+          start_date,
+          due_date,
+          project_status,
+          customer_id,
+          nation,
+          cost,
+          billable
+        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+        RETURNING *`,
       [
+        final_project_id,
         project_name,
         project_description,
         start_date,
         due_date,
         project_status,
-        customername,
+        customer_id,
         nation,
         cost,
+        billable,
       ]
     );
     return res.status(201).json({ project: result.rows[0] });
   } catch (err) {
+    console.error("Error creating project:", err);
     return res.status(500).json({ error: err.message });
   }
 });
 
-//Get all employess's Projects
+// Get All Projects for an Employee
 router.post("/get-project", async (req, res) => {
   const { employee_id } = req.body;
 
   if (!employee_id) {
-    return res.status(400).json({ error: "employee ID is required" });
+    return res.status(400).json({ error: "Employee ID is required." });
   }
 
   try {
+    // Retrieve projects assigned to the employee by joining project_employee and project tables.
     const result = await pool.query(
-      'SELECT * FROM public.project_employee pm JOIN public.project p on pm.project_id = p.project_id WHERE employee_id = $1',
+      `SELECT * FROM public.project_employee pm 
+       JOIN public.project p ON pm.project_id = p.project_id 
+       WHERE pm.employee_id = $1`,
       [employee_id]
     );
 
     if (result.rows.length === 0) {
-      return res.status(404).json({ error: "Project or Employee not found" });
+      return res.status(404).json({ error: "Project or Employee not found." });
     }
 
     return res.status(200).json({ projects: result.rows });
   } catch (err) {
+    console.error("Error retrieving projects:", err);
     return res.status(500).json({ error: err.message });
   }
 });
-
 
 router.post("/checkmanager", async (req, res) => {
   const { projectId } = req.body;
@@ -149,7 +204,7 @@ router.post("/info", async (req, res) => {
   }
 });
 
-//Update Project
+// Update Project
 router.post("/update", async (req, res) => {
   const {
     project_id,
@@ -157,9 +212,10 @@ router.post("/update", async (req, res) => {
     project_description,
     due_date,
     project_status,
-    customerName,
+    customer_id,  // new field replacing customerName
     nation,
     cost,
+    billable      // new attribute
   } = req.body;
 
   if (!project_id) {
@@ -171,117 +227,52 @@ router.post("/update", async (req, res) => {
     project_description === undefined &&
     due_date === undefined &&
     project_status === undefined &&
-    customerName === undefined &&
+    customer_id === undefined &&
     nation === undefined &&
-    cost === undefined
+    cost === undefined &&
+    billable === undefined
   ) {
-    return res
-      .status(400)
-      .json({ error: "Missing required field to be updated" });
+    return res.status(400).json({ error: "Missing required field to be updated" });
   }
 
   try {
-    const updateQuery = `UPDATE public."project" 
-                           SET  project_name = COALESCE($1, project_name),
-                                project_description = COALESCE($2, project_description),
-                                due_date = COALESCE($3, due_date),
-                                project_status = COALESCE($4, project_status),
-                                customername = COALESCE($5, customername),
-                                nation = COALESCE($6, nation),
-                                cost = COALESCE($7, cost)
-                            WHERE project_id = $8
-                            RETURNING *`;
+    const updateQuery = `
+      UPDATE public.project 
+      SET project_name = COALESCE($1, project_name),
+          project_description = COALESCE($2, project_description),
+          due_date = COALESCE($3, due_date),
+          project_status = COALESCE($4, project_status),
+          customer_id = COALESCE($5, customer_id),
+          nation = COALESCE($6, nation),
+          cost = COALESCE($7, cost),
+          billable = COALESCE($8, billable)
+      WHERE project_id = $9
+      RETURNING *`;
 
-    const value = [
+    const values = [
       project_name,
       project_description,
       due_date,
       project_status,
-      customerName,
+      customer_id,
       nation,
       cost,
+      billable,
       project_id,
     ];
-    const result = await pool.query(updateQuery, value);
+
+    const result = await pool.query(updateQuery, values);
 
     if (result.rows.length === 0) {
       return res.status(404).json({ error: "Project not found." });
     }
-    return res.status(201).json({ project: result.rows[0] });
+    return res.status(200).json({ project: result.rows[0] });
   } catch (err) {
     console.error("Error updating project:", err);
-    res.status(500).json({ error: "Internal Server Error" });
+    return res.status(500).json({ error: "Internal Server Error" });
   }
 });
 
-// Add multiple employees to a project
-// router.post("/add-employee", async (req, res) => {
-//   const { employee_ids, project_id, ismanager } = req.body;
-
-//   if (!employee_ids || !Array.isArray(employee_ids) || employee_ids.length === 0 || !project_id) {
-//     return res.status(400).json({ error: "Missing or invalid required fields" });
-//   }
-
-//   const client = await pool.connect();
-//   try {
-//     await client.query("BEGIN");
-
-//     let addedEmployees = [];
-
-//     for (const employee_id of employee_ids) {
-//       const manager = ismanager?.includes(employee_id) ? true : false; // Allow multiple managers if needed
-
-//       // Insert each employee into the project_employee table
-//       const addEmployeeQuery = `
-//         INSERT INTO public."project_employee" (ismanager, project_id, employee_id)
-//         VALUES ($1, $2, $3) RETURNING *`;
-//       const employeeResult = await client.query(addEmployeeQuery, [
-//         manager,
-//         project_id,
-//         employee_id,
-//       ]);
-
-//       addedEmployees.push(employeeResult.rows[0]);
-//     }
-
-//     // Calculate the total cost for the project by summing pay rates of all employees in the project.
-//     const sumQuery = `
-//       SELECT SUM(
-//         CASE 
-//           WHEN p.nation = 'Singapore' THEN r.pay_rate_sg 
-//           ELSE r.pay_rate_vn 
-//         END
-//       ) AS total_cost
-//       FROM public."project_employee" pm
-//       JOIN public."employee" e ON pm.employee_id = e.employee_id
-//       JOIN public."role" r ON e.role_id = r.role_id
-//       JOIN public."project" p ON p.project_id = pm.project_id
-//       WHERE pm.project_id = $1
-//     `;
-//     const sumResult = await client.query(sumQuery, [project_id]);
-//     const totalCost = sumResult.rows[0].total_cost;
-
-//     // Update the project cost
-//     await client.query(
-//       `UPDATE public."project" SET cost = $1 WHERE project_id = $2`,
-//       [totalCost, project_id]
-//     );
-
-//     await client.query("COMMIT");
-
-//     return res.status(201).json({
-//       message: "Employees added successfully",
-//       addedEmployees,
-//       updated_cost: totalCost,
-//     });
-//   } catch (error) {
-//     await client.query("ROLLBACK");
-//     console.error("Error adding employees:", error);
-//     res.status(500).json({ error: "Internal Server Error" });
-//   } finally {
-//     client.release();
-//   }
-// });
 router.post("/add-employee", async (req, res) => {
   const { employee_ids, project_id, ismanager } = req.body;
 
