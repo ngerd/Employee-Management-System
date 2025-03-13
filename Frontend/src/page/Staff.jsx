@@ -12,6 +12,8 @@ import "primereact/resources/themes/lara-light-blue/theme.css";
 import "primereact/resources/primereact.min.css";
 import "primeicons/primeicons.css";
 
+const backendUrl = import.meta.env.VITE_API_URL || "http://localhost:3000";
+
 const Staff = () => {
   const navigate = useNavigate();
   const { currentEmployeeId, setCurrentEmployeeId } = useContext(Employee);
@@ -27,7 +29,7 @@ const Staff = () => {
 
   const fetchEmployees = async () => {
     try {
-      const response = await fetch("http://localhost:3000/getEmployee2"); // Fetching employees from backend
+      const response = await fetch(`${backendUrl}/getEmployee2`); // Fetching employees from backend
       const data = await response.json();
       setEmployees(data);
       setLoading(false);
@@ -64,7 +66,7 @@ const Staff = () => {
 
   const deleteEmployee = async (employee_id) => {
     try {
-      const response = await fetch("http://localhost:3000/deleteEmployee", {
+      const response = await fetch(`${backendUrl}/deleteEmployee`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

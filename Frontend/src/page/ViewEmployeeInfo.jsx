@@ -3,6 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { Employee } from "../context/ContextProvider";
 import Alert from "../component/Alert";
 
+const backendUrl = import.meta.env.VITE_API_URL || "http://localhost:3000";
+
 const ViewEmployeeInfo = () => {
   const navigate = useNavigate();
   const { employeeId, isadmin } = useContext(Employee);
@@ -23,7 +25,7 @@ const ViewEmployeeInfo = () => {
   useEffect(() => {
     const fetchEmployeeInfo = async () => {
       try {
-        const response = await fetch("http://localhost:3000/getEmployeeById", {
+        const response = await fetch(`${backendUrl}/getEmployeeById`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -50,7 +52,7 @@ const ViewEmployeeInfo = () => {
 
     const fetchRoles = async () => {
       try {
-        const response = await fetch("http://localhost:3000/get-role");
+        const response = await fetch(`${backendUrl}/get-role`);
         if (!response.ok) {
           throw new Error("Failed to fetch roles");
         }
@@ -89,7 +91,7 @@ const ViewEmployeeInfo = () => {
       return;
     }
     try {
-      const response = await fetch("http://localhost:3000/updateEmployee", {
+      const response = await fetch(`${backendUrl}/updateEmployee`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

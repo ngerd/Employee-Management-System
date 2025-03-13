@@ -6,6 +6,8 @@ import "primeicons/primeicons.css";
 import Alert from "../component/Alert";
 import { ProjectContext } from '../context/ContextProvider';
 
+const backendUrl = import.meta.env.VITE_API_URL || "http://localhost:3000";
+
 const AddMember = () => {
   const { projectId } = useContext(ProjectContext);
   const [formValues, setFormValues] = useState({ projectId });
@@ -28,7 +30,7 @@ const AddMember = () => {
   useEffect(() => {
     const fetchEmployees = async () => {
       try {
-        const response = await fetch("http://localhost:3000/get-employees");
+        const response = await fetch(`${backendUrl}/get-employees`);
         if (!response.ok) throw new Error("Failed to fetch employees");
         const data = await response.json();
         setEmployees(data.employees);
@@ -44,7 +46,7 @@ const AddMember = () => {
     const fetchProjectMembers = async () => {
       if (!projectId) return;
       try {
-        const response = await fetch("http://localhost:3000/projects/info", {
+        const response = await fetch(`${backendUrl}/projects/info`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ projectId }),
@@ -93,7 +95,7 @@ const AddMember = () => {
       // New employees are added as non-managers
       const ismanager = [];
 
-      const response = await fetch("http://localhost:3000/projects/add-employee", {
+      const response = await fetch(`${backendUrl}/projects/add-employee`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

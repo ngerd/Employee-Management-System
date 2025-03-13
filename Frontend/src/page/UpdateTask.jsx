@@ -5,6 +5,8 @@ import "primereact/resources/themes/lara-light-blue/theme.css";
 import "primereact/resources/primereact.min.css";
 import "primeicons/primeicons.css";
 
+const backendUrl = import.meta.env.VITE_API_URL || "http://localhost:3000";
+
 const UpdateTask = () => {
   const navigate = useNavigate();
   const { projectId } = useContext(ProjectContext);
@@ -19,7 +21,7 @@ const UpdateTask = () => {
   useEffect(() => {
     const fetchTask = async () => {
       try {
-        const response = await fetch("http://localhost:3000/task/info", {
+        const response = await fetch(`${backendUrl}/task/info`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -55,7 +57,7 @@ const UpdateTask = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch("http://localhost:3000/task/update", {
+      const response = await fetch(`${backendUrl}/task/update`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

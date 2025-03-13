@@ -13,6 +13,8 @@ import "primeicons/primeicons.css";
 
 import { Employee, ProjectContext } from '../context/ContextProvider';
 
+const backendUrl = import.meta.env.VITE_API_URL || "http://localhost:3000";
+
 const Project = () => {
 
   const { employeeId } = useContext(Employee);
@@ -20,7 +22,7 @@ const Project = () => {
 
   const fectchproject = async () => {
     try {
-      const response = await fetch("http://localhost:3000/projects/get-project", {
+      const response = await fetch(`${backendUrl}/projects/get-project`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

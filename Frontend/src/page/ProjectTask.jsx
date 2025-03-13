@@ -12,6 +12,8 @@ import "primeicons/primeicons.css";
 
 import { ProjectContext, Employee, TaskContext } from "../context/ContextProvider";
 
+const backendUrl = import.meta.env.VITE_API_URL || "http://localhost:3000";
+
 const ProjectTask = () => {
   const navigate = useNavigate();
   const { currentTaskId, setCurrentTaskId } = useContext(TaskContext);
@@ -38,7 +40,7 @@ const ProjectTask = () => {
 
   const isManager = async (projectId, employeeId) => {
     try {
-      const response = await fetch("http://localhost:3000/projects/checkmanager", {
+      const response = await fetch(`${backendUrl}/projects/checkmanager`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ projectId }),
@@ -67,7 +69,7 @@ const ProjectTask = () => {
     console.log("Project ID for tasks:", projectId);
     if (!projectId) return;
     try {
-      const response = await fetch("http://localhost:3000/task/get", {
+      const response = await fetch(`${backendUrl}/task/get`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -93,7 +95,7 @@ const ProjectTask = () => {
 
   const handleDelete = async (taskId) => {
     try {
-      const response = await fetch("http://localhost:3000/task/delete", {
+      const response = await fetch(`${backendUrl}/task/delete`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
