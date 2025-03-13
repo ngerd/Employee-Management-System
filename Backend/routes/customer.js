@@ -94,6 +94,25 @@ router.post("/create-customer", async (req, res) => {
   }
 });
 
+//Get all customer
+router.get("/allcustomer", async (req, res) => {
+  try {
+    const customerQuery = "SELECT * FROM public.customer";
+    const customerResult = await pool.query(customerQuery);
+
+    if (customerResult.rows.length === 0) {
+      return res.status(404).json({ error: "No customers found." });
+    }
+
+    return res.status(200).json({ customers: customerResult.rows });
+  } catch (error) {
+    console.error("Error fetching customers:", error);
+    return res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
+
+
 router.post("/customer-info", async (req, res) => {
   const { companyCode } = req.body;
 

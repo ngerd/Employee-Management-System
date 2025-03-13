@@ -30,6 +30,10 @@ import ViewEmployeeInfo from "./page/ViewEmployeeInfo";
 import EditTimeslot from "./page/EditTimeslot";
 import UpdateTimeslot from "./page/UpdateTimeslot";
 import ViewAccountForStaff from "./page/ViewAccountForStaff";
+import Customer from "./page/Customer";
+import CustomerInformation from "./page/CustomerInformation";
+import CustomerPayment from "./page/CustomerPayment";
+
 
 function Layout() {
   const location = useLocation();
@@ -62,7 +66,9 @@ function Layout() {
           <Route path="/edit-timeslot" element={<EditTimeslot />} />
           <Route path="/timesheet2" element={<Timesheet2 />} />
           <Route path="/update-timeslot/:assignment_id" element={<UpdateTimeslot />} />
-
+          <Route path="/customer" element={<Customer />} />
+          <Route path="/customer-information" element={<CustomerInformation />} />
+          <Route path="/customer-payment" element={<CustomerPayment />} />
         </Routes>
       </ContextProvider>
     </div>
