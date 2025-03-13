@@ -33,7 +33,7 @@ import ViewAccountForStaff from "./page/ViewAccountForStaff";
 import Customer from "./page/Customer";
 import CustomerInformation from "./page/CustomerInformation";
 import CustomerPayment from "./page/CustomerPayment";
-
+import CreateCustomer from "./page/CreateCustomer";
 
 function Layout() {
   const location = useLocation();
@@ -69,6 +69,7 @@ function Layout() {
           <Route path="/customer" element={<Customer />} />
           <Route path="/customer-information" element={<CustomerInformation />} />
           <Route path="/customer-payment" element={<CustomerPayment />} />
+          <Route path="/create-customer" element={<CreateCustomer />} />
         </Routes>
       </ContextProvider>
     </div>

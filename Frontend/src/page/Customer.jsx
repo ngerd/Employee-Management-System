@@ -118,7 +118,7 @@ const Customer = () => {
                     />
                     <button
                         className="cursor-pointer flex items-center gap-2 rounded-md bg-green-700 px-4 py-2 text-white font-medium hover:bg-green-500"
-                        onClick={() => navigate("/create-employee")}
+                        onClick={() => navigate("/create-customer")}
                     >
                         <CirclePlus className="w-5 h-5" /> Add Customer
                     </button>
