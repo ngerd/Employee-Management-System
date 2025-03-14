@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Alert from "../component/Alert";
 
+const backendUrl = import.meta.env.VITE_API_URL || "http://localhost:3000";
+
 const CreateEmployee = () => {
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
@@ -21,7 +23,7 @@ const CreateEmployee = () => {
   useEffect(() => {
     const fetchRoles = async () => {
       try {
-        const response = await fetch("http://localhost:3000/get-role"); // Adjust API URL
+        const response = await fetch(`${backendUrl}/get-role`); // Adjust API URL
         const data = await response.json();
         setRoles(data.Role);
       } catch (error) {
@@ -46,7 +48,7 @@ const CreateEmployee = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch("http://localhost:3000/createAccount", {
+      const response = await fetch(`${backendUrl}/createAccount`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

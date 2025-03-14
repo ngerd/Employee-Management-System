@@ -110,14 +110,47 @@ function Timesheet() {
   }, []);
 
   useEffect(() => {
-    getJson(
-      'https://trial.mobiscroll.com/drag-drop-events/',
-      (events) => {
-        setEvents(events);
-      },
-      'jsonp',
-    );
-  }, []);
+    const fetchTasks = async () => {
+      console.log("Fetching timesheet for Employee ID:", employeeId);
+      try {
+        const response = await fetch("http://localhost:3000/getTimesheet", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ employee_id: employeeId }),
+        });
+        const data = await response.json();
+
+        if (Array.isArray(data)) {
+          const formattedEvents = data.map((task) => ({
+            id: String(task.assignment_id),
+            title: task.task_name,
+            description: task.project_name,
+            start: formatDateTime(task.emp_startdate),
+            end: formatDateTime(task.emp_enddate),
+          }));
+
+          // Guarantee a test event is included
+          const testEvent = {
+            id: "test-1",
+            title: "Test Event",
+            start: "2025-03-03 22:00",
+            end: "2025-03-03 23:00",
+            description: "This is a manually added test event.",
+          };
+
+          setTasks([...formattedEvents, testEvent]);
+        } else {
+          setTasks([]);
+        }
+      } catch (error) {
+        console.error("Error fetching tasks:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchTasks();
+  }, [employeeId]);
 
   return (
     <div className="mbsc-grid mbsc-no-padding">

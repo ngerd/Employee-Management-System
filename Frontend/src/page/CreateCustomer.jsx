@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Alert from "../component/Alert";
 
+const backendUrl = import.meta.env.VITE_API_URL || "http://localhost:3000";
+
 const CreateCustomer = () => {
     const navigate = useNavigate();
     const [alert, setAlert] = useState({ show: false, message: "", type: "" });
@@ -37,7 +39,7 @@ const CreateCustomer = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const response = await fetch("http://localhost:3000/customer/create-customer", {
+            const response = await fetch(`${backendUrl}/customer/create-customer`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",

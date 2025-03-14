@@ -3,6 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { Employee } from "../context/ContextProvider";
 import Alert from "../component/Alert";
 
+const backendUrl = import.meta.env.VITE_API_URL || "http://localhost:3000";
+
 const CreateTimeslot = () => {
   const { employeeId } = useContext(Employee);
   const navigate = useNavigate();
@@ -31,7 +33,7 @@ const CreateTimeslot = () => {
   useEffect(() => {
     const fetchTasks = async () => {
       try {
-        const response = await fetch("http://localhost:3000/task/getEmployeeTask", {
+        const response = await fetch(`${backendUrl}/task/getEmployeeTask`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ employee_id: employeeId }),
@@ -85,7 +87,7 @@ const CreateTimeslot = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch("http://localhost:3000/createTimesheet", {
+      const response = await fetch(`${backendUrl}/createTimesheet`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formValues),

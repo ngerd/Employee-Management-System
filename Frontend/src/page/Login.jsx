@@ -3,6 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { Employee } from "../context/ContextProvider";
 import Alert from "../component/Alert"; // Import Alert component
 
+const backendUrl = import.meta.env.VITE_API_URL || "http://localhost:3000";
+
 function Login() {
   const initialValues = {
     email: "",
@@ -17,7 +19,7 @@ function Login() {
   const fetchMockData = async () => {
     try {
       console.log(formValues);
-      const response = await fetch("http://localhost:3000/login", {
+      const response = await fetch(`${backendUrl}/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -51,7 +53,7 @@ function Login() {
   const fetchEmployeeInfo = async () => {
     try {
       console.log(formValues);
-      const response = await fetch("http://localhost:3000/viewinfo", {
+      const response = await fetch(`${backendUrl}/viewinfo`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

@@ -3,6 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { Employee } from "../context/ContextProvider";
 import Alert from "../component/Alert";
 
+const backendUrl = import.meta.env.VITE_API_URL || "http://localhost:3000";
+
 const ViewAccountForStaff = () => {
   const navigate = useNavigate();
   const { currentEmployeeId } = useContext(Employee);
@@ -21,7 +23,7 @@ const ViewAccountForStaff = () => {
     const fetchEmployeeInfo = async () => {
       console.log("Meow " + currentEmployeeId);
       try {
-        const response = await fetch("http://localhost:3000/getEmployeeById", {
+        const response = await fetch(`${backendUrl}/getEmployeeById`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -46,7 +48,7 @@ const ViewAccountForStaff = () => {
 
     const fetchRoles = async () => {
       try {
-        const response = await fetch("http://localhost:3000/get-role");
+        const response = await fetch(`${backendUrl}/get-role`);
         if (!response.ok) {
           throw new Error("Failed to fetch roles");
         }
@@ -77,7 +79,7 @@ const ViewAccountForStaff = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch("http://localhost:3000/updateEmployee2", {
+      const response = await fetch(`${backendUrl}/updateEmployee2`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

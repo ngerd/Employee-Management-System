@@ -2,6 +2,9 @@ import React, { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Info, ClipboardList } from "lucide-react";
 import { CustomerContext } from "../context/ContextProvider";
+import DownloadButton from "../component/DownloadButton"; // Import component
+
+const backendUrl = import.meta.env.VITE_API_URL || "http://localhost:3000";
 
 const CustomerInformation = () => {
     const navigate = useNavigate();
@@ -11,7 +14,7 @@ const CustomerInformation = () => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await fetch("http://localhost:3000/customer/customer-info", {
+                const response = await fetch(`${backendUrl}/customer/customer-info`, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({ companyCode: company_code }),
@@ -30,12 +33,32 @@ const CustomerInformation = () => {
         }
     }, [company_code]);
 
+    const fetchCustomerData = async (companyCode) => {
+        try {
+            const response = await fetch(`${backendUrl}/customer/customer-info`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ companyCode }),
+            });
+            if (!response.ok) throw new Error("Failed to fetch customer data");
+            const data = await response.json();
+            return data.customer;
+        } catch (error) {
+            console.error("Error fetching customer data:", error);
+            return null;
+        }
+    };
+
+
+
     return (
         <div className="mx-auto max-w-screen-xl py-10 sm:px-6 lg:px-8">
             <div className="flex items-center justify-between">
                 <h1 className="text-4xl font-bold text-gray-900 flex items-center gap-2">
                     General Information
                 </h1>
+                <DownloadButton customer={customer} />
+
             </div>
 
             <div className="mt-4">

@@ -2,24 +2,27 @@ import React, { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Info, ClipboardList } from "lucide-react";
 import { CustomerContext } from "../context/ContextProvider";
+import DownloadButton from "../component/DownloadButton"; // Import component
+
+const backendUrl = import.meta.env.VITE_API_URL || "http://localhost:3000";
 
 const CustomerPayment = () => {
-    const navigate = useNavigate();
+    // const navigate = useNavigate();
     const { company_code } = useContext(CustomerContext);
-    const [paymentInfo, setPaymentInfo] = useState(null);
+    const [customer, setCustomer] = useState(null);
 
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await fetch("http://localhost:3000/customer/customer-info", {
+                const response = await fetch(`${backendUrl}/customer/customer-info`, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({ companyCode: company_code }),
                 });
-                console.log("Customer Payment: " + companyCode)
+                console.log("Customer Payment: " + company_code)
                 if (!response.ok) throw new Error("Failed to fetch payment data");
                 const data = await response.json();
-                setPaymentInfo(data.payment);
+                setCustomer(data.customer);
             } catch (error) {
                 console.error("Error fetching payment data:", error);
             }
@@ -36,18 +39,20 @@ const CustomerPayment = () => {
                 <h1 className="text-4xl font-bold text-gray-900 flex items-center gap-2">
                     General Information
                 </h1>
+                <DownloadButton customer={customer} />
             </div>
 
             <div className="mt-4">
                 <div className="hidden sm:block">
                     <div className="border-b border-gray-200">
                         <nav className="-mb-px flex space-x-1">
-                            <a href="customer-information" className="shrink-0 w-32 flex items-center gap-2 rounded-t-2xl border border-gray-300 border-b-white p-3 text-sm font-medium text-sky-600 bg-white">
-                                <Info size={16} /> General Information
+                            <a href="customer-information" className="shrink-0 w-32 flex items-center gap-2 rounded-t-2xl border border-gray-300 border-b-white p-3 text-sm font-medium text-gray-500 hover:text-gray-700 bg-gray-100">
+                                <ClipboardList size={16} /> General Information
                             </a>
-                            <a href="customer-payment" className="shrink-0 w-32 flex items-center gap-2 rounded-t-2xl border border-gray-300 border-b-white p-3 text-sm font-medium text-gray-500 hover:text-gray-700 bg-gray-100">
-                                <ClipboardList size={16} /> Payment Information
+                            <a href="customer-payment" className="shrink-0 w-32 flex items-center gap-2 rounded-t-2xl border border-gray-300 border-b-white p-3 text-sm font-medium text-sky-600 bg-white">
+                                <Info size={16} /> Payment Information
                             </a>
+
                         </nav>
                     </div>
                 </div>
@@ -56,45 +61,52 @@ const CustomerPayment = () => {
             <div className="flow-root rounded-b-lg border border-gray-300 py-3 shadow-xs bg-white">
                 <dl className="-my-3 divide-y divide-gray-100 text-sm">
                     <div className="grid grid-cols-1 gap-1 p-3 sm:grid-cols-3 sm:gap-4">
-                        <dt className="font-medium text-gray-900">Company Code</dt>
-                        <dd className="text-gray-700 sm:col-span-2">{customer ? customer.company_code : "N/A"}</dd>
+                        <dt className="font-medium text-gray-900">Tax number</dt>
+                        <dd className="text-gray-700 sm:col-span-2">{customer ? customer.tax_number : "N/A"}</dd>
                     </div>
                     <div className="grid grid-cols-1 gap-1 p-3 sm:grid-cols-3 sm:gap-4">
-                        <dt className="font-medium text-gray-900">Legal Name</dt>
-                        <dd className="text-gray-700 sm:col-span-2">{customer ? customer.legal_name : "N/A"}</dd>
+                        <dt className="font-medium text-gray-900">Order currency </dt>
+                        <dd className="text-gray-700 sm:col-span-2">{customer ? customer.order_currency : "N/A"}</dd>
                     </div>
                     <div className="grid grid-cols-1 gap-1 p-3 sm:grid-cols-3 sm:gap-4">
-                        <dt className="font-medium text-gray-900">Street 1</dt>
-                        <dd className="text-gray-700 sm:col-span-2">{customer ? customer.street_1 : "N/A"}</dd>
+                        <dt className="font-medium text-gray-900">Payment term</dt>
+                        <dd className="text-gray-700 sm:col-span-2">{customer ? customer.payment_term : "N/A"}</dd>
                     </div>
                     <div className="grid grid-cols-1 gap-1 p-3 sm:grid-cols-3 sm:gap-4">
-                        <dt className="font-medium text-gray-900">Street 2</dt>
-                        <dd className="text-gray-700 sm:col-span-2">{customer ? customer.street_2 : "N/A"}</dd>
+                        <dt className="font-medium text-gray-900">Payment method</dt>
+                        <dd className="text-gray-700 sm:col-span-2">{customer ? customer.payment_method : "N/A"}</dd>
+                    </div>
+
+                    <div className="grid grid-cols-1 gap-1 p-3 sm:grid-cols-3 sm:gap-4">
+                        <dt className="font-medium text-gray-900">Account code</dt>
+                        <dd className="text-gray-700 sm:col-span-2">{customer ? customer.account_code : "N/A"}</dd>
                     </div>
                     <div className="grid grid-cols-1 gap-1 p-3 sm:grid-cols-3 sm:gap-4">
-                        <dt className="font-medium text-gray-900">Street 3</dt>
-                        <dd className="text-gray-700 sm:col-span-2">{customer ? customer.street_3 : "N/A"}</dd>
+                        <dt className="font-medium text-gray-900">Accountant</dt>
+                        <dd className="text-gray-700 sm:col-span-2">{customer ? customer.accountant : "N/A"}</dd>
                     </div>
                     <div className="grid grid-cols-1 gap-1 p-3 sm:grid-cols-3 sm:gap-4">
-                        <dt className="font-medium text-gray-900">House Number</dt>
-                        <dd className="text-gray-700 sm:col-span-2">{customer ? customer.house_number : "N/A"}</dd>
+                        <dt className="font-medium text-gray-900">Invoice email</dt>
+                        <dd className="text-gray-700 sm:col-span-2">{customer ? customer.invoice_email : "N/A"}</dd>
                     </div>
                     <div className="grid grid-cols-1 gap-1 p-3 sm:grid-cols-3 sm:gap-4">
-                        <dt className="font-medium text-gray-900">Postal Code</dt>
-                        <dd className="text-gray-700 sm:col-span-2">{customer ? customer.postal_code : "N/A"}</dd>
+                        <dt className="font-medium text-gray-900">Notices email</dt>
+                        <dd className="text-gray-700 sm:col-span-2">{customer ? customer.notices_email : "N/A"}</dd>
                     </div>
                     <div className="grid grid-cols-1 gap-1 p-3 sm:grid-cols-3 sm:gap-4">
-                        <dt className="font-medium text-gray-900">City</dt>
-                        <dd className="text-gray-700 sm:col-span-2">{customer ? customer.city : "N/A"}</dd>
+                        <dt className="font-medium text-gray-900">Account manager</dt>
+                        <dd className="text-gray-700 sm:col-span-2">{customer ? customer.account_manager : "N/A"}</dd>
                     </div>
                     <div className="grid grid-cols-1 gap-1 p-3 sm:grid-cols-3 sm:gap-4">
-                        <dt className="font-medium text-gray-900">Region</dt>
-                        <dd className="text-gray-700 sm:col-span-2">{customer ? customer.region : "N/A"}</dd>
+                        <dt className="font-medium text-gray-900">Account partner</dt>
+                        <dd className="text-gray-700 sm:col-span-2">{customer ? customer.account_partner : "N/A"}</dd>
                     </div>
                     <div className="grid grid-cols-1 gap-1 p-3 sm:grid-cols-3 sm:gap-4">
-                        <dt className="font-medium text-gray-900">Country</dt>
-                        <dd className="text-gray-700 sm:col-span-2">{customer ? customer.country : "N/A"}</dd>
+                        <dt className="font-medium text-gray-900">Sales manager</dt>
+                        <dd className="text-gray-700 sm:col-span-2">{customer ? customer.sales_manager : "N/A"}</dd>
                     </div>
+
+
                 </dl>
             </div>
         </div>
