@@ -104,7 +104,7 @@ router.get("/allcustomer", async (req, res) => {
       return res.status(404).json({ error: "No customers found." });
     }
 
-    return res.status(200).json({ customers: customerResult.rows });
+    res.status(200).json({ customers: customerResult.rows });
   } catch (error) {
     console.error("Error fetching customers:", error);
     return res.status(500).json({ error: "Internal Server Error" });

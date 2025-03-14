@@ -9,6 +9,7 @@ import projectRoutes from "./routes/project.js";
 import authRoutes from "./routes/auth.js";
 import infoRoutes from "./routes/information.js";
 import timesheetRoutes from "./routes/timesheet.js";
+import customerRoutes from "./routes/customer.js";
 
 // Setup __dirname in ES modules
 const __filename = fileURLToPath(import.meta.url);
@@ -29,6 +30,7 @@ app.use(
 app.use(express.json());
 
 // Mount API routes
+app.use("/customer", customerRoutes);
 app.use("/projects", projectRoutes);
 app.use("/task", taskRoutes);
 app.use("/", authRoutes);
