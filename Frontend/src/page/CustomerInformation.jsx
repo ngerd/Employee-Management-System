@@ -1,9 +1,8 @@
 import React, { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Info, ClipboardList } from "lucide-react";
+import { Info, ClipboardList, CirclePlus } from "lucide-react";
 import { CustomerContext } from "../context/ContextProvider";
 import DownloadButton from "../component/DownloadButton"; // Import component
-
 
 const CustomerInformation = () => {
     const navigate = useNavigate();
@@ -18,7 +17,7 @@ const CustomerInformation = () => {
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({ companyCode: company_code }),
                 });
-                console.log("Customer infor:" + company_code)
+                console.log("Customer info:" + company_code);
                 if (!response.ok) throw new Error("Failed to fetch customer data");
                 const data = await response.json();
                 setCustomer(data.customer);
@@ -48,16 +47,22 @@ const CustomerInformation = () => {
         }
     };
 
-
-
     return (
         <div className="mx-auto max-w-screen-xl py-10 sm:px-6 lg:px-8">
             <div className="flex items-center justify-between">
                 <h1 className="text-4xl font-bold text-gray-900 flex items-center gap-2">
                     General Information
                 </h1>
-                <DownloadButton customer={customer} />
-
+                <div className="flex items-center gap-4 ml-auto">
+                    <DownloadButton customer={customer} />
+                    <button
+                        className="cursor-pointer flex items-center gap-2 rounded-md bg-green-700 px-4 py-2 text-white font-medium hover:bg-green-500"
+                        onClick={() => navigate("/update-customer")}
+                    >
+                        {/* <CirclePlus className="w-5 h-5" />  */}
+                        Update Customer
+                    </button>
+                </div>
             </div>
 
             <div className="mt-4">

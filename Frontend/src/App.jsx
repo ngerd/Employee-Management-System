@@ -34,6 +34,7 @@ import Customer from "./page/Customer";
 import CustomerInformation from "./page/CustomerInformation";
 import CustomerPayment from "./page/CustomerPayment";
 import CreateCustomer from "./page/CreateCustomer";
+import UpdateCustomer from "./page/UpdateCustomer";
 
 function Layout() {
   const location = useLocation();
@@ -70,6 +71,9 @@ function Layout() {
           <Route path="/customer-information" element={<CustomerInformation />} />
           <Route path="/customer-payment" element={<CustomerPayment />} />
           <Route path="/create-customer" element={<CreateCustomer />} />
+          <Route path="/update-customer" element={<UpdateCustomer />} />
+
+
         </Routes>
       </ContextProvider>
     </div>
