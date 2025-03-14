@@ -14,6 +14,7 @@ import { Employee } from "../context/ContextProvider";
 import "@schedule-x/theme-default/dist/index.css";
 import { CirclePlus, Pencil } from "lucide-react";
 
+const backendUrl = import.meta.env.VITE_API_URL || "http://localhost:3000";
 
 function CalendarWrapper({ tasks, eventsService }) {
   const calendar = useCalendarApp({
@@ -78,7 +79,7 @@ function Timesheet() {
     const fetchTasks = async () => {
       console.log("Fetching timesheet for Employee ID:", employeeId);
       try {
-        const response = await fetch("http://localhost:3000/getTimesheet", {
+        const response = await fetch(`${backendUrl}/getTimesheet`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ employee_id: employeeId }),

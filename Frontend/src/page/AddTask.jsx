@@ -6,6 +6,8 @@ import "primereact/resources/themes/lara-light-blue/theme.css";
 import "primereact/resources/primereact.min.css";
 import "primeicons/primeicons.css";
 
+const backendUrl = import.meta.env.VITE_API_URL || "http://localhost:3000";
+
 const AddTask = () => {
   const navigate = useNavigate();
   const { projectId } = useContext(ProjectContext);
@@ -22,7 +24,7 @@ const AddTask = () => {
   // Hàm lấy danh sách task
   const fetchTasks = async () => {
     try {
-      const response = await fetch("http://localhost:3000/task/list", { // Thay API lấy danh sách task nếu cần
+      const response = await fetch(`${backendUrl}/task/list`, { // Thay API lấy danh sách task nếu cần
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -53,7 +55,7 @@ const AddTask = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch("http://localhost:3000/task/add", {
+      const response = await fetch(`${backendUrl}/task/add`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

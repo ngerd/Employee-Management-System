@@ -15,6 +15,8 @@ import "primeicons/primeicons.css";
 
 import { ProjectContext, Employee } from "../context/ContextProvider";
 
+const backendUrl = import.meta.env.VITE_API_URL || "http://localhost:3000";
+
 // Helper: Convert numeric month to abbreviated name (e.g., 1 -> "Jan")
 function getMonthName(monthNumber) {
   const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
@@ -70,7 +72,7 @@ const EditTimeslot = () => {
 
   const fetchTasks = async () => {
     try {
-      const response = await fetch("http://localhost:3000/getTimesheet", {
+      const response = await fetch(`${backendUrl}/getTimesheet`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ employee_id: employeeId }),
@@ -93,7 +95,7 @@ const EditTimeslot = () => {
 
   const handleDelete = async (taskId) => {
     try {
-      const response = await fetch("http://localhost:3000/deleteTimesheet", {
+      const response = await fetch(`${backendUrl}/deleteTimesheet`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ assignment_id: taskId }),

@@ -6,6 +6,8 @@ import { Info, ClipboardList, Users, CirclePlus } from "lucide-react";
 import { ProjectContext, Employee } from "../context/ContextProvider";
 import Alert from "../component/Alert";
 
+const backendUrl = import.meta.env.VITE_API_URL || "http://localhost:3000";
+
 const ProjectTeam = () => {
   const navigate = useNavigate();
   const { projectId } = useContext(ProjectContext);
@@ -34,7 +36,7 @@ const ProjectTeam = () => {
 
   const isManager = async (projectId, employeeId) => {
     try {
-      const response = await fetch("http://localhost:3000/projects/checkmanager", {
+      const response = await fetch(`${backendUrl}/projects/checkmanager`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ projectId }),
@@ -58,7 +60,7 @@ const ProjectTeam = () => {
   // Fetch team data
   const fetchTeam = async () => {
     try {
-      const response = await fetch("http://localhost:3000/projects/info", {
+      const response = await fetch(`${backendUrl}/projects/info`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ projectId }),
@@ -84,7 +86,7 @@ const ProjectTeam = () => {
     if (!projectId || !empId) return;
     try {
       // Fetch available tasks for project
-      const taskResponse = await fetch("http://localhost:3000/task/get", {
+      const taskResponse = await fetch(`${backendUrl}/task/get`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ projectId }),
@@ -93,7 +95,7 @@ const ProjectTeam = () => {
       const taskData = await taskResponse.json();
       setTasks(taskData || []);
       // Fetch tasks assigned to this employee
-      const assignedResponse = await fetch("http://localhost:3000/task/getEmployeeTask", {
+      const assignedResponse = await fetch(`${backendUrl}/task/getEmployeeTask`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ employee_id: empId }),
@@ -122,7 +124,7 @@ const ProjectTeam = () => {
     const isAssigned = assignedTaskIds.has(taskId);
     const endpoint = isAssigned ? "/unassign" : "/assign"; // Change API based on state
     try {
-      const response = await fetch(`http://localhost:3000/task${endpoint}`, {
+      const response = await fetch(`${backendUrl}/task${endpoint}`, {
         method: isAssigned ? "DELETE" : "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ employeeId: selectedEmployeeId, taskId }),
@@ -159,7 +161,7 @@ const ProjectTeam = () => {
   // Delete employee from project
   const handleDelete = async (empId) => {
     try {
-      const response = await fetch("http://localhost:3000/projects/delete-employee", {
+      const response = await fetch(`${backendUrl}/projects/delete-employee`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ employee_id: empId, project_id: projectId }),

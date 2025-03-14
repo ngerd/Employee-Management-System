@@ -13,6 +13,8 @@ import "primereact/resources/themes/lara-light-blue/theme.css";
 import "primereact/resources/primereact.min.css";
 import "primeicons/primeicons.css";
 
+const backendUrl = import.meta.env.VITE_API_URL || "http://localhost:3000";
+
 const Customer = () => {
     const navigate = useNavigate();
     const [customers, setCustomers] = useState([]);
@@ -28,7 +30,7 @@ const Customer = () => {
 
     const fetchCustomers = async () => {
         try {
-            const response = await fetch("http://localhost:3000/customer/allcustomer");
+            const response = await fetch(`${backendUrl}/customer/allcustomer`);
             const data = await response.json();
             if (data.customers) {
                 setCustomers(data.customers);
@@ -65,7 +67,7 @@ const Customer = () => {
 
     const deleteCustomer = async (company_code) => {
         try {
-            const response = await fetch("http://localhost:3000/customer/delete-customer", {
+            const response = await fetch(`${backendUrl}/customer/delete-customer`, {
                 method: "DELETE",
                 headers: {
                     "Content-Type": "application/json",

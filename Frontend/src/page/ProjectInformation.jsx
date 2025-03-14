@@ -3,6 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { Info, ClipboardList, Users } from "lucide-react"; // Importing icons
 import { ProjectContext } from "../context/ContextProvider";
 
+const backendUrl = import.meta.env.VITE_API_URL || "http://localhost:3000";
+
 const ProjectInformation = () => {
   const navigate = useNavigate();
   const { projectId } = useContext(ProjectContext);
@@ -23,7 +25,7 @@ const ProjectInformation = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch("http://localhost:3000/projects/info", {
+        const response = await fetch(`${backendUrl}/projects/info`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",

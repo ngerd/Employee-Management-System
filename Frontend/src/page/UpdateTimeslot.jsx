@@ -6,6 +6,8 @@ import "primeicons/primeicons.css";
 import { Employee } from '../context/ContextProvider';
 import Alert from "../component/Alert";
 
+const backendUrl = import.meta.env.VITE_API_URL || "http://localhost:3000";
+
 const UpdateTimeslot = () => {
   const navigate = useNavigate();
   const { employeeId } = useContext(Employee);
@@ -21,7 +23,7 @@ const UpdateTimeslot = () => {
   useEffect(() => {
     const fetchTask = async () => {
       try {
-        const response = await fetch("http://localhost:3000/getTimesheet", {
+        const response = await fetch(`${backendUrl}/getTimesheet`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -63,7 +65,7 @@ const UpdateTimeslot = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch("http://localhost:3000/updateTimesheet", {
+      const response = await fetch(`${backendUrl}/updateTimesheet`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

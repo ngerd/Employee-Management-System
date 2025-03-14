@@ -4,6 +4,8 @@ import { Info, ClipboardList } from "lucide-react";
 import { CustomerContext } from "../context/ContextProvider";
 import DownloadButton from "../component/DownloadButton"; // Import component
 
+const backendUrl = import.meta.env.VITE_API_URL || "http://localhost:3000";
+
 const CustomerPayment = () => {
     const navigate = useNavigate();
     const { company_code } = useContext(CustomerContext);
@@ -12,7 +14,7 @@ const CustomerPayment = () => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await fetch("http://localhost:3000/customer/customer-info", {
+                const response = await fetch(`${backendUrl}/customer/customer-info`, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({ companyCode: company_code }),

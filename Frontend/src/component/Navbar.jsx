@@ -19,9 +19,11 @@ function Navbar() {
     navigate("/");
   };
 
+  const backendUrl = import.meta.env.VITE_API_URL || "http://localhost:3000";
+
   const fetchData = async () => {
     try {
-      const response = await fetch("http://localhost:3000/logout", {
+      const response = await fetch(`${backendUrl}/logout`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
