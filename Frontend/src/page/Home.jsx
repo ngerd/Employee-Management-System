@@ -14,7 +14,7 @@ function Home() {
           {isadmin && (
             <Card
               Icon={FileUser}
-              title="CustomerCustomer"
+              title="Customer"
               subtitle="Manage customer"
               description="Oversee customer details"
               linkText="See details"
