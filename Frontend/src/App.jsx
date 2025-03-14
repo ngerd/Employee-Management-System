@@ -14,7 +14,7 @@ import Home from "./page/Home";
 import ProjectDetail from "./page/ProjectDetail";
 import Navbar from "./component/Navbar";
 import Timesheet from "./page/Timesheet";
-import Timesheet2 from "./page/Timesheet2";
+// import Timesheet2 from "./page/Timesheet2";
 import Login from "./page/Login";
 import CreateEmployee from "./page/CreateEmployee";
 import CreateTimeslot from "./page/CreateTimeslot";
@@ -34,6 +34,7 @@ import Customer from "./page/Customer";
 import CustomerInformation from "./page/CustomerInformation";
 import CustomerPayment from "./page/CustomerPayment";
 import CreateCustomer from "./page/CreateCustomer";
+import UpdateCustomer from "./page/UpdateCustomer";
 
 function Layout() {
   const location = useLocation();
@@ -70,6 +71,9 @@ function Layout() {
           <Route path="/customer-information" element={<CustomerInformation />} />
           <Route path="/customer-payment" element={<CustomerPayment />} />
           <Route path="/create-customer" element={<CreateCustomer />} />
+          <Route path="/update-customer" element={<UpdateCustomer />} />
+
+
         </Routes>
       </ContextProvider>
     </div>

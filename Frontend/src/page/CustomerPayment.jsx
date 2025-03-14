@@ -7,7 +7,7 @@ import DownloadButton from "../component/DownloadButton"; // Import component
 const backendUrl = import.meta.env.VITE_API_URL || "http://localhost:3000";
 
 const CustomerPayment = () => {
-    // const navigate = useNavigate();
+    const navigate = useNavigate();
     const { company_code } = useContext(CustomerContext);
     const [customer, setCustomer] = useState(null);
 
@@ -39,7 +39,16 @@ const CustomerPayment = () => {
                 <h1 className="text-4xl font-bold text-gray-900 flex items-center gap-2">
                     General Information
                 </h1>
-                <DownloadButton customer={customer} />
+                <div className="flex items-center gap-4 ml-auto">
+                    <DownloadButton customer={customer} />
+                    <button
+                        className="cursor-pointer flex items-center gap-2 rounded-md bg-green-700 px-4 py-2 text-white font-medium hover:bg-green-500"
+                        onClick={() => navigate("/update-customer")}
+                    >
+                        {/* <CirclePlus className="w-5 h-5" />  */}
+                        Update Customer
+                    </button>
+                </div>
             </div>
 
             <div className="mt-4">

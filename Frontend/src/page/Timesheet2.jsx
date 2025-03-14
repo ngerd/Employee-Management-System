@@ -25,6 +25,8 @@ setOptions({
   themeVariant: 'light'
 });
 
+const backendUrl = import.meta.env.VITE_API_URL || "http://localhost:3000";
+
 function Task({ data }) {
   const [draggable, setDraggable] = useState();
 
@@ -113,7 +115,7 @@ function Timesheet() {
     const fetchTasks = async () => {
       console.log("Fetching timesheet for Employee ID:", employeeId);
       try {
-        const response = await fetch("http://localhost:3000/getTimesheet", {
+        const response = await fetch(`${backendUrl}/getTimesheet`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ employee_id: employeeId }),

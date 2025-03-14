@@ -148,6 +148,7 @@ const Customer = () => {
                     >
                         <CirclePlus className="w-5 h-5" /> Add Customer
                     </button>
+
                 </div>
             </div>
 
