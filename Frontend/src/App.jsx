@@ -14,7 +14,7 @@ import Home from "./page/Home";
 import ProjectDetail from "./page/ProjectDetail";
 import Navbar from "./component/Navbar";
 import Timesheet from "./page/Timesheet";
-import Timesheet2 from "./page/Timesheet2";
+// import Timesheet2 from "./page/Timesheet2";
 import Login from "./page/Login";
 import CreateEmployee from "./page/CreateEmployee";
 import CreateTimeslot from "./page/CreateTimeslot";
@@ -64,7 +64,7 @@ function Layout() {
           <Route path="/view-account" element={<ViewEmployeeInfo />} />
           <Route path="/view-account-for-staff" element={<ViewAccountForStaff />} />
           <Route path="/edit-timeslot" element={<EditTimeslot />} />
-          <Route path="/timesheet2" element={<Timesheet2 />} />
+          {/* <Route path="/timesheet2" element={<Timesheet2 />} /> */}
           <Route path="/update-timeslot/:assignment_id" element={<UpdateTimeslot />} />
           <Route path="/customer" element={<Customer />} />
           <Route path="/customer-information" element={<CustomerInformation />} />
