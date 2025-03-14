@@ -64,7 +64,7 @@ function Layout() {
           <Route path="/view-account" element={<ViewEmployeeInfo />} />
           <Route path="/view-account-for-staff" element={<ViewAccountForStaff />} />
           <Route path="/edit-timeslot" element={<EditTimeslot />} />
-          <Route path="/timesheet2" element={<Timesheet2 />} />
+          {/* <Route path="/timesheet2" element={<Timesheet2 />} /> */}
           <Route path="/update-timeslot/:assignment_id" element={<UpdateTimeslot />} />
           <Route path="/customer" element={<Customer />} />
           <Route path="/customer-information" element={<CustomerInformation />} />

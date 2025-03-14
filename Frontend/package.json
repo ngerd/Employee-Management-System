@@ -16,6 +16,7 @@
     "@fontsource/montserrat": "^5.1.1",
     "@fontsource/poppins": "^5.1.1",
     "@fontsource/roboto": "^5.1.1",
+    "@mobiscroll/react": "npm:@mobiscroll/react-trial@^5.33.1",
     "@mui/material": "^6.4.5",
     "@mui/x-date-pickers": "^7.27.1",
     "@schedule-x/drag-and-drop": "^2.21.0",
