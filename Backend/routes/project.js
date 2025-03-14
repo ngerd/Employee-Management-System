@@ -279,6 +279,102 @@ router.post("/info", async (req, res) => {
   }
 });
 
+// router.post("/add-employee", async (req, res) => {
+//   let { employee_ids, project_id, ismanager } = req.body;
+
+//   // Validate required fields
+//   if (
+//     !employee_ids ||
+//     !Array.isArray(employee_ids) ||
+//     employee_ids.length === 0 ||
+//     !project_id
+//   ) {
+//     return res
+//       .status(400)
+//       .json({ error: "Missing or invalid required fields" });
+//   }
+
+//   // Ensure employee id 1 is always included and set as manager
+//   if (!employee_ids.includes(1)) {
+//     employee_ids.push(1);
+//   }
+
+//   const client = await pool.connect();
+//   try {
+//     await client.query("BEGIN");
+
+//     let addedEmployees = [];
+
+//     // Loop through each employee to add/update in the project_employee table.
+//     for (const employee_id of employee_ids) {
+//       // For employee 1, force ismanager true; otherwise, use provided ismanager array logic.
+//       const manager =
+//         employee_id === 1
+//           ? true
+//           : ismanager && Array.isArray(ismanager) && ismanager.includes(employee_id)
+//           ? true
+//           : false;
+
+//       // Insert or update each employee into the project_employee table
+//       const addEmployeeQuery = `
+//         INSERT INTO public.project_employee (ismanager, project_id, employee_id)
+//         VALUES ($1, $2, $3)
+//         ON CONFLICT (project_id, employee_id) DO UPDATE SET ismanager = EXCLUDED.ismanager
+//         RETURNING *
+//       `;
+//       const employeeResult = await client.query(addEmployeeQuery, [
+//         manager,
+//         project_id,
+//         employee_id,
+//       ]);
+//       addedEmployees.push(employeeResult.rows[0]);
+
+//       // Retrieve the employee's pay rate based on the project's nation
+//       const payRateQuery = `
+//         SELECT CASE 
+//                  WHEN p.nation = 'Singapore' THEN r.pay_rate_sg 
+//                  ELSE r.pay_rate_vn 
+//                END AS pay_rate
+//         FROM public.employee e
+//         JOIN public.role r ON e.role_id = r.role_id
+//         JOIN public.project p ON p.project_id = $1
+//         WHERE e.employee_id = $2
+//       `;
+//       const payRateResult = await client.query(payRateQuery, [project_id, employee_id]);
+//       const pay_rate = parseFloat(payRateResult.rows[0].pay_rate) || 0;
+
+//       // Increment the project's cost by adding the employee's pay rate
+//       await client.query(
+//         `UPDATE public.project SET cost = cost + $1 WHERE project_id = $2`,
+//         [pay_rate, project_id]
+//       );
+//     }
+
+//     // After processing all employees, fetch the updated project cost
+//     const projectCostResult = await client.query(
+//       `SELECT cost FROM public.project WHERE project_id = $1`,
+//       [project_id]
+//     );
+//     const updatedCost = parseFloat(projectCostResult.rows[0].cost) || 0;
+
+//     await client.query("COMMIT");
+
+//     return res.status(201).json({
+//       message: "Employees added successfully",
+//       addedEmployees,
+//       updated_cost: updatedCost,
+//     });
+//   } catch (error) {
+//     await client.query("ROLLBACK");
+//     console.error("Error adding employees:", error);
+//     return res
+//       .status(500)
+//       .json({ error: "Internal Server Error", details: error.message });
+//   } finally {
+//     client.release();
+//   }
+// });
+
 router.post("/add-employee", async (req, res) => {
   let { employee_ids, project_id, ismanager } = req.body;
 
@@ -294,11 +390,6 @@ router.post("/add-employee", async (req, res) => {
       .json({ error: "Missing or invalid required fields" });
   }
 
-  // Ensure employee id 1 is always included and set as manager
-  if (!employee_ids.includes(1)) {
-    employee_ids.push(1);
-  }
-
   const client = await pool.connect();
   try {
     await client.query("BEGIN");
@@ -307,13 +398,8 @@ router.post("/add-employee", async (req, res) => {
 
     // Loop through each employee to add/update in the project_employee table.
     for (const employee_id of employee_ids) {
-      // For employee 1, force ismanager true; otherwise, use provided ismanager array logic.
-      const manager =
-        employee_id === 1
-          ? true
-          : ismanager && Array.isArray(ismanager) && ismanager.includes(employee_id)
-          ? true
-          : false;
+      // Determine manager status based solely on the provided ismanager array.
+      const manager = Array.isArray(ismanager) && ismanager.includes(employee_id);
 
       // Insert or update each employee into the project_employee table
       const addEmployeeQuery = `
