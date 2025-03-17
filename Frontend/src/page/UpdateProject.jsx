@@ -18,9 +18,7 @@ const UpdateProject = () => {
         cost: "",
         billable: false,
     });
-    const [employees, setEmployees] = useState([]);
-    const [selectedEmployees, setSelectedEmployees] = useState([]);
-    const [searchTerm, setSearchTerm] = useState("");
+
     const [isEditing, setIsEditing] = useState(false);
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const [isOpen, setIsOpen] = useState(false);
@@ -28,21 +26,7 @@ const UpdateProject = () => {
     const [customerName, setCustomerName] = useState([]);
     const [alert, setAlert] = useState({ show: false, message: "", type: "" });
     const dropdownRef = useRef(null);
-    const { employeeId } = useContext(Employee);
 
-    useEffect(() => {
-        const fetchCustomerName = async () => {
-            try {
-                const response = await fetch(`${backendUrl}/customer/get-customer-codeandname`);
-                const data = await response.json();
-                setCustomerName(data.customers || []);
-            } catch (error) {
-                console.error("Error fetching customers' name:", error);
-            }
-        };
-
-        fetchCustomerName();
-    }, []);
 
     useEffect(() => {
         const fetchProjectInfo = async () => {
@@ -59,7 +43,7 @@ const UpdateProject = () => {
                     throw new Error("Network response was not ok");
                 }
                 const data = await response.json();
-                console.log(data);
+                console.log("Fetched project data:", data);
                 setFormValues({
                     project_name: data.project.project_name,
                     project_description: data.project.project_description,
@@ -70,8 +54,10 @@ const UpdateProject = () => {
                     cost: data.project.cost,
                     billable: data.project.billable,
                 });
-                setSelectedCustomerName(`${data.project.customer_name}`); //${data.project.companyCode} - 
-                setSelectedEmployees(data.employees || []);
+                console.log("API Response:", data);
+                console.log("Customer ID from API:", data.project.customer_id);
+
+                setSelectedCustomerName(`${data.project.customer_name}`);
             } catch (error) {
                 console.error("Fetch error:", error);
             }
@@ -83,11 +69,7 @@ const UpdateProject = () => {
         }
     }, [projectId]);
 
-    const handleSelect = (customer) => {
-        setSelectedCustomerName(`${customer.company_code} - ${customer.legal_name}`);
-        setFormValues({ ...formValues, customer_id: customer.company_code });
-        setIsOpen(false);
-    };
+
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -153,83 +135,12 @@ const UpdateProject = () => {
         }
     };
 
-    const handleAddEmployee = async () => {
-        if (!projectId || selectedEmployees.length === 0) {
-            setAlert({
-                show: true,
-                message: "Please select at least one employee.",
-                type: "error",
-            });
-            return;
-        }
-        try {
-            const employee_ids = selectedEmployees.map((emp) => emp.employee_id);
-            const response = await fetch(`${backendUrl}/projects/add-employee`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                    employee_ids,
-                    project_id: projectId,
-                    ismanager: [],
-                }),
-            });
-            const data = await response.json();
-            if (response.ok) {
-                setEmployees([...employees, ...selectedEmployees]);
-                setSelectedEmployees([]);
-                setSearchTerm("");
-                setAlert({
-                    show: true,
-                    message: "Employees added successfully!",
-                    type: "success",
-                });
-                setTimeout(() => {
-                    navigate("/project");
-                }, 3000);
-            } else {
-                throw new Error(data.error || "Failed to add employees.");
-            }
-        } catch (error) {
-            console.error("There was a problem adding the employees:", error);
-            setAlert({
-                show: true,
-                message: "There was a problem adding the employees.",
-                type: "error",
-            });
-        }
-    };
 
     const handleFinish = () => {
         navigate("/project");
     };
 
-    useEffect(() => {
-        const fetchEmployees = async () => {
-            try {
-                const response = await fetch(`${backendUrl}/get-employees`);
-                if (!response.ok) {
-                    throw new Error("Network response was not ok");
-                }
-                const data = await response.json();
-                setEmployees(data.employees || []);
-            } catch (error) {
-                console.error("There was a problem fetching employees:", error);
-            }
-        };
-        fetchEmployees();
-    }, []);
 
-    const availableEmployees = employees.filter(
-        (emp) =>
-            !selectedEmployees.some(
-                (selected) => selected.employee_id === emp.employee_id
-            ) &&
-            `${emp.firstname} ${emp.lastname} - ${emp.role_name}`
-                .toLowerCase()
-                .includes(searchTerm.toLowerCase())
-    );
 
     const handleClickOutside = (event) => {
         if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -245,7 +156,7 @@ const UpdateProject = () => {
     }, []);
 
     return (
-        <div className="mx-auto max-w-screen-xl py-10 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-xl py-10 sm:px-6 lg:px-8">
             {alert.show && (
                 <Alert
                     message={alert.message}
@@ -253,7 +164,7 @@ const UpdateProject = () => {
                     onClose={() => setAlert({ show: false, message: "", type: "" })}
                 />
             )}
-            <div className="mt-4 grid grid-cols-1 gap-x-16 gap-y-8 lg:grid-cols-2">
+            <div className="mt-4 grid grid-cols-1 gap-x-16 gap-y-8 lg:grid-cols-">
                 <div className="rounded-lg bg-white p-8 shadow-lg">
                     <h2 className="text-2xl pb-10 font-extrabold text-gray-900">
                         {isEditing ? "Edit Project" : "Create Project"}
@@ -316,7 +227,7 @@ const UpdateProject = () => {
                                 </svg>
                             </button>
 
-                            {isOpen && (
+                            {/* {isOpen && (
                                 <div className="absolute mt-1 w-full bg-white border border-gray-200 rounded-md shadow-lg z-10">
                                     <ul className="py-1">
                                         {customerName.map((customer) => (
@@ -333,7 +244,7 @@ const UpdateProject = () => {
                                         ))}
                                     </ul>
                                 </div>
-                            )}
+                            )} */}
                         </div>
 
                         <select
@@ -386,95 +297,6 @@ const UpdateProject = () => {
                     </form>
                 </div>
 
-                <div className="rounded-lg bg-white p-8 shadow-lg">
-                    <h2 className="text-2xl pb-10 font-extrabold text-gray-900">
-                        Add Employee
-                    </h2>
-                    <div className="mt-4 relative" ref={dropdownRef}>
-                        <input
-                            type="text"
-                            placeholder="Search Members..."
-                            className="w-full p-2 border rounded-md cursor-pointer"
-                            value={searchTerm}
-                            onFocus={() => setIsDropdownOpen(true)}
-                            onChange={(e) => setSearchTerm(e.target.value)}
-                        />
-                        {isDropdownOpen && availableEmployees.length > 0 && (
-                            <ul className="absolute w-full mt-2 max-h-40 overflow-auto border rounded-md bg-white shadow-lg">
-                                {availableEmployees.map((emp) => (
-                                    <li
-                                        key={emp.employee_id}
-                                        className="p-2 hover:bg-gray-100 cursor-pointer"
-                                        onClick={() => {
-                                            if (
-                                                !selectedEmployees.some(
-                                                    (selected) => selected.employee_id === emp.employee_id
-                                                )
-                                            ) {
-                                                setSelectedEmployees([...selectedEmployees, emp]);
-                                            }
-                                            setIsDropdownOpen(false);
-                                        }}
-                                    >
-                                        {`${emp.firstname} ${emp.lastname} - ${emp.role_name}`}
-                                    </li>
-                                ))}
-                            </ul>
-                        )}
-                    </div>
-                    {selectedEmployees.length > 0 && (
-                        <div className="mt-4">
-                            <h3 className="text-lg font-semibold">Selected Members</h3>
-                            <table className="w-full mt-2 border-collapse border border-gray-300">
-                                <thead>
-                                    <tr className="bg-gray-100">
-                                        <th className="border p-2">Name</th>
-                                        <th className="border p-2">Role</th>
-                                        <th className="border p-2">Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {selectedEmployees.map((emp) => (
-                                        <tr key={emp.employee_id}>
-                                            <td className="border p-2">
-                                                {emp.firstname} {emp.lastname}
-                                            </td>
-                                            <td className="border p-2">{emp.role_name}</td>
-                                            <td className="border p-2 text-center">
-                                                <button
-                                                    className="cursor-pointer text-red-500 hover:text-red-700"
-                                                    onClick={() =>
-                                                        setSelectedEmployees(
-                                                            selectedEmployees.filter(
-                                                                (e) => e.employee_id !== emp.employee_id
-                                                            )
-                                                        )
-                                                    }
-                                                    type="button"
-                                                >
-                                                    Remove
-                                                </button>
-                                            </td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        </div>
-                    )}
-                    <div className="mt-6 text-right">
-                        <button
-                            type="button"
-                            onClick={handleAddEmployee}
-                            disabled={!projectId}
-                            className={`inline-block w-full rounded-lg px-5 py-3 font-medium text-white sm:w-auto ${!projectId
-                                ? "bg-gray-400 cursor-not-allowed"
-                                : "bg-black hover:bg-gray-700 cursor-pointer"
-                                }`}
-                        >
-                            Add Employee
-                        </button>
-                    </div>
-                </div>
             </div>
         </div>
     );

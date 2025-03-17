@@ -265,6 +265,7 @@ router.post("/info", async (req, res) => {
         start_date: project.start_date,
         due_date: project.due_date,
         created_at: project.created_at,
+        customer_id: project.customer_id,
         customer_name: project.customer_name, // Customer name retrieved from the join
         nation: project.nation,
         cost: project.cost,
