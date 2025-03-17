@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Info, ClipboardList, Users } from "lucide-react"; // Importing icons
-import { ProjectContext } from "../context/ContextProvider";
+import { ProjectContext, Employee } from "../context/ContextProvider";
 
 const backendUrl = import.meta.env.VITE_API_URL || "http://localhost:3000";
 
@@ -9,7 +9,8 @@ const ProjectInformation = () => {
   const navigate = useNavigate();
   const { projectId } = useContext(ProjectContext);
   const [project, setProject] = useState(null);
-  const [employees, setEmployees] = useState([]);
+  const { employeeId } = useContext(Employee);
+  const [isUserManager, setIsUserManager] = useState(false);
 
   const formatDate = (dateString) => {
     if (!dateString) return ''; // Handle cases where the date might be null/undefined
@@ -21,6 +22,42 @@ const ProjectInformation = () => {
       year: 'numeric',
     }).format(date); // Format as DD/MM/YYYY
   };
+
+  // Check if current user is manager
+  useEffect(() => {
+    const checkIfManager = async () => {
+      if (!projectId || !employeeId) return;
+      const result = await isManager(projectId, employeeId);
+      console.log("Manager check result:", result);
+      setIsUserManager(result);
+    };
+    checkIfManager();
+  }, [projectId, employeeId]);
+
+
+  const isManager = async (projectId, employeeId) => {
+    try {
+      const response = await fetch(`${backendUrl}/projects/checkmanager`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ projectId }),
+      });
+      if (!response.ok) throw new Error("Failed to fetch manager");
+      const data1 = await response.json();
+      console.log("Data received:", JSON.stringify(data1, null, 2));
+      console.log("Employee ID:", employeeId);
+      if (!data1.manager) {
+        console.log("No manager assigned to this project.");
+        return false;
+      }
+      console.log("Comparison result:", Number(data1.manager) === Number(employeeId));
+      return Number(data1.manager) === Number(employeeId);
+    } catch (error) {
+      console.error("Error checking manager:", error);
+      return false;
+    }
+  };
+
 
   useEffect(() => {
     const fetchData = async () => {
@@ -54,13 +91,17 @@ const ProjectInformation = () => {
         <h1 className="text-4xl font-bold text-gray-900 flex items-center gap-2">
           Project Information
         </h1>
-        <button
-          className="cursor-pointer flex items-center gap-2 rounded-md bg-green-700 px-4 py-2 text-white font-medium hover:bg-green-500"
-          onClick={() => navigate("/update-project")}
-        >
-          {/* <CirclePlus className="w-5 h-5" />  */}
-          Update Project
-        </button>
+        <div className="flex gap-2">
+          {isUserManager && (
+            <button
+              className="cursor-pointer flex items-center gap-2 rounded-md bg-green-700 px-4 py-2 text-white font-medium hover:bg-green-500"
+              onClick={() => navigate("/update-project")}
+            >
+              {/* <CirclePlus className="w-5 h-5" />  */}
+              Update Project
+            </button>
+          )}
+        </div>
       </div>
 
       <div className="mt-4">

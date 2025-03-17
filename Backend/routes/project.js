@@ -176,7 +176,7 @@ router.post("/update", async (req, res) => {
     project_description === undefined &&
     due_date === undefined &&
     project_status === undefined &&
-    customer_id === undefined &&
+    // customer_id === undefined &&
     nation === undefined &&
     cost === undefined &&
     billable === undefined
