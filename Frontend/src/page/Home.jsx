@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useContext } from "react";
+import React, { useContext } from "react";
 import Card from "../component/Card";
 import { FileUser, SquareChartGantt, CalendarRange } from "lucide-react"; // Importing new icons
 import { Employee } from "../context/ContextProvider";
@@ -10,7 +10,8 @@ function Home() {
   return (
     <div className="min-h-screen bg-gray-100">
       <div className="py-8 px-4 sm:px-8 lg:px-16">
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-6">
+        {/* Set default grid-cols-2 for mobile, then adjust breakpoints */}
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-6">
           {isadmin && (
             <Card
               Icon={FileUser}
@@ -50,7 +51,6 @@ function Home() {
             linkText="See details"
             href="timesheet"
           />
-
         </div>
       </div>
     </div>

@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Employee } from "../context/ContextProvider";
-import Alert from "../component/Alert"; // Import Alert component
+import Alert from "../component/Alert";
 
 const backendUrl = import.meta.env.VITE_API_URL || "http://localhost:3000";
 
@@ -13,7 +13,6 @@ function Login() {
   const [formValues, setFormValues] = useState(initialValues);
   const navigate = useNavigate();
   const { employeeId, setEmployeeId, setisadmin } = useContext(Employee);
-  // Alert state: using an object with show, message and type
   const [alert, setAlert] = useState({ show: false, message: "", type: "" });
 
   const fetchMockData = async () => {
@@ -103,7 +102,6 @@ function Login() {
 
   return (
     <div className="relative">
-      {/* Fixed, small, centered Alert at the top */}
       {alert.show && (
         <div className="fixed top-4 left-1/2 transform -translate-x-1/2 z-50 max-w-md w-full px-4">
           <Alert
@@ -114,13 +112,14 @@ function Login() {
         </div>
       )}
       <div className="lg:grid lg:min-h-screen lg:grid-cols-12">
-        <section className="relative flex h-32 items-end bg-gray-900 lg:col-span-5 lg:h-full xl:col-span-6">
+        {/* Hide image section on mobile */}
+        <section className="hidden lg:flex relative items-end bg-gray-900 lg:col-span-5 lg:h-full xl:col-span-6">
           <img
             alt="A background"
             src="https://images.unsplash.com/photo-1617195737496-bc30194e3a19?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=870&q=80"
             className="absolute inset-0 h-full w-full object-cover opacity-80"
           />
-          <div className="hidden lg:relative lg:block lg:p-12">
+          <div className="relative p-12">
             <h2 className="mt-6 text-2xl font-bold text-white sm:text-3xl md:text-4xl">
               Welcome to Icon Consulting Group
             </h2>
@@ -131,8 +130,8 @@ function Login() {
             </p>
           </div>
         </section>
-        <div className="flex items-center justify-center place-items-center px-12 py-12 sm:px-16 lg:col-span-7 lg:px-32 lg:py-32 xl:col-span-6">
-          <div className="rounded-lg bg-white p-16 shadow-xl max-w-2xl w-full">
+        <div className="flex items-center justify-center px-8 py-12 sm:px-16 lg:col-span-7 lg:px-32 lg:py-32 xl:col-span-6">
+          <div className="rounded-lg bg-white p-8 sm:p-12 md:p-16 shadow-xl w-full max-w-md">
             <h2 className="text-2xl pb-10 font-extrabold text-gray-900">
               Login
             </h2>
@@ -157,7 +156,7 @@ function Login() {
               <div className="col-span-6 mt-7 sm:flex sm:items-center sm:gap-4">
                 <button
                   type="submit"
-                  className="cursor-pointer rounded-lg bg-black px-5 py-3 font-medium text-white hover:bg-gray-700"
+                  className="cursor-pointer rounded-lg bg-black px-5 py-3 font-medium text-white transition duration-300 ease-in-out hover:bg-gray-700"
                 >
                   Login
                 </button>
