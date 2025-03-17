@@ -35,6 +35,7 @@ import CustomerInformation from "./page/CustomerInformation";
 import CustomerPayment from "./page/CustomerPayment";
 import CreateCustomer from "./page/CreateCustomer";
 import UpdateCustomer from "./page/UpdateCustomer";
+import UpdateProject from "./page/UpdateProject";
 
 function Layout() {
   const location = useLocation();
@@ -72,6 +73,7 @@ function Layout() {
           <Route path="/customer-payment" element={<CustomerPayment />} />
           <Route path="/create-customer" element={<CreateCustomer />} />
           <Route path="/update-customer" element={<UpdateCustomer />} />
+          <Route path="/update-project" element={<UpdateProject />} />
 
 
         </Routes>

@@ -54,6 +54,13 @@ const ProjectInformation = () => {
         <h1 className="text-4xl font-bold text-gray-900 flex items-center gap-2">
           Project Information
         </h1>
+        <button
+          className="cursor-pointer flex items-center gap-2 rounded-md bg-green-700 px-4 py-2 text-white font-medium hover:bg-green-500"
+          onClick={() => navigate("/update-project")}
+        >
+          {/* <CirclePlus className="w-5 h-5" />  */}
+          Update Project
+        </button>
       </div>
 
       <div className="mt-4">
