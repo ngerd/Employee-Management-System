@@ -1,155 +1,102 @@
+DROP TABLE IF EXISTS public.customer;
+
 CREATE TABLE IF NOT EXISTS public.customer
 (
-    company_code character varying(50) COLLATE pg_catalog."default" NOT NULL,
-    legal_name character varying(255) COLLATE pg_catalog."default" NOT NULL,
-    street_1 character varying(60) COLLATE pg_catalog."default" NOT NULL,
-    street_2 character varying(60) COLLATE pg_catalog."default",
-    street_3 character varying(60) COLLATE pg_catalog."default",
-    house_number character varying(20) COLLATE pg_catalog."default" NOT NULL,
-    postal_code integer NOT NULL,
-    city character varying(100) COLLATE pg_catalog."default" NOT NULL,
-    region character varying(100) COLLATE pg_catalog."default" NOT NULL,
-    country character varying(50) COLLATE pg_catalog."default" NOT NULL,
-    tax_number character varying(50) COLLATE pg_catalog."default" NOT NULL,
-    order_currency character(3) COLLATE pg_catalog."default" NOT NULL,
-    payment_term character varying(50) COLLATE pg_catalog."default" NOT NULL,
-    payment_method character varying(50) COLLATE pg_catalog."default" NOT NULL,
-    account_code character varying(50) COLLATE pg_catalog."default" NOT NULL,
-    accountant character varying(100) COLLATE pg_catalog."default" NOT NULL,
-    invoice_email character varying(255) COLLATE pg_catalog."default",
-    notices_email character varying(255) COLLATE pg_catalog."default",
-    account_manager character varying(100) COLLATE pg_catalog."default" NOT NULL,
-    account_partner character varying(100) COLLATE pg_catalog."default" NOT NULL,
-    sales_manager character varying(100) COLLATE pg_catalog."default" NOT NULL,
-    CONSTRAINT customer_pkey PRIMARY KEY (company_code)
-)
+  company_code      VARCHAR(50) PRIMARY KEY,
+  legal_name        VARCHAR(255) NOT NULL,
+  street_1          VARCHAR(60) NOT NULL,
+  street_2          VARCHAR(60),
+  street_3          VARCHAR(60),
+  house_number      VARCHAR(20) NOT NULL,
+  postal_code       INTEGER NOT NULL,       -- Changed to INTEGER
+  city              VARCHAR(100) NOT NULL,
+  region            VARCHAR(100) NOT NULL,
+  country           VARCHAR(50) NOT NULL,         -- ISO country code
+  tax_number        VARCHAR(50) NOT NULL,
+  order_currency    CHAR(3) NOT NULL,         -- ISO currency code
+  payment_term      VARCHAR(50) NOT NULL,     -- formerly "paymenterm"
+  payment_method    VARCHAR(50) NOT NULL,     -- formerly "paymenmethod"
+  account_code      VARCHAR(50) NOT NULL,     -- formerly "accountcode"
+  accountant        VARCHAR(100) NOT NULL,
+  invoice_email     VARCHAR(255),    -- formerly "invoiceemail"
+  notices_email     VARCHAR(255),    -- formerly "noticesemail"
+  account_manager   VARCHAR(100) NOT NULL,
+  account_partner   VARCHAR(100) NOT NULL,
+  sales_manager     VARCHAR(100) NOT NULL
+);
 
-TABLESPACE pg_default;
 
-ALTER TABLE IF EXISTS public.customer
-    OWNER to employeemanagement;
+DROP TABLE IF EXISTS public.project, public.task, public.task_assignment, public.project_member, public.employee;
 
-CREATE TABLE IF NOT EXISTS public.project
+CREATE TABLE public.role
 (
-    project_id character varying(50) COLLATE pg_catalog."default" NOT NULL,
-    project_name character varying(255) COLLATE pg_catalog."default" NOT NULL,
-    project_description text COLLATE pg_catalog."default" NOT NULL,
-    start_date date NOT NULL,
-    due_date date NOT NULL,
-    project_status character varying(50) COLLATE pg_catalog."default" NOT NULL,
-    customer_id character varying(50) COLLATE pg_catalog."default" NOT NULL,
-    nation character varying(100) COLLATE pg_catalog."default" NOT NULL,
-    cost numeric(10,2) NOT NULL,
-    billable boolean NOT NULL,
-    CONSTRAINT project_pkey PRIMARY KEY (project_id),
-    CONSTRAINT project_customer_id_fkey FOREIGN KEY (customer_id)
-        REFERENCES public.customer (company_code) MATCH SIMPLE
-        ON UPDATE CASCADE
-        ON DELETE CASCADE
-)
+  role_id SERIAL PRIMARY KEY,
+  role_name VARCHAR(255) NOT NULL,
+  pay_rate_sg DECIMAL(10,2) NOT NULL,
+  pay_rate_vn DECIMAL(10,2) NOT NULL
+);
 
-TABLESPACE pg_default;
-
-ALTER TABLE IF EXISTS public.project
-    OWNER to employeemanagement;
-
-CREATE TABLE IF NOT EXISTS public.task
+CREATE TABLE public.employee
 (
-    task_id integer NOT NULL DEFAULT nextval('task_task_id_seq'::regclass),
-    project_id character varying(50) COLLATE pg_catalog."default" NOT NULL,
-    task_name character varying(255) COLLATE pg_catalog."default" NOT NULL,
-    task_description text COLLATE pg_catalog."default" NOT NULL,
-    start_date date NOT NULL,
-    due_date date NOT NULL,
-    task_status character varying(50) COLLATE pg_catalog."default" NOT NULL,
-    CONSTRAINT task_pkey PRIMARY KEY (task_id),
-    CONSTRAINT task_project_id_fkey FOREIGN KEY (project_id)
-        REFERENCES public.project (project_id) MATCH SIMPLE
-        ON UPDATE CASCADE
-        ON DELETE CASCADE
-)
+  employee_id SERIAL PRIMARY KEY,
+  firstname VARCHAR(255) NOT NULL,
+  lastname VARCHAR(255) NOT NULL,
+  email VARCHAR(255) UNIQUE NOT NULL,
+  password VARCHAR(255) NOT NULL,
+  isAdmin BOOLEAN NOT NULL,
+  role_id INT NOT NULL,
+  FOREIGN KEY (role_id) REFERENCES Role(role_id) 
+    ON DELETE CASCADE ON UPDATE CASCADE
+);
 
-TABLESPACE pg_default;
+CREATE TABLE public.project (
+  project_id          VARCHAR(50) PRIMARY KEY,  -- Changed type to VARCHAR
+  project_name        VARCHAR(255) NOT NULL,
+  project_description TEXT NOT NULL,
+  start_date          DATE NOT NULL,
+  due_date            DATE NOT NULL,
+  project_status      VARCHAR(50) NOT NULL,
+  customer_id         VARCHAR(50) NOT NULL,     -- Foreign key to Customer
+  nation              VARCHAR(100) NOT NULL,
+  cost                DECIMAL(10,2) NOT NULL,
+  FOREIGN KEY (customer_id) REFERENCES customer(company_code)
+    ON DELETE CASCADE ON UPDATE CASCADE
+);
 
-ALTER TABLE IF EXISTS public.task
-    OWNER to employeemanagement;
+-- Create Task table referencing Project
+CREATE TABLE public.task (
+  task_id SERIAL PRIMARY KEY,
+  project_id VARCHAR(50) NOT NULL,
+  task_name VARCHAR(255) NOT NULL,
+  task_description TEXT NOT NULL,
+  start_date DATE NOT NULL,
+  due_date DATE NOT NULL,
+  task_status VARCHAR(50) NOT NULL,
+  FOREIGN KEY (project_id) REFERENCES project(project_id)
+    ON DELETE CASCADE ON UPDATE CASCADE
+);
 
-CREATE TABLE IF NOT EXISTS public.role
-(
-    role_id integer NOT NULL DEFAULT nextval('role_role_id_seq'::regclass),
-    role_name character varying(255) COLLATE pg_catalog."default" NOT NULL,
-    pay_rate_sg numeric(10,2) NOT NULL,
-    pay_rate_vn numeric(10,2) NOT NULL,
-    CONSTRAINT role_pkey PRIMARY KEY (role_id)
-)
+-- Create Project_employee table to manage many-to-many relationship between Project and Employee
+CREATE TABLE public.project_employee (
+  ismanager BOOLEAN NOT NULL,
+  project_id VARCHAR(50) NOT NULL,
+  employee_id INT NOT NULL,
+  PRIMARY KEY (project_id, employee_id),
+  FOREIGN KEY (project_id) REFERENCES project(project_id)
+    ON DELETE CASCADE ON UPDATE CASCADE,
+  FOREIGN KEY (employee_id) REFERENCES employee(employee_id)
+    ON DELETE CASCADE ON UPDATE CASCADE
+);
 
-TABLESPACE pg_default;
-
-ALTER TABLE IF EXISTS public.role
-    OWNER to employeemanagement;
-
-CREATE TABLE IF NOT EXISTS public.employee
-(
-    employee_id integer NOT NULL DEFAULT nextval('employee_employee_id_seq'::regclass),
-    firstname character varying(255) COLLATE pg_catalog."default" NOT NULL,
-    lastname character varying(255) COLLATE pg_catalog."default" NOT NULL,
-    email character varying(255) COLLATE pg_catalog."default" NOT NULL,
-    password character varying(255) COLLATE pg_catalog."default" NOT NULL,
-    isadmin boolean NOT NULL,
-    role_id integer NOT NULL,
-    CONSTRAINT employee_pkey PRIMARY KEY (employee_id),
-    CONSTRAINT employee_email_key UNIQUE (email),
-    CONSTRAINT employee_role_id_fkey FOREIGN KEY (role_id)
-        REFERENCES public.role (role_id) MATCH SIMPLE
-        ON UPDATE CASCADE
-        ON DELETE CASCADE
-)
-
-TABLESPACE pg_default;
-
-ALTER TABLE IF EXISTS public.employee
-    OWNER to employeemanagement;
-
-CREATE TABLE IF NOT EXISTS public.project_employee
-(
-    ismanager boolean NOT NULL,
-    project_id character varying(50) COLLATE pg_catalog."default" NOT NULL,
-    employee_id integer NOT NULL,
-    CONSTRAINT project_member_pkey PRIMARY KEY (project_id, employee_id),
-    CONSTRAINT project_member_employee_id_fkey FOREIGN KEY (employee_id)
-        REFERENCES public.employee (employee_id) MATCH SIMPLE
-        ON UPDATE CASCADE
-        ON DELETE CASCADE,
-    CONSTRAINT project_member_project_id_fkey FOREIGN KEY (project_id)
-        REFERENCES public.project (project_id) MATCH SIMPLE
-        ON UPDATE CASCADE
-        ON DELETE CASCADE
-)
-
-TABLESPACE pg_default;
-
-ALTER TABLE IF EXISTS public.project_employee
-    OWNER to employeemanagement;
-
-CREATE TABLE IF NOT EXISTS public.task_assignment
-(
-    assignment_id integer NOT NULL DEFAULT nextval('task_assignment_assignment_id_seq'::regclass),
-    emp_startdate timestamp without time zone,
-    emp_enddate timestamp without time zone,
-    employee_id integer NOT NULL,
-    task_id integer NOT NULL,
-    CONSTRAINT task_assignment_pkey PRIMARY KEY (assignment_id),
-    CONSTRAINT task_assignment_employee_id_fkey FOREIGN KEY (employee_id)
-        REFERENCES public.employee (employee_id) MATCH SIMPLE
-        ON UPDATE CASCADE
-        ON DELETE CASCADE,
-    CONSTRAINT task_assignment_task_id_fkey FOREIGN KEY (task_id)
-        REFERENCES public.task (task_id) MATCH SIMPLE
-        ON UPDATE CASCADE
-        ON DELETE CASCADE
-)
-
-TABLESPACE pg_default;
-
-ALTER TABLE IF EXISTS public.task_assignment
-    OWNER to employeemanagement;
+-- Create Task_Assignment table referencing Employee and Task
+CREATE TABLE public.task_assignment (
+  assignment_id SERIAL PRIMARY KEY,
+  emp_startdate TIMESTAMP,
+  emp_enddate TIMESTAMP,
+  employee_id INT NOT NULL,
+  task_id INT NOT NULL,
+  FOREIGN KEY (employee_id) REFERENCES employee(employee_id)
+    ON DELETE CASCADE ON UPDATE CASCADE,
+  FOREIGN KEY (task_id) REFERENCES task(task_id)
+    ON DELETE CASCADE ON UPDATE CASCADE
+);
