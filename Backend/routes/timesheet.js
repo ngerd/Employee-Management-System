@@ -6,17 +6,17 @@ const router = express.Router();
 // GET Timesheet endpoint
 router.post("/getTimesheet", async (req, res) => {
   const { employee_id, days } = req.body;
-
   if (!employee_id) {
     return res.status(400).json({ error: "Missing employee_id" });
   }
-
   try {
     let query = `
       SELECT 
         ta.assignment_id,
         p.project_name,
         t.task_name,
+        t.start_date,
+        t.due_date,
         ta.emp_startdate,
         ta.emp_enddate,
         e.firstname,
@@ -30,8 +30,6 @@ router.post("/getTimesheet", async (req, res) => {
         AND ta.emp_enddate IS NOT NULL
     `;
     const params = [employee_id];
-
-    // Optional: filter by "days" if provided
     if (days) {
       const daysInt = parseInt(days, 10);
       if (!isNaN(daysInt)) {
@@ -41,16 +39,11 @@ router.post("/getTimesheet", async (req, res) => {
         params.push(filterDate);
       }
     }
-
     query += " ORDER BY ta.emp_startdate DESC";
-
     const result = await pool.query(query, params);
-
     if (result.rowCount === 0) {
       return res.status(404).json({ message: "No timesheet records found" });
     }
-
-    // Add new fields without changing the existing ones
     const transformedRows = result.rows.map(row => {
       const start = new Date(row.emp_startdate);
       const end = new Date(row.emp_enddate);
@@ -62,14 +55,12 @@ router.post("/getTimesheet", async (req, res) => {
         duration: (end - start) / (1000 * 60 * 60)
       };
     });
-
     return res.json(transformedRows);
   } catch (err) {
     console.error("Error retrieving timesheet:", err);
     return res.status(500).json({ error: "Internal server error" });
   }
 });
-
 
 // CREATE Timesheet endpoint (updated without project_id input)
 router.post("/createTimesheet", async (req, res) => {
