@@ -177,7 +177,7 @@ const ViewEmployeeInfo = () => {
             className="mt-1 p-2 h-10 w-full rounded-md border-gray-300 bg-white text-sm text-gray-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 pr-10"
             placeholder="Confirm Password"
           />
-          {isadmin && (
+          {isadmin ? (
             <div className="relative mt-1">
               <button
                 type="button"
@@ -215,6 +215,12 @@ const ViewEmployeeInfo = () => {
                   </ul>
                 </div>
               )}
+            </div>
+          ) : (
+            <div className="mt-1">
+              <p className="px-4 py-2 text-sm text-gray-700 bg-gray-100 border rounded-md">
+                {selectedRole}
+              </p>
             </div>
           )}
           <div className="mt-6 flex justify-between">
