@@ -210,11 +210,13 @@ function Timesheet() {
     <div className="mx-auto max-w-screen-xl py-10 sm:px-6 lg:px-8">
       {/* Alert */}
       {alert.show && (
-        <Alert
-          message={alert.message}
-          type={alert.type}
-          onClose={() => setAlert({ show: false, message: "", type: "" })}
-        />
+        <div className="fixed top-4 left-1/2 transform -translate-x-1/2 z-50 max-w-md w-full px-4">
+          <Alert
+            message={alert.message}
+            type={alert.type}
+            onClose={() => setAlert({ show: false, message: "", type: "" })}
+          />
+        </div>
       )}
       {/* Header */}
       <div className="flex flex-col md:flex-row items-center justify-between mb-4">
