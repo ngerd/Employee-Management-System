@@ -49,7 +49,7 @@ function Home() {
             subtitle="Record and review working hours"
             description="Track employee attendance, log working hours, and ensure accurate timesheet management for improved payroll accuracy and productivity."
             linkText="See details"
-            href="timesheet"
+            href="timesheet2"
           />
         </div>
       </div>
