@@ -21,10 +21,13 @@ function Navbar() {
 
   const handleLogout = async (e) => {
     e.preventDefault();
+    // Optional: Clear sessionStorage if you want to remove persisted state
+    sessionStorage.clear();
     await fetchData();
     setEmployeeId(null);
     setisadmin(null);
-    navigate("/");
+    // Navigate to the login page instead of "/"
+    navigate("/login", { replace: true });
   };
 
   const fetchData = async () => {
@@ -47,21 +50,18 @@ function Navbar() {
   };
 
   /**
-   * Whenever the dropdown is activated,
-   * compute its position based on the button’s bounding rect.
+   * Compute dropdown position when activated
    */
   useEffect(() => {
     if (isActive && buttonRef.current) {
       const rect = buttonRef.current.getBoundingClientRect();
-
-      // Tailwind 'w-56' is ~224px. Adjust if your dropdown width differs.
-      const DROPDOWN_WIDTH = 224;
+      const DROPDOWN_WIDTH = 224; // Tailwind 'w-56' ~224px
       const OFFSET = 4; // Gap below the button
 
       let top = rect.bottom + OFFSET;
       let left = rect.left;
 
-      // If the dropdown would overflow the right edge, shift it left.
+      // Adjust if dropdown overflows right edge
       if (left + DROPDOWN_WIDTH > window.innerWidth) {
         left = window.innerWidth - DROPDOWN_WIDTH - 16; // 16px margin
       }
@@ -70,7 +70,7 @@ function Navbar() {
     }
   }, [isActive]);
 
-  // Close dropdown if user clicks anywhere outside
+  // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (
@@ -83,14 +83,13 @@ function Navbar() {
       }
     };
 
-    // Use 'click' instead of 'mousedown' for better mobile compatibility
     document.addEventListener("click", handleClickOutside);
     return () => {
       document.removeEventListener("click", handleClickOutside);
     };
   }, []);
 
-  // Dropdown content
+  // Dropdown menu content
   const dropdownMenu = (
     <div
       ref={dropdownRef}
@@ -144,19 +143,14 @@ function Navbar() {
 
   return (
     <div className="flex items-center justify-between py-2 px-3 md:px-5 bg-white drop-shadow-md text-black">
-      <a href="/home">
-        <img
-          src={logo}
-          alt="Logo"
-          className="w-32 sm:w-40 hover:scale-110 transition-all"
-        />
-      </a>
+      <img
+        src={logo}
+        alt="Logo"
+        className="w-32 sm:w-40 hover:scale-110 transition-all"
+        onClick={() => navigate("/home")}
+      />
       <div className="flex gap-4">
-        <button
-          ref={buttonRef}
-          onClick={toggleDropdown}
-          className="focus:outline-none"
-        >
+        <button ref={buttonRef} onClick={toggleDropdown} className="focus:outline-none">
           <CircleUserRound size={30} />
         </button>
       </div>

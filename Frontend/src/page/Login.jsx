@@ -15,14 +15,13 @@ function Login() {
   const { employeeId, setEmployeeId, setisadmin } = useContext(Employee);
   const [alert, setAlert] = useState({ show: false, message: "", type: "" });
 
-  const fetchMockData = async () => {
+  // Login API call; returns login data including employee_id
+  const fetchLogin = async () => {
     try {
       console.log(formValues);
       const response = await fetch(`${backendUrl}/login`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formValues),
       });
       const data = await response.json();
@@ -34,6 +33,7 @@ function Login() {
         });
         return null;
       } else {
+        // Update context with employee id
         setEmployeeId(data.employee_id);
         setAlert({ show: true, message: "Login successful", type: "success" });
         return data;
@@ -49,18 +49,16 @@ function Login() {
     }
   };
 
-  const fetchEmployeeInfo = async () => {
+  // Update fetchEmployeeInfo to accept an employee id parameter.
+  const fetchEmployeeInfo = async (empId) => {
     try {
-      console.log(formValues);
       const response = await fetch(`${backendUrl}/viewinfo`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ employee_id: employeeId }),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ employee_id: empId }),
       });
       const data = await response.json();
-      console.log(data);
+      console.log("Employee info:", data);
       setisadmin(data.isadmin);
       return data;
     } catch (error) {
@@ -75,30 +73,27 @@ function Login() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    validate();
+    loginUser();
   };
 
-  const validate = async () => {
-    const data = await fetchMockData();
+  // Use the employee id returned from login to fetch employee info.
+  const loginUser = async () => {
+    const data = await fetchLogin();
     if (data && !data.error) {
-      console.log("Waiting for employeeId update...");
+      const empInfo = await fetchEmployeeInfo(data.employee_id);
+      if (empInfo && !empInfo.error) {
+        setTimeout(() => {
+          navigate("/home");
+        }, 1500);
+      }
     }
   };
 
   useEffect(() => {
     if (employeeId) {
-      console.log("Updated Employee ID:", employeeId);
-      const init = async () => {
-        const data = await fetchEmployeeInfo();
-        if (data && !data.error) {
-          setTimeout(() => {
-            navigate("/home");
-          }, 1500);
-        }
-      };
-      init();
+      console.log("Employee logged in:", employeeId);
     }
-  }, [employeeId, navigate]);
+  }, [employeeId]);
 
   return (
     <div className="relative">
@@ -112,7 +107,6 @@ function Login() {
         </div>
       )}
       <div className="lg:grid lg:min-h-screen lg:grid-cols-12">
-        {/* Hide image section on mobile */}
         <section className="hidden lg:flex relative items-end bg-gray-900 lg:col-span-5 lg:h-full xl:col-span-6">
           <img
             alt="A background"
@@ -125,16 +119,13 @@ function Login() {
             </h2>
             <p className="mt-4 leading-relaxed text-white/90">
               Icon Consulting Group Internal Portal is an exclusively designed
-              platform to help our team manage projects, track tasks, and
-              collaborate seamlessly in one place.
+              platform to help our team manage projects, track tasks, and collaborate seamlessly in one place.
             </p>
           </div>
         </section>
         <div className="flex items-center justify-center px-8 py-12 sm:px-16 lg:col-span-7 lg:px-32 lg:py-32 xl:col-span-6">
           <div className="rounded-lg bg-white p-8 sm:p-12 md:p-16 shadow-xl w-full max-w-md">
-            <h2 className="text-2xl pb-10 font-extrabold text-gray-900">
-              Login
-            </h2>
+            <h2 className="text-2xl pb-10 font-extrabold text-gray-900">Login</h2>
             <form className="space-y-6" onSubmit={handleSubmit}>
               <input
                 id="email"
