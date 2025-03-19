@@ -240,7 +240,7 @@ function Timesheet() {
         </button>
       </div>
       {/* Calendar Container */}
-      <div className="rounded-lg shadow-md border border-gray-300 mt-4">
+      <div className="rounded-lg shadow-md border border-gray-300 bg-white mt-4">
         <div className="p-4 h-[70vh]">
           {loading ? (
             <p>Loading...</p>
