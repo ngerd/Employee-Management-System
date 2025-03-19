@@ -234,7 +234,7 @@ function Timesheet() {
         </button>
         <button
           onClick={() => navigate("/edit-timeslot")}
-          className="flex items-center gap-2 rounded-md bg-blue-700 px-4 py-2 text-white font-medium hover:bg-blue-500"
+          className="flex items-center gap-2 rounded-md bg-blue-700 px-4 py-2 text-white font-medium hover:bg-green-500"
         >
           <Pencil className="w-5 h-5" /> Edit Timeslot
         </button>
