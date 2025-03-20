@@ -114,9 +114,9 @@ npm start
 ---
 
 ## 👤 **Authors**  
-**Database**: Khoa Nguyen
-**Frontend**: Jun Truong, John Nguyen, Mei Nguyen
-**Backend**: An Vuong, Kha Le, Minh Nguyen
+- **Database**: Khoa Nguyen
+- **Frontend**: Jun Truong, John Nguyen, Mei Nguyen
+- **Backend**: An Vuong, Kha Le, Minh Nguyen
 
 ---  
 
