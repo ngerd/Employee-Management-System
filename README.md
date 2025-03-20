@@ -1,5 +1,5 @@
 
-# 🗂️ **Custom Data Chatbot with Ollama 3.1 8b**  
+# 🗂️ **Employee Management System**  
 
 The **Employee Management System (EMS)** is a comprehensive and intuitive web application designed to streamline **project management, employee administration, task tracking, timesheet monitoring**, and other **core business processes** within an organization.
 
@@ -56,73 +56,69 @@ Built with **React** for the frontend and **Node.js** for the backend, EMS deliv
 
 ---
 
-## 🔗 **Useful Links**  
-- 📚 **[Chainlit Documentation](https://docs.chainlit.io)** - Comprehensive resources to get started.  
-- 💬 **[Chainlit Discord](https://discord.gg/k73SQ3FyUh)** - Join the community for support, collaboration, and project sharing!  
-- 🌐 **[Ollama Official Website](https://ollama.ai)** - Learn more about Ollama and its offerings.  
+## 🚀 Getting Started
+
+Follow these steps to set up and run the project locally, or check out the deployed version for a quick demo.
+
+### ✅ Prerequisites  
+
+Before running the Employee Management System locally, make sure you have the following installed on your machine:
+
+- **Node.js (v14 or higher)**  
+  Node.js is a JavaScript runtime environment that allows you to run JavaScript code outside of a browser—essential for running both the backend server and managing the frontend build process.  
+  👉 [Download Node.js here](https://nodejs.org/en/download)
+
+- **npm or yarn**  
+  These are package managers used to install project dependencies and manage scripts for both the frontend and backend. npm comes bundled with Node.js, but you can also install Yarn separately if you prefer it.  
+  👉 [Learn more about npm](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm)  
+  👉 [Download Yarn](https://classic.yarnpkg.com/lang/en/docs/install/)
+
 
 ---
 
-## 💬 **Chatbot Use Cases**  
-This chatbot is designed to:  
-- **Provide Expert Answers**: Deliver detailed, accurate responses based on the **Encyclopedia of Human Development**.  
-- **Simplify Knowledge Access**: Allow users to easily explore and understand topics related to human development.  
-- **Support Learning and Research**: Assist students, educators, and researchers with contextual insights from a reliable source.  
+### 🌐 Live Demo
+
+Try out the deployed version of the **Employee Management System** here:  
+👉 [Employee Management System (Live)](https://employee-management-system1-ddqn.onrender.com/login)
+
+#### 🔑 Test Credentials
+- **Email**: `testuser@example.com`  
+- **Password**: `123456`  
 
 ---
 
-## 🚀 **Getting Started**  
-Follow these steps to set up and run the chatbot locally:  
+### 📦 Installation (Local Setup)
 
-### **Prerequisites**  
-- **Python 3.7+** - Ensure Python is installed.  
-- **Ollama 3.1** - Download and install from [Ollama's official site](https://www.ollama.ai).  
+#### 1. Clone the repository
+```shell
+git clone https://github.com/ngerd/Employee-Management-System.git
+cd Employee-Management-System
+```
 
----
+#### 2. Install dependencies for both frontend and backend
+```shell
+cd Backend
+npm i
+```
 
-### 🛠️ **Installation**  
+```shell
+cd Frontend
+npm i
+```
 
-1. **Clone the repository:**  
-   ```shell  
-   git clone https://github.com/mattzuha/Chainlit-Chatbot.git  
-   cd Chainlit-Chatbot  
-   ```  
-
-2. **Install dependencies:**  
-   ```shell  
-   pip install -r requirements.txt  
-   ```  
-
-3. **Start Ollama Model:**  
-   ```shell  
-   ollama run llama 3.1  
-   ```  
-
-### ⚙️ **Setting Up the Vector Database**  
-For document-based interactions, run the following command to ingest documents and create a vector database:  
-```shell  
-python ingest.py  
-```  
-
----
-
-### 🖥️ **Running Locally**  
-Start the chatbot by running:  
-```shell  
-chainlit run model.py  
-```  
-
----
-
-## 🎥 **YouTube Demo**  
-Check out our chatbot in action on **YouTube**: [Demo Link](https://www.youtube.com/watch?v=z0TeFWldKLk)  
+### 3. Run Locally
+```shell
+npm start
+```
 
 ---
 
 ## 👤 **Authors**  
-- **10421091 - Nguyen Nguyen Minh**  
-- **10421114 - Nguyen Khanh Hoang Minh**  
+**Database**: Khoa Nguyen
+**Frontend**: Jun Truong, John Nguyen, Mei Nguyen
+**Backend**: An Vuong, Kha Le, Minh Nguyen
 
 ---  
 
-🎉 **We hope you enjoy using this chatbot! Happy coding!** 💻😊  
+
+🎉 **We hope you enjoy using this web app! Happy coding!** 💻😊  
