@@ -120,5 +120,4 @@ npm start
 
 ---  
 
-
 🎉 **We hope you enjoy using this web app! Happy coding!** 💻😊  
