@@ -14,7 +14,7 @@ const CreateProject2 = () => {
     customer_id: "",
     nation: "",
     cost: "",
-    billable: false, // New attribute for toggling billable
+    // billable: false, // Removed billable
   });
   const [projectId, setProjectId] = useState(null);
   const [employees, setEmployees] = useState([]);
@@ -90,7 +90,11 @@ const CreateProject2 = () => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(formValues),
+        body: JSON.stringify({
+          ...formValues,
+          cost: formValues.cost === "" ? 0 : Number(formValues.cost),
+          // billable: !!formValues.billable, // Removed billable
+        }),
       });
       const data = await response.json();
       if (data.project && data.project.project_id) {
@@ -143,7 +147,12 @@ const CreateProject2 = () => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ ...formValues, project_id: projectId }),
+        body: JSON.stringify({
+          ...formValues,
+          project_id: projectId,
+          cost: formValues.cost === "" ? 0 : Number(formValues.cost),
+          // billable: !!formValues.billable, // Removed billable
+        }),
       });
       const data = await response.json();
       console.log(data);
@@ -371,12 +380,13 @@ const CreateProject2 = () => {
               placeholder="Cost"
             />
 
-            <div className="col-span-6 mt-3">
-              <label htmlFor="isadmin" className="flex gap-4">
+            {/* Remove Billable Checkbox */}
+            {/* <div className="col-span-6 mt-3">
+              <label htmlFor="billable" className="flex gap-4">
                 <input
                   type="checkbox"
-                  id="isadmin"
-                  name="isadmin"
+                  id="billable"
+                  name="billable"
                   checked={formValues.billable}
                   onChange={(e) =>
                     setFormValues({ ...formValues, billable: e.target.checked })
@@ -385,7 +395,7 @@ const CreateProject2 = () => {
                 />
                 <span className="block text-sm font-medium text-gray-700">Billable</span>
               </label>
-            </div>
+            </div> */}
 
             <div className="mt-6 text-right">
               <button

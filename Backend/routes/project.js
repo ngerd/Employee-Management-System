@@ -12,7 +12,7 @@ router.post("/create-project", async (req, res) => {
     customer_id, // now using customer_id (customer's company_code)
     nation,
     cost,
-    billable,   // new attribute
+    // billable,   // removed billable
   } = req.body;
 
   const project_status = "In Progress";
@@ -25,8 +25,8 @@ router.post("/create-project", async (req, res) => {
     !due_date ||
     !customer_id ||
     !nation ||
-    cost === undefined ||
-    billable === undefined
+    cost === undefined
+    // billable === undefined
   ) {
     return res.status(400).json({ error: "Missing required fields." });
   }
@@ -70,9 +70,8 @@ router.post("/create-project", async (req, res) => {
           project_status,
           customer_id,
           nation,
-          cost,
-          billable
-        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+          cost
+        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
         RETURNING *`,
       [
         final_project_id,
@@ -84,7 +83,7 @@ router.post("/create-project", async (req, res) => {
         customer_id,
         nation,
         cost,
-        billable,
+        // billable, // removed billable
       ]
     );
     return res.status(201).json({ project: result.rows[0] });
@@ -164,7 +163,7 @@ router.post("/update", async (req, res) => {
     customer_id,  // new field replacing customerName
     nation,
     cost,
-    billable      // new attribute
+    // billable      // removed billable
   } = req.body;
 
   if (!project_id) {
@@ -178,8 +177,8 @@ router.post("/update", async (req, res) => {
     project_status === undefined &&
     // customer_id === undefined &&
     nation === undefined &&
-    cost === undefined &&
-    billable === undefined
+    cost === undefined
+    // billable === undefined
   ) {
     return res.status(400).json({ error: "Missing required field to be updated" });
   }
@@ -193,9 +192,8 @@ router.post("/update", async (req, res) => {
           project_status = COALESCE($4, project_status),
           customer_id = COALESCE($5, customer_id),
           nation = COALESCE($6, nation),
-          cost = COALESCE($7, cost),
-          billable = COALESCE($8, billable)
-      WHERE project_id = $9
+          cost = COALESCE($7, cost)
+      WHERE project_id = $8
       RETURNING *`;
 
     const values = [
@@ -206,7 +204,6 @@ router.post("/update", async (req, res) => {
       customer_id,
       nation,
       cost,
-      billable,
       project_id,
     ];
 
@@ -269,7 +266,7 @@ router.post("/info", async (req, res) => {
         customer_name: project.customer_name, // Customer name retrieved from the join
         nation: project.nation,
         cost: project.cost,
-        billable: project.billable,
+        // billable: project.billable, // removed billable
         project_status: project.project_status,
       },
       employees: employeesResult.rows,
